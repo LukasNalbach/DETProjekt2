@@ -55,6 +55,6 @@ public class crewMadeScript : MonoBehaviour
 
     public float processByTask()
     {
-        return (Game.Instance.Settings.tasks-taskToDo.size())/Game.Instance.Settings.tasks;
+        return (Game.Instance.Settings.tasks-taskToDo.Count)/Game.Instance.Settings.tasks;
     }
 }
