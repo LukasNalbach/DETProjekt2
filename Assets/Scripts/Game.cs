@@ -19,6 +19,7 @@ public class Game : MonoBehaviour
 
     public System.Random random = new System.Random();
 
+    private float killCooldown{get;}
     private void Awake()
     {
         // there can be only one...
@@ -37,7 +38,7 @@ public class Game : MonoBehaviour
         // load settings
         Settings = GameSettings.Load();
         
-        
+        killCooldown=0;
     }
     public void SetTexture(GameObject obj, string name, float scale) {
         Texture2D tex = new Texture2D(500, 500);
@@ -54,7 +55,10 @@ public class Game : MonoBehaviour
     }
 
     private void FixedUpdate() {
-
+        if(killCooldown>0)
+        {
+            killCooldown-=Time.deltaTime;
+        }
     }
 
     void OnDestroy()
@@ -64,5 +68,10 @@ public class Game : MonoBehaviour
             Instance = null;
             Debug.Log("unregistered Level instance", Instance);
         }
+    }
+
+    public void resetKillCooldown()
+    {
+        killCooldown=Settings.cooldownTime;
     }
 }
