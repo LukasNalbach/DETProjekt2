@@ -42,6 +42,6 @@ public class UpdateRoom : MonoBehaviour
     }
 
     public static bool isInRectangle(Vector2 pos, Vector2 rectPos, Vector2 rectScale) {
-        return pos.x >= rectPos.x && pos.x <= rectPos.x + rectScale.x && pos.y >= rectPos.y && pos.y <= rectPos.y + rectScale.y;
+        return pos.x >= rectPos.x - rectScale.x/2 && pos.x <= rectPos.x + rectScale.x/2 && pos.y >= rectPos.y - rectScale.y/2 && pos.y <= rectPos.y + rectScale.y/2;
     }
 }
