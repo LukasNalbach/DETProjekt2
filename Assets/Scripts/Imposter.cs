@@ -18,8 +18,8 @@ public class Imposter : Player
 
     void kill(CrewMate crewMate)
     {
-        crewMade.getKilledByImposter();
-        Game.Instance.setKillCooldown();
+        crewMate.getKilledByImposter();
+        Game.Instance.resetKillCooldown();
     }
 
     public override bool immobile()

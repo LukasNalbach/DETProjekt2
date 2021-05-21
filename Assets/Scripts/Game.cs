@@ -19,7 +19,7 @@ public class Game : MonoBehaviour
 
     public System.Random random = new System.Random();
 
-    private float killCooldown{get;}
+    private float killCooldown{get; set;}
     private void Awake()
     {
         // there can be only one...

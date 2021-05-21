@@ -37,7 +37,7 @@ public class CrewMate : Player
         task.endSolving();
     }
 
-    void getKilledByImposter()
+    public void getKilledByImposter()
     {
         alive=false;
         addDeadBody();
