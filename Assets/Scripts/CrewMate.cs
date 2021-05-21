@@ -15,6 +15,7 @@ public class CrewMate : Player
     // Start is called before the first frame update
     void Start()
     {
+        updateRoom=GetComponent<UpdateRoom>();
         imposter=false;
         taskDone=0;
         doingTask=false;
@@ -30,7 +31,7 @@ public class CrewMate : Player
                 Task taskToDoNow=null;
                 float nearesTaskDistance=Mathf.Infinity;
                 float distance;
-                foreach (var task in currentRoom.getTasks())
+                foreach (var task in updateRoom.getCurrentRoom().getTasks())
                 {
                     if(taskToDo.Contains(task))
                     {
@@ -48,7 +49,7 @@ public class CrewMate : Player
     }
     public bool nearOwnTask()
     {
-        foreach (var task in currentRoom.getTasks())
+        foreach (var task in updateRoom.getCurrentRoom().getTasks())
         {
             if(taskToDo.Contains(task))
             {
@@ -70,6 +71,7 @@ public class CrewMate : Player
     {
         task.startSolving();
         doingTask=true;
+        Debug.Log("I do a task");
         yield return new WaitForSeconds(task.timeToSolve);
         doingTask=false;
         task.endSolving();

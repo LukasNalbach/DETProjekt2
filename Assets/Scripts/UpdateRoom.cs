@@ -21,6 +21,10 @@ public class UpdateRoom : MonoBehaviour
             GameObject.Find("Canvas/currentRoom").GetComponent<TextMeshProUGUI>().SetText("Room: " + newRoom.getRoomNum());
         }
     }
+    public Room getCurrentRoom()
+    {
+        return currentRoom;
+    }
 
     private Room GetNewRoomIfChanged() {
         for (int i = 1; i <= Room.getRooms().Count; i++) {

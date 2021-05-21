@@ -7,6 +7,7 @@ public class Imposter : Player
     // Start is called before the first frame update
     void Start()
     {
+         updateRoom=GetComponent<UpdateRoom>();
         imposter=true;       
     }
 

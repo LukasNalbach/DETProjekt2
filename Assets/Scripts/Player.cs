@@ -10,11 +10,11 @@ public abstract class Player : MonoBehaviour
 
     public Color color;
     
-    public Room currentRoom{get;set;}
+    public UpdateRoom updateRoom;
     // Start is called before the first frame update
     void Start()
     {
-        
+       
     }
 
     // Update is called once per frame
