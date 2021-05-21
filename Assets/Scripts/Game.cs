@@ -51,7 +51,26 @@ public class Game : MonoBehaviour
 
     private void Start()
     {
-        //???
+        setRooms();
+
+        SceneManager.LoadScene("IngameGUI", LoadSceneMode.Additive);
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName("World"));
+    }
+
+    private void setRooms() {
+        int i = 1;
+        while (GameObject.Find("Room" + i + "_1")) {
+            Debug.Log(i);
+            Room room = gameObject.AddComponent<Room>();
+            Task task1 = gameObject.AddComponent<Task>();
+            Task task2 = gameObject.AddComponent<Task>();
+            task1.CreateTask(1);
+            task2.CreateTask(2);
+            room.CreateRoom(i, task1, task2);
+            task1.room = room;
+            task2.room = room;
+            i++;
+        }
     }
 
     private void FixedUpdate() {
