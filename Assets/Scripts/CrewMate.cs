@@ -4,25 +4,63 @@ using UnityEngine;
 
 public class CrewMate : Player
 {
+    public bool ki=false;
 
+    private LinkedList<Task>taskToDo;
 
-    private List<Task>taskToDo;
-
+    public int taskDone;
 
     //When a crewMate is doing task, he cannot move
     private bool doingTask;
     // Start is called before the first frame update
     void Start()
     {
-        
+        imposter=false;
+        taskDone=0;
+        doingTask=false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKey(KeyCode.Return))
+        {
+            if(canDoTask())
+            {
+                Task taskToDoNow=null;
+                float nearesTaskDistance=Mathf.Infinity;
+                float distance;
+                foreach (var task in currentRoom.getTasks())
+                {
+                    if(taskToDo.Contains(task))
+                    {
+                        distance=Vector3.Distance(gameObject.transform.position, task.transform.position);
+                        if(distance<=nearesTaskDistance)
+                        {
+                            taskToDoNow=task;
+                            nearesTaskDistance=distance;
+                        }
+                    }
+                }
+                doTask(taskToDoNow);
+            }
+        }
     }
-
+    public bool nearOwnTask()
+    {
+        foreach (var task in currentRoom.getTasks())
+        {
+            if(taskToDo.Contains(task))
+            {
+                return Vector3.Distance(gameObject.transform.position, task.transform.position)<=2f;
+            }
+        }
+        return false;
+    }
+    public bool canDoTask()
+    {
+        return !doingTask&&nearOwnTask();
+    }
     void doTask(Task task)
     {
         StartCoroutine(coTask(task));
@@ -35,13 +73,23 @@ public class CrewMate : Player
         yield return new WaitForSeconds(task.timeToSolve);
         doingTask=false;
         task.endSolving();
+        taskDone++;
+        Game.Instance.increaseTaskProgress();
+        taskToDo.Remove(task);
     }
 
     public void getKilledByImposter()
     {
         alive=false;
         addDeadBody();
-        getGhost();
+        if(!ki)
+        {
+            getGhost();
+        }
+        else
+        {
+            Game.Instance.removeCrewMateFromTaskProgress(this);
+        }
     }
 
     void addDeadBody()
@@ -56,7 +104,7 @@ public class CrewMate : Player
 
     public float processByTask()
     {
-        return (Game.Instance.Settings.tasks-taskToDo.Count)/Game.Instance.Settings.tasks;
+        return (float)(taskDone)/Game.Instance.Settings.tasks;
     }
 
     public override bool immobile()

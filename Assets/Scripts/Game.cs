@@ -15,6 +15,11 @@ public class Game : MonoBehaviour
     /// </summary>
     public GameSettings Settings { get; private set; }
 
+    public int  taskDone;
+
+    public int totalTasks;
+
+    public LinkedList<Player>allPlayers;
     //the prefabs of all weapons
 
     public System.Random random = new System.Random();
@@ -88,9 +93,25 @@ public class Game : MonoBehaviour
             Debug.Log("unregistered Level instance", Instance);
         }
     }
-
+    public float getKillCooldown()
+    {
+        return killCooldown;
+    }
     public void resetKillCooldown()
     {
         killCooldown=Settings.cooldownTime;
+    }
+    public float getTaskProgress()
+    {
+        return 1.0f*taskDone/totalTasks;
+    }
+    public void increaseTaskProgress()
+    {
+        taskDone++;
+    }
+    public void removeCrewMateFromTaskProgress(CrewMate lostCrewMate)
+    {
+        totalTasks-=Game.Instance.Settings.tasks;
+        taskDone-=lostCrewMate.taskDone;
     }
 }

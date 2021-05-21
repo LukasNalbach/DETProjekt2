@@ -34,6 +34,9 @@ public class GameSettings : ScriptableObject
     [Tooltip("what is the minimal time between to imposter kills in secounds")]
     public int cooldownTime;
 
+    [Tooltip("what is the minimal time between to imposter kills in secounds")]
+    public int killDistance;
+
     [Tooltip("Amount of task that one crew member must solve")]
     public int tasks;
    
