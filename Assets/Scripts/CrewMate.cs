@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class CrewMate : Player
 {
+    public string name="Player";
     public bool ki=false;
 
-    private LinkedList<Task>taskToDo;
+    private LinkedList<Task>taskToDo=new LinkedList<Task>();
 
     public int taskDone;
 
@@ -46,6 +47,11 @@ public class CrewMate : Player
                 doTask(taskToDoNow);
             }
         }
+    }
+    public void addTask(Task task)
+    {
+        Debug.Log("Player "+name+" gets Task "+task.getTaskNum() +" from Room "+task.getRoom().getRoomNum());
+        taskToDo.AddLast(task);
     }
     public bool nearOwnTask()
     {
