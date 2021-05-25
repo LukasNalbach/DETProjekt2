@@ -62,8 +62,8 @@ public class Game : MonoBehaviour
         while (GameObject.Find("Room" + i + "_1")) {
             Debug.Log(i);
             Room room = gameObject.AddComponent<Room>();
-            Task task1 = gameObject.AddComponent<Task>();
-            Task task2 = gameObject.AddComponent<Task>();
+            Task task1 = GameObject.Find("Room" + i + "Task1").AddComponent<Task>();
+            Task task2 = GameObject.Find("Room" + i + "Task2").AddComponent<Task>();
             task1.CreateTask(1);
             task2.CreateTask(2);
             room.CreateRoom(i, task1, task2);
