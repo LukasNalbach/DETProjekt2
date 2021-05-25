@@ -16,6 +16,7 @@ MonoBehaviour:
   numberPlayers: 0
   numberImposters: 0
   playerSpeed: 2
-  viewDistance: 0
+  viewDistance: 10
   cooldownTime: 0
+  killDistance: 0
   tasks: 0
