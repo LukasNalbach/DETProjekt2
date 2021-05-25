@@ -70,6 +70,7 @@ public class Game : MonoBehaviour
         setCrewMadesTask();
         SceneManager.LoadScene("IngameGUI", LoadSceneMode.Additive);
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("World"));
+        GUI.updateTaskProgress(0);
     }
 
     private void createCrew()
@@ -129,6 +130,7 @@ public class Game : MonoBehaviour
             else
             {
                 crewMate.addTask(allTasks[i]);
+                totalTasks++;
             }
         }
     }
@@ -175,10 +177,12 @@ public class Game : MonoBehaviour
     public void increaseTaskProgress()
     {
         taskDone++;
+        GUI.updateTaskProgress((int)(getTaskProgress()*100));
     }
     public void removeCrewMateFromTaskProgress(CrewMate lostCrewMate)
     {
         totalTasks-=Game.Instance.Settings.tasks;
         taskDone-=lostCrewMate.taskDone;
+        GUI.updateTaskProgress((int)(getTaskProgress()*100));
     }
 }

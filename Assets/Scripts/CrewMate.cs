@@ -50,8 +50,6 @@ public class CrewMate : Player
     }
     void FixedUpdate()
     {
-         Task taskToDoNow=null;
-        float nearesTaskDistance=Mathf.Infinity;
         float distance;
         foreach (var task in taskToDo)
         {
