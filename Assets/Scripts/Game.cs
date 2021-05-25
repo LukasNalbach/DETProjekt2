@@ -15,6 +15,8 @@ public class Game : MonoBehaviour
     /// </summary>
     public GameSettings Settings { get; private set; }
 
+    public GUI GUI;
+
     public int  taskDone;
 
     public int totalTasks;
@@ -46,6 +48,7 @@ public class Game : MonoBehaviour
         
         // load settings
         Settings = GameSettings.Load();
+        GUI=new GUI();
         allPlayers=new List<Player>();
         allTasks=new List<Task>();
         allRooms=new List<Room>();
@@ -144,6 +147,7 @@ public class Game : MonoBehaviour
         if(killCooldown>0)
         {
             killCooldown-=Time.deltaTime;
+            GUI.updateKillCooldown((int)killCooldown);
         }
     }
 
@@ -162,6 +166,7 @@ public class Game : MonoBehaviour
     public void resetKillCooldown()
     {
         killCooldown=Settings.cooldownTime;
+        GUI.updateKillCooldown((int)killCooldown);
     }
     public float getTaskProgress()
     {

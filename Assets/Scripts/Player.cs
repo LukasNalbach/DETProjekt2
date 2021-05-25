@@ -30,9 +30,9 @@ public abstract class Player : MonoBehaviour
     {
         return alive;
     }
-    protected void getGhost()
+    protected void becomeGhost()
     {
-
+        
     }
 
     public abstract bool immobile();

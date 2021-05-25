@@ -48,6 +48,24 @@ public class CrewMate : Player
             }
         }
     }
+    void FixedUpdate()
+    {
+         Task taskToDoNow=null;
+        float nearesTaskDistance=Mathf.Infinity;
+        float distance;
+        foreach (var task in taskToDo)
+        {
+            distance=Vector3.Distance(gameObject.transform.position, task.transform.position);
+            if(distance<=Game.Instance.Settings.viewDistance)
+            {
+                task.setActivated();
+            }
+            else
+            {
+                task.setDeactivated();
+            }
+        }
+    }
     public void addTask(Task task)
     {
         Debug.Log("Player "+name+" gets Task "+task.getTaskNum() +" from Room "+task.getRoom().getRoomNum());
@@ -92,7 +110,7 @@ public class CrewMate : Player
         addDeadBody();
         if(!ki)
         {
-            getGhost();
+            becomeGhost();
         }
         else
         {
@@ -102,7 +120,7 @@ public class CrewMate : Player
 
     void addDeadBody()
     {
-
+        gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.black);
     }
 
     void stopSabotage()
@@ -117,6 +135,6 @@ public class CrewMate : Player
 
     public override bool immobile()
     {
-        return doingTask;
+        return doingTask||!isAlive();
     }
 }

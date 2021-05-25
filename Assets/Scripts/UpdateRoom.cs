@@ -18,7 +18,7 @@ public class UpdateRoom : MonoBehaviour
         Room newRoom = GetNewRoomIfChanged();
         if (newRoom) {
             currentRoom = newRoom;
-            GameObject.Find("Canvas/currentRoom").GetComponent<TextMeshProUGUI>().SetText("Room: " + newRoom.getRoomNum());
+            Game.Instance.GUI.updateRoom(newRoom.getRoomNr());
         }
     }
     public Room getCurrentRoom()
