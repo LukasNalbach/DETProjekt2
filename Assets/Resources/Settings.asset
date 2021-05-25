@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Settings
   m_EditorClassIdentifier: 
   size: 0
-  numberPlayers: 0
-  numberImposters: 0
+  numberPlayers: 5
+  numberImposters: 1
   playerSpeed: 2
   viewDistance: 5
   cooldownTime: 30

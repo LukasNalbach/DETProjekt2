@@ -74,14 +74,30 @@ public class Game : MonoBehaviour
 
     private void createCrew()
     {
-        Player player=GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
-        allPlayers.Add(player);
+        GameObject playerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Player.prefab", typeof(GameObject)) as GameObject;
+
+        for (int i = 0; i < Settings.numberPlayers; i++) {
+            Vector3 pos = new Vector3(0, 0, 0);
+            GameObject newPlayer = Instantiate(playerPrefab, pos, new Quaternion());
+            if (i >= Settings.numberImposters) {
+                newPlayer.AddComponent<CrewMate>();
+            } else {
+                newPlayer.AddComponent<Imposter>();
+            }
+            allPlayers.Add(newPlayer.GetComponent<Player>());
+        }
+
+        GameObject currentPlayer = allPlayers[random.Next(Settings.numberPlayers)].gameObject;
+        
+        currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
+        GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>().target = currentPlayer.transform;
+        
+        GetComponent<swapPlayer>().currentPlayer = currentPlayer;
     }
 
     private void setRooms() {
         int i = 1;
         while (GameObject.Find("Room" + i + "_1")) {
-            Debug.Log(i);
             Room room = gameObject.AddComponent<Room>();
             Task task1 = GameObject.Find("Room" + i + "Task1").AddComponent<Task>();
             Task task2 = GameObject.Find("Room" + i + "Task2").AddComponent<Task>();
@@ -108,7 +124,7 @@ public class Game : MonoBehaviour
     }
     private void setCrewMadesTask()
     {
-        foreach(Player player in allPlayers)
+        foreach(var player in allPlayers)
         {
             if(!player.isImposter())
             {

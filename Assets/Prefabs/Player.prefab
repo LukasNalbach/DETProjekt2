@@ -97,9 +97,9 @@ GameObject:
   - component: {fileID: 5628018141983903116}
   - component: {fileID: 5628018141983903117}
   - component: {fileID: 4616719885696106401}
-  - component: {fileID: 748806542156784675}
+  - component: {fileID: -910210162219461693}
   m_Layer: 20
-  m_Name: PF Player
+  m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -132,6 +132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abd146093740c5d43b5909c7913f3109, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  active: 0
 --- !u!212 &5628018141983903107
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -250,7 +251,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &748806542156784675
+--- !u!114 &-910210162219461693
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -259,11 +260,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 5628018141983903104}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b8615be791729048976f2290344bb58, type: 3}
+  m_Script: {fileID: 11500000, guid: 64c68358354579a46b4b10ff70246962, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alive: 1
-  color: {r: 0, g: 0, b: 0, a: 0}
-  updateRoom: {fileID: 0}
-  ki: 0
-  taskDone: 0

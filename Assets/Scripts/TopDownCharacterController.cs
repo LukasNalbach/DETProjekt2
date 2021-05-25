@@ -6,6 +6,7 @@ namespace Cainos.PixelArtTopDown_Basic
 {
     public class TopDownCharacterController : MonoBehaviour
     {
+        public bool active = false;
 
         private Animator animator;
 
@@ -20,37 +21,39 @@ namespace Cainos.PixelArtTopDown_Basic
 
         private void Update()
         {
-            Vector2 dir = Vector2.zero;
-            if(!playerScript.immobile())
-            {
-                if (Input.GetKey(KeyCode.A))
+            if (active) {
+                Vector2 dir = Vector2.zero;
+                if(!playerScript.immobile())
                 {
-                    dir.x = -1;
-                    animator.SetInteger("Direction", 3);
-                }
-                else if (Input.GetKey(KeyCode.D))
-                {
-                    dir.x = 1;
-                    animator.SetInteger("Direction", 2);
-                }
+                    if (Input.GetKey(KeyCode.A))
+                    {
+                        dir.x = -1;
+                        animator.SetInteger("Direction", 3);
+                    }
+                    else if (Input.GetKey(KeyCode.D))
+                    {
+                        dir.x = 1;
+                        animator.SetInteger("Direction", 2);
+                    }
 
-                if (Input.GetKey(KeyCode.W))
-                {
-                    dir.y = 1;
-                    animator.SetInteger("Direction", 1);
-                }
-                else if (Input.GetKey(KeyCode.S))
-                {
-                    dir.y = -1;
-                    animator.SetInteger("Direction", 0);
-                }
+                    if (Input.GetKey(KeyCode.W))
+                    {
+                        dir.y = 1;
+                        animator.SetInteger("Direction", 1);
+                    }
+                    else if (Input.GetKey(KeyCode.S))
+                    {
+                        dir.y = -1;
+                        animator.SetInteger("Direction", 0);
+                    }
 
-                dir.Normalize();
+                    dir.Normalize();
+                }
+                
+                animator.SetBool("IsMoving", dir.magnitude > 0);
+
+                GetComponent<Rigidbody2D>().velocity = Game.Instance.Settings.playerSpeed * dir;
             }
-            
-            animator.SetBool("IsMoving", dir.magnitude > 0);
-
-            GetComponent<Rigidbody2D>().velocity = Game.Instance.Settings.playerSpeed * dir;
         }
     }
 }

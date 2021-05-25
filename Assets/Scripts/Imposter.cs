@@ -7,8 +7,11 @@ public class Imposter : Player
     // Start is called before the first frame update
     void Start()
     {
-         updateRoom=GetComponent<UpdateRoom>();
-        imposter=true;       
+        updateRoom=GetComponent<UpdateRoom>();
+    }
+
+    void Awake() {
+        imposter=true;
     }
 
     // Update is called once per frame

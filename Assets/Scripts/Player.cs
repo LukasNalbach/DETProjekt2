@@ -6,7 +6,7 @@ public abstract class Player : MonoBehaviour
 {
     protected bool imposter;
 
-    public bool alive;
+    public bool alive = true;
 
     public Color color;
     
