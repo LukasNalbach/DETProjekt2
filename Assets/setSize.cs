@@ -7,7 +7,7 @@ public class setSize : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        gameObject.transform.localScale = new Vector3(1, 1, 1) * Game.Instance.Settings.viewDistance /30;
+        gameObject.transform.localScale = new Vector3(1, 1, 1) * Game.Instance.Settings.viewDistance /15;
     }
 
     // Update is called once per frame
