@@ -12,13 +12,20 @@ public class GUI
 
     public void updateKillCooldown(int newKillCooldown)
     {
-        GameObject.Find("Canvas/KillCooldown").GetComponent<TextMeshProUGUI>().SetText("Kill Cooldown: " + newKillCooldown);
+        var textField=GameObject.Find("Canvas/KillCooldown");
+        if(textField!=null)
+        {
+            textField.GetComponent<TextMeshProUGUI>().SetText("Kill Cooldown: " + newKillCooldown);
+        }
     }
 
     public void updateTaskProgress(int newTaskProgressInDegree)
     {
-        GameObject.Find("Canvas/TaskProgress").GetComponent<TextMeshProUGUI>().SetText("Task Progress: " + newTaskProgressInDegree+"%");
-
+         var textField=GameObject.Find("Canvas/TaskProgress");
+        if(textField!=null)
+        {
+            textField.GetComponent<TextMeshProUGUI>().SetText("Task Progress: " + newTaskProgressInDegree+"%");
+        }
     }
 
 }
