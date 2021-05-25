@@ -17,6 +17,6 @@ MonoBehaviour:
   numberImposters: 0
   playerSpeed: 2
   viewDistance: 5
-  cooldownTime: 0
-  killDistance: 0
-  tasks: 0
+  cooldownTime: 30
+  killDistance: 1
+  tasks: 2

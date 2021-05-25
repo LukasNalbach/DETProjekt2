@@ -18,7 +18,7 @@ public class UpdateRoom : MonoBehaviour
         Room newRoom = GetNewRoomIfChanged();
         if (newRoom) {
             currentRoom = newRoom;
-            Game.Instance.GUI.updateRoom(newRoom.getRoomNr());
+            Game.Instance.GUI.updateRoom(newRoom.getRoomNum());
         }
     }
     public Room getCurrentRoom()
