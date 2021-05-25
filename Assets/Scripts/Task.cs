@@ -16,8 +16,11 @@ public class Task : MonoBehaviour
         this.taskNum = taskNum;
     }
 
-    private int getTaskNum() {
+    public int getTaskNum() {
         return taskNum;
+    }
+    public Room getRoom() {
+        return room;
     }
     // Start is called before the first frame update
 

@@ -15,6 +15,15 @@ public class Game : MonoBehaviour
     /// </summary>
     public GameSettings Settings { get; private set; }
 
+    public int  taskDone;
+
+    public int totalTasks;
+
+    public List<Room>allRooms;
+
+    public List<Task>allTasks;
+
+    public List<Player>allPlayers;
     //the prefabs of all weapons
 
     public System.Random random = new System.Random();
@@ -37,7 +46,9 @@ public class Game : MonoBehaviour
         
         // load settings
         Settings = GameSettings.Load();
-        
+        allPlayers=new List<Player>();
+        allTasks=new List<Task>();
+        allRooms=new List<Room>();
         killCooldown=0;
     }
     public void SetTexture(GameObject obj, string name, float scale) {
@@ -51,10 +62,17 @@ public class Game : MonoBehaviour
 
     private void Start()
     {
+        createCrew();
         setRooms();
-
+        setCrewMadesTask();
         SceneManager.LoadScene("IngameGUI", LoadSceneMode.Additive);
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("World"));
+    }
+
+    private void createCrew()
+    {
+        Player player=GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        allPlayers.Add(player);
     }
 
     private void setRooms() {
@@ -69,10 +87,59 @@ public class Game : MonoBehaviour
             room.CreateRoom(i, task1, task2);
             task1.room = room;
             task2.room = room;
+            addRoom(room);
+            addTask(task1);
+            addTask(task2);
             i++;
         }
     }
 
+    private void addRoom(Room room)
+    {
+        allRooms.Add(room);
+    }
+
+    private void addTask(Task task)
+    {
+        allTasks.Add(task);
+    }
+    private void setCrewMadesTask()
+    {
+        foreach(Player player in allPlayers)
+        {
+            if(!player.isImposter())
+            {
+                CrewMate crew=player.gameObject.GetComponent<CrewMate>();
+                addCrewMateTasks(crew);
+            }
+        }
+    }
+    private void addCrewMateTasks(CrewMate crewMate)
+    {
+        Shuffle<Task>(allTasks);
+        for(int i=0;i<Settings.tasks;i++)
+        {
+            if(i>=allTasks.Count)
+            {
+                Debug.LogError("To many Tasks for crew Mates");
+            }
+            else
+            {
+                crewMate.addTask(allTasks[i]);
+            }
+        }
+    }
+    public void Shuffle<T>(List<T> list)  
+    {  
+        int n = list.Count;  
+        while (n > 1) {  
+            n--;  
+            int k = random.Next(n + 1);  
+            T value = list[k];  
+            list[k] = list[n];  
+            list[n] = value;  
+        }  
+    }
     private void FixedUpdate() {
         if(killCooldown>0)
         {
@@ -88,9 +155,25 @@ public class Game : MonoBehaviour
             Debug.Log("unregistered Level instance", Instance);
         }
     }
-
+    public float getKillCooldown()
+    {
+        return killCooldown;
+    }
     public void resetKillCooldown()
     {
         killCooldown=Settings.cooldownTime;
+    }
+    public float getTaskProgress()
+    {
+        return 1.0f*taskDone/totalTasks;
+    }
+    public void increaseTaskProgress()
+    {
+        taskDone++;
+    }
+    public void removeCrewMateFromTaskProgress(CrewMate lostCrewMate)
+    {
+        totalTasks-=Game.Instance.Settings.tasks;
+        taskDone-=lostCrewMate.taskDone;
     }
 }

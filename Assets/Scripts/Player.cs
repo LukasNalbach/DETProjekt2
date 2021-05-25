@@ -4,14 +4,17 @@ using UnityEngine;
 
 public abstract class Player : MonoBehaviour
 {
+    protected bool imposter;
+
     public bool alive;
 
     public Color color;
     
+    public UpdateRoom updateRoom;
     // Start is called before the first frame update
     void Start()
     {
-        
+       
     }
 
     // Update is called once per frame
@@ -19,7 +22,14 @@ public abstract class Player : MonoBehaviour
     {
         
     }
-
+    public bool isImposter()
+    {
+        return imposter;
+    }
+    public bool isAlive()
+    {
+        return alive;
+    }
     protected void getGhost()
     {
 
