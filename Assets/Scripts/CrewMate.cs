@@ -23,9 +23,9 @@ public class CrewMate : Player
     }
 
     // Update is called once per frame
-    void Update()
+    public void Update()
     {
-        if (Input.GetKey(KeyCode.Return))
+        if (Input.GetKey(KeyCode.Return)&&activePlayer())
         {
             if(canDoTask())
             {
@@ -47,22 +47,27 @@ public class CrewMate : Player
                 doTask(taskToDoNow);
             }
         }
+        base.Update();
     }
     void FixedUpdate()
     {
-        float distance;
-        foreach (var task in taskToDo)
+        if(activePlayer())
         {
-            distance=Vector3.Distance(gameObject.transform.position, task.transform.position);
-            if(distance<=Game.Instance.Settings.viewDistance)
+            float distance;
+            foreach (var task in taskToDo)
             {
-                task.setActivated();
-            }
-            else
-            {
-                task.setDeactivated();
+                distance=Vector3.Distance(gameObject.transform.position, task.transform.position);
+                if(distance<=Game.Instance.Settings.viewDistance)
+                {
+                    task.setActivated();
+                }
+                else
+                {
+                    task.setDeactivated();
+                }
             }
         }
+        base.FixedUpdate();
     }
     public void addTask(Task task)
     {
@@ -106,6 +111,8 @@ public class CrewMate : Player
     {
         alive=false;
         addDeadBody();
+        Game.Instance.removeCrewMateFromTaskProgress(this);
+        /*
         if(!ki)
         {
             becomeGhost();
@@ -114,6 +121,7 @@ public class CrewMate : Player
         {
             Game.Instance.removeCrewMateFromTaskProgress(this);
         }
+        */
     }
 
     void addDeadBody()

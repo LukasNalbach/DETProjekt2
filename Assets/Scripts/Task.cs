@@ -12,6 +12,7 @@ public class Task : MonoBehaviour
     private bool visibleAktivated;
     private int taskNum {get; set;}
     public Room room {get; set;}
+    public Color currentColor=Color.white;
 
     public void CreateTask(int taskNum) {
         this.taskNum = taskNum;
@@ -40,7 +41,7 @@ public class Task : MonoBehaviour
     {
         if(solvingVisible)
         {
-            gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.blue);
+            currentColor= Color.blue;
         }
     }
 
@@ -48,7 +49,7 @@ public class Task : MonoBehaviour
     {
         if(solvingVisible)
         {
-            gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.white);
+            currentColor=  Color.white;
         }
     }
     public void setActivated()
@@ -56,7 +57,7 @@ public class Task : MonoBehaviour
         if(!visibleAktivated)
         {
             visibleAktivated=true;
-            gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
+            currentColor= Color.red;
         }
         
     }
@@ -65,9 +66,17 @@ public class Task : MonoBehaviour
         if(visibleAktivated)
         {
             visibleAktivated=false;
-            gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.white);
+            currentColor= Color.white;
         }
        
+    }
+    public void setVisible()
+    {
+        gameObject.GetComponent<Renderer>().material.SetColor("_Color",currentColor);
+    }
+    public void setInvisble()
+    {
+        gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.white);
     }
 
 }

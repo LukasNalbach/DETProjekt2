@@ -201,4 +201,12 @@ public class Game : MonoBehaviour
         taskDone-=lostCrewMate.taskDone;
         GUI.updateTaskProgress((int)(getTaskProgress()*100));
     }
+    public void startEmergencyMeeting(Player initiator)
+    {
+        Debug.Log("Start EmergencyMeeting");
+    }
+    public swapPlayer swapPlayer()
+    {
+        return gameObject.GetComponent<swapPlayer>();
+    }
 }
