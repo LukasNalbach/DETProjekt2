@@ -43,3 +43,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95b1f4c3570493947a6466c995c661fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  taskDone: 0
+  totalTasks: 0
+  allRooms: []
+  allTasks: []
+  allPlayers: []

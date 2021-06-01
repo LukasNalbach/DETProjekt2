@@ -71,6 +71,8 @@ public class Game : MonoBehaviour
         SceneManager.LoadScene("IngameGUI", LoadSceneMode.Additive);
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("World"));
         GUI.updateTaskProgress(0);
+
+         gameObject.AddComponent<Voting>();
     }
 
     private void createCrew()
@@ -203,10 +205,25 @@ public class Game : MonoBehaviour
     }
     public void startEmergencyMeeting(Player initiator)
     {
-        Debug.Log("Start EmergencyMeeting");
+     Debug.Log("Start EmergencyMeeting");
     }
     public swapPlayer swapPlayer()
     {
         return gameObject.GetComponent<swapPlayer>();
+    }
+     public static void accuse(int p2) {
+        Game.Instance.gameObject.GetComponent<Voting>().accuse(-1, p2);
+    }
+
+    public static void accusePublic(int p2) {
+        Game.Instance.gameObject.GetComponent<Voting>().accusePublic(-1, p2);
+    }
+
+    public static void defendPublic(int p2) {
+        Game.Instance.gameObject.GetComponent<Voting>().defendPublic(-1, p2);
+    }
+
+    public static void skip() {
+        Game.Instance.gameObject.GetComponent<Voting>().skip(-1);
     }
 }

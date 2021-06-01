@@ -14,7 +14,7 @@ public abstract class Player : MonoBehaviour
     
     public UpdateRoom updateRoom;
 
-    public void create(String name, Color color)
+    public void create(string name, Color color)
     {
         this.name=name;
         this.color=color;
