@@ -39,6 +39,6 @@ public class GameSettings : ScriptableObject
 
     [Tooltip("Amount of task that one crew member must solve")]
     public int tasks;
-   
-   
+    [Tooltip("time of the voting phase in seconds")]
+    public int votingTime;
 }
