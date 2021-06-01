@@ -10,6 +10,7 @@ public class Voting : MonoBehaviour
     int t, n, p;
     bool[][] accuses, accusesPublic, defendsPublic;
     bool[] wantsSkip;
+    bool votingActive;
     public void Awake() {
         t = Game.Instance.Settings.votingTime;
         n = Game.Instance.Settings.numberPlayers;
@@ -30,14 +31,13 @@ public class Voting : MonoBehaviour
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("World"));
 
         StartCoroutine(Countdown(op));
-
-        SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("SelectionGUI"));
     }
 
     private IEnumerator Countdown(AsyncOperation op) {
         while (!op.isDone) {
             yield return new WaitForEndOfFrame();
         }
+        Game.Instance.GetComponent<swapPlayer>().currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = false;
         GameObject.Find("Canvas/timeRemaining/textTimeRemaining").GetComponent<TextMeshProUGUI>().SetText(t.ToString());
         for (int i=n; i<10; i++) {
             GameObject.Destroy(GameObject.Find("Canvas/Players/Player" + i));
@@ -46,6 +46,7 @@ public class Voting : MonoBehaviour
         GameObject.Find("Canvas/Players/Player" + p + "/Buttons").SetActive(false);
         GameObject.Find("Canvas/Players/Player" + p + "/Buttons/buttonAccusePublic").SetActive(false);
         GameObject.Find("Canvas/Players/Player" + p + "/Buttons/buttonDefendPublic").SetActive(false);
+        votingActive = true;
         yield return new WaitForSeconds(1);
         while (t > 0) {
             t--;
@@ -53,14 +54,19 @@ public class Voting : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
         yield return new WaitForSeconds(1);
+        votingActive = false;
         GameObject.Find("Canvas/Players/Player" + p + "/Buttons").SetActive(true);
         showResults();
-        t = 5;
+        t = 6;
         while (t > 0) {
             t--;
             GameObject.Find("Canvas/timeRemaining/textTimeRemaining").GetComponent<TextMeshProUGUI>().SetText(t.ToString());
             yield return new WaitForSeconds(1);
         }
+        SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("SelectionGUI"));
+        Game.Instance.GetComponent<swapPlayer>().currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
+        Destroy(this);
+        yield return null;
     }
 
     private void showResults() {
@@ -74,7 +80,7 @@ public class Voting : MonoBehaviour
             for (int j=0; j<n; j++) {
                 if (i != j) {
                     if (accuses[j][i]) {
-                        
+
                         accusedBy[i]++;
 
                         if (iMax == -1) {
@@ -101,7 +107,7 @@ public class Voting : MonoBehaviour
     }
 
     public void accuse(int p1, int p2) {
-        if (t == 0) return;
+        if (!votingActive) return;
 
         if (p1 == -1) {
             p1 = p;
@@ -123,7 +129,7 @@ public class Voting : MonoBehaviour
     }
 
     public void accusePublic(int p1, int p2) {
-        if (t == 0) return;
+        if (!votingActive) return;
 
         if (p1 == -1) {
             p1 = p;
@@ -151,14 +157,14 @@ public class Voting : MonoBehaviour
             GameObject newEntry = Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/publicVotingEntry.prefab", typeof(GameObject)) as GameObject, new Vector3(), new Quaternion());
             newEntry.name = p1.ToString();
             newEntry.GetComponent<TextMeshProUGUI>().SetText(p1.ToString());
-            newEntry.transform.parent = GameObject.Find("Canvas/Players/Player" + p2 + "/Votings/VotingsAttacking").transform;
+            newEntry.transform.SetParent(GameObject.Find("Canvas/Players/Player" + p2 + "/Votings/VotingsAttacking").transform);
         } else {
             GameObject.Destroy(GameObject.Find("Canvas/Players/Player" + p2 + "/Votings/VotingsAttacking/" + p1));
         }
     }
 
     public void defendPublic(int p1, int p2) {
-        if (t == 0) return;
+        if (!votingActive) return;
         
         if (p1 == -1) {
             p1 = p;
@@ -186,13 +192,14 @@ public class Voting : MonoBehaviour
             GameObject newEntry = Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/publicVotingEntry.prefab", typeof(GameObject)) as GameObject, new Vector3(), new Quaternion());
             newEntry.name = p1.ToString();
             newEntry.GetComponent<TextMeshProUGUI>().SetText(p1.ToString());
-            newEntry.transform.parent = GameObject.Find("Canvas/Players/Player" + p2 + "/Votings/VotingsDefensive").transform;
+            newEntry.transform.SetParent(GameObject.Find("Canvas/Players/Player" + p2 + "/Votings/VotingsDefensive").transform);
         } else {
             GameObject.Destroy(GameObject.Find("Canvas/Players/Player" + p2 + "/Votings/VotingsDefensive/" + p1));
         }
     }
 
     public void skip(int p1) {
+        if (!votingActive) return;
         if (p1 == -1) {
             p1 = p;
         }
