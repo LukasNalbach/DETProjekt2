@@ -8,7 +8,8 @@ using UnityEngine.UI;
 public class Voting : MonoBehaviour
 {
     int t, n, p;
-    bool[][] accuses, accusesPublic, defendsPublic;
+    bool[][] accusesPublic, defendsPublic;
+    int[] accuses;
     bool[] wantsSkip;
     bool votingActive;
     public void Awake() {
@@ -16,13 +17,13 @@ public class Voting : MonoBehaviour
         n = Game.Instance.Settings.numberPlayers;
         p = Game.Instance.allPlayers.FindIndex(x => x.Equals(Game.Instance.gameObject.GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>()));
 
-        accuses = new bool[n][];
+        accuses = new int[n];
         accusesPublic = new bool[n][];
         defendsPublic = new bool[n][];
         wantsSkip = new bool[n];
 
         for (int i = 0; i<n; i++) {
-            accuses[i] = new bool[n];
+            accuses[i] = -1;
             accusesPublic[i] = new bool[n];
             defendsPublic[i] = new bool[n];
         }
@@ -75,30 +76,26 @@ public class Voting : MonoBehaviour
         bool multipleMax = true;
 
         for (int i=0; i<n; i++) {
-            accusedBy[i] = 0;
+            if (accuses[i] != -1) {
+                accusedBy[accuses[i]]++;
+            }
+        }
 
-            for (int j=0; j<n; j++) {
-                if (i != j) {
-                    if (accuses[j][i]) {
+        for (int i=0; i<n; i++) {
+            GameObject.Find("Canvas/Players/Player" + i + "/Buttons/buttonAccuse/textAccuse").GetComponent<TextMeshProUGUI>().SetText("Accused by " + accusedBy[i]);
 
-                        accusedBy[i]++;
-
-                        if (iMax == -1) {
-                            iMax = i;
-                            multipleMax = false;
-                        } else if (accusedBy[i] >= accusedBy[iMax]) {
-                            if (accusedBy[i] > accusedBy[iMax]) {
-                                iMax = i;
-                                multipleMax = false;
-                            } else {
-                                multipleMax = true;
-                            }
-                        }
-                    }
+            if (accusedBy[i] > 0) {
+                if (iMax == -1) {
+                    iMax = i;
+                } else if (accusedBy[i] >= accusedBy[iMax]) {
+                    if (accusedBy[i] > accusedBy[iMax]) {
+                        multipleMax = false;
+                        iMax = i;
+                    } else {
+                        multipleMax = true;
+                    }      
                 }
             }
-            
-            GameObject.Find("Canvas/Players/Player" + i + "/Buttons/buttonAccuse/textAccuse").GetComponent<TextMeshProUGUI>().SetText("Accused by " + accusedBy[i]);
         }
 
         if (!multipleMax) {
@@ -113,18 +110,15 @@ public class Voting : MonoBehaviour
             p1 = p;
         }
 
-        accuses[p1][p2] = !accuses[p1][p2];
+        if (accuses[p1] != -1) {
+            GameObject.Find("Canvas/Players/Player" + accuses[p1] + "/Buttons/buttonAccuse").GetComponent<Image>().color = new Color(0.75f, 0.75f, 0.75f);
+        }
 
-        if (p1 == p) {
-            Color newColor;
-
-            if (accuses[p1][p2]) {
-                newColor = (Color.red + Color.yellow) / 2;
-            } else {
-                newColor = new Color(0.75f, 0.75f, 0.75f);
-            }
-            
-            GameObject.Find("Canvas/Players/Player" + p2 + "/Buttons/buttonAccuse").GetComponent<Image>().color = newColor;
+        if (accuses[p1] == p2) {
+            accuses[p1] = -1;
+        } else if (p1 == p) {
+            accuses[p1] = p2;
+            GameObject.Find("Canvas/Players/Player" + p2 + "/Buttons/buttonAccuse").GetComponent<Image>().color = (Color.red + Color.yellow) / 2;
         }
     }
 
