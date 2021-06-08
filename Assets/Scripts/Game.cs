@@ -297,9 +297,9 @@ public class Game : MonoBehaviour
         }
         gameObject.AddComponent<Voting>();
     }
-    public void meetingResult(int playerToKill, bool multipleMax)
+    public void meetingResult(int playerToKill)
     {
-        Debug.Log(playerToKill+", "+multipleMax);
+        Debug.Log(playerToKill);
     }
     public swapPlayer swapPlayer()
     {

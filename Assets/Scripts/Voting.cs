@@ -87,6 +87,7 @@ public class Voting : MonoBehaviour
             if (accusedBy[i] > 0) {
                 if (iMax == -1) {
                     iMax = i;
+                    multipleMax = false;
                 } else if (accusedBy[i] >= accusedBy[iMax]) {
                     if (accusedBy[i] > accusedBy[iMax]) {
                         multipleMax = false;
@@ -99,7 +100,16 @@ public class Voting : MonoBehaviour
         }
 
         if (!multipleMax) {
-            GameObject.Find("Canvas/Players/Player" + iMax + "/textName").GetComponent<TextMeshProUGUI>().color = Color.red;
+            int skipWantedBy = 0;
+            foreach (bool b in wantsSkip) {
+                if (b) {
+                    skipWantedBy++;
+                }
+            }
+            if (skipWantedBy < accusedBy[iMax]) {
+                GameObject.Find("Canvas/Players/Player" + iMax + "/textName").GetComponent<TextMeshProUGUI>().color = Color.red;
+                Game.Instance.meetingResult(iMax);
+            }
         }
     }
 
@@ -210,16 +220,6 @@ public class Voting : MonoBehaviour
             GameObject.Find("Canvas/skip").GetComponent<Image>().color = Color.blue;
         } else {
             GameObject.Find("Canvas/skip").GetComponent<Image>().color = new Color(0.45f, 0.45f, 0.45f);
-        }
-        
-        int skipWantedBy = 0;
-        foreach (bool b in wantsSkip) {
-            if (b) {
-                skipWantedBy++;
-            }
-        }
-        if (2*skipWantedBy > n) {
-            t = 0;
         }
     }
 }
