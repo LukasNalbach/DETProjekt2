@@ -20,6 +20,7 @@ public class StartGui : UIBehaviour, ICancelHandler
     private int pointerCooldownTimeOptions;
 
     private int pointerTaskOptions;
+
     void Awake()
     {
         Settings = GameSettings.Load();
@@ -46,6 +47,8 @@ public class StartGui : UIBehaviour, ICancelHandler
         pointerTaskOptions=(Settings.getTaskOptions().Length-1)/2;
         Settings.tasks=Settings.getTaskOptions()[pointerTaskOptions];
 
+        Settings.setColorPointer(2);
+
         GameObject.Find("Canvas/Spieleranzahl/Spieleranzahl").GetComponent<TextMeshProUGUI>().SetText("Number of Players: " + Settings.numberPlayers);
         GameObject.Find("Canvas/Imposter/Imposter").GetComponent<TextMeshProUGUI>().SetText("Number of Imposters: " + Settings.numberImposters);
         GameObject.Find("Canvas/Speed/Speed").GetComponent<TextMeshProUGUI>().SetText("Player Speed: x" + Settings.playerSpeed);
@@ -53,7 +56,8 @@ public class StartGui : UIBehaviour, ICancelHandler
         GameObject.Find("Canvas/KillDistance/KillDistance").GetComponent<TextMeshProUGUI>().SetText("Kill Distance: " + Settings.killDistance);
         GameObject.Find("Canvas/CooldownTime/CooldownTime").GetComponent<TextMeshProUGUI>().SetText("Cooldown Time: " + Settings.cooldownTime);
         GameObject.Find("Canvas/Tasks/Tasks").GetComponent<TextMeshProUGUI>().SetText("Task per Player: " + Settings.tasks);
-
+        setColorMenu();
+    
         //GameObject.Find("Canvas/Tasks/Senken").GetComponent<TextMeshProUGUI>().color = Color.red;
     }
     void Update()
@@ -218,6 +222,22 @@ public class StartGui : UIBehaviour, ICancelHandler
         pointerTaskOptions++;
         Settings.tasks=Settings.getTaskOptions()[pointerTaskOptions];
         GameObject.Find("Canvas/Tasks/Tasks").GetComponent<TextMeshProUGUI>().SetText("Task per Player: " + Settings.tasks);
+    }
+     public void decreaseColor()
+    {
+        Settings.decreaseColorPointer();
+        setColorMenu();
+    }
+    public void increaseColor()
+    {
+        Settings.increaseColorPointer();
+        setColorMenu();
+    }
+    public void setColorMenu()
+    {
+        GameObject.Find("Canvas/Color/Color").GetComponent<TextMeshProUGUI>().color=Settings.getPlayerColor();
+        //GameObject.Find("Canvas/Color/Senken/Text").GetComponent<TextMeshProUGUI>().color=Settings.getPreviousColor();
+        //GameObject.Find("Canvas/Color/Steigern/Text").GetComponent<TextMeshProUGUI>().color=Settings.getNextColor();
     }
     public void startGame()
     {

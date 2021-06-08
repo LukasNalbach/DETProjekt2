@@ -41,6 +41,8 @@ public class Game : MonoBehaviour
     public System.Random random = new System.Random();
 
     private float killCooldown{get; set;}
+
+    private bool meetingNow=false;
     private void Awake()
     {
         // there can be only one...
@@ -99,6 +101,8 @@ public class Game : MonoBehaviour
             } else {
                 newPlayer.AddComponent<Imposter>();
             }
+            Color nextColor=Settings.getPossibleColors()[(Settings.getPlayerColorPointer()+i)%Settings.getPossibleColors().Length];
+            newPlayer.GetComponent<Player>().create(nextColor);
             allPlayers.Add(newPlayer.GetComponent<Player>());
         }
 
@@ -209,21 +213,24 @@ public class Game : MonoBehaviour
         }  
     }
     private void FixedUpdate() {
-        if(killCooldown>0)
+        if(!meetingNow)
         {
-            killCooldown-=Time.deltaTime;
-            GUI.updateKillCooldown((int)killCooldown);
-        }
-        if(activeSabortage!=null)
-        {
-            activeSabortage.currentTimeToSolve-=Time.deltaTime;
-            if(activeSabortage.currentTimeToSolve<=0f)
+             if(killCooldown>0)
             {
-                Debug.Log("Imposer wins with Sabortage");
+                killCooldown-=Time.deltaTime;
+                GUI.updateKillCooldown((int)killCooldown);
             }
-            else
+            if(activeSabortage!=null)
             {
-                 GUI.updateSabortageCountdown((int)activeSabortage.currentTimeToSolve);
+                activeSabortage.currentTimeToSolve-=Time.deltaTime;
+                if(activeSabortage.currentTimeToSolve<=0f)
+                {
+                    Debug.Log("Imposer wins with Sabortage");
+                }
+                else
+                {
+                    GUI.updateSabortageCountdown((int)activeSabortage.currentTimeToSolve);
+                }
             }
         }
     }
@@ -269,6 +276,11 @@ public class Game : MonoBehaviour
         }
         
     }
+    public void stopSabortage()
+    {
+        activeSabortage=null;
+        GUI.stopSabortageCountdown();
+    }
     public List<SabortageTask> allActiveSabortageTasks()
     {
         List<SabortageTask>result=new List<SabortageTask>();
@@ -286,20 +298,27 @@ public class Game : MonoBehaviour
     }
     public void startEmergencyMeeting(Player initiator)
     {
+        meetingNow=true;
+        if(activeSabortage)
+        {
+            activeSabortage.currentTimeToSolve=activeSabortage.timeToSolve;
+        }
         foreach(var player in allPlayers)
         {
             if(player.isAlive())
             {
-                player.transform.position=startPoint;
-                player.lastRoomBeforeMeeting=player.updateRoom.getCurrentRoom();
-                player.updateRoom.setCurrentRoom(2);
+                player.goToMeeting();
             }
         }
         gameObject.AddComponent<Voting>();
     }
     public void meetingResult(int playerToKill)
     {
-        Debug.Log(playerToKill);
+        allPlayers[playerToKill].killAfterMeeting();
+    }
+    public void endMeeting()
+    {
+        meetingNow=false;
     }
     public swapPlayer swapPlayer()
     {

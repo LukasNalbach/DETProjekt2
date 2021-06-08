@@ -9,10 +9,13 @@ public class Task : MonoBehaviour
 
     public bool solvingVisible=true;
     public bool sabortageTask=false;
-    protected bool visibleAktivated;
+    protected bool activePlayerNear=false;
+
+    public bool activePlayerHasToDoThisTaskAndNear=false;
+
+    public Player playerDoingThisTask=null;
     protected int taskNum {get; set;}
     public Room room {get; set;}
-    public Color currentColor=Color.white;
 
     public void CreateTask(int taskNum, float timeToSolve, bool solvingVisible) {
         this.taskNum = taskNum;
@@ -39,46 +42,91 @@ public class Task : MonoBehaviour
         
     }
 
-    public void startSolving()
+    public void startSolving(Player player)
     {
-        if(solvingVisible)
-        {
-            currentColor= Color.blue;
-        }
+        playerDoingThisTask=player;
+        setColor();
     }
 
     public void endSolving()
     {
-        if(solvingVisible)
-        {
-            currentColor=  Color.white;
-        }
+        playerDoingThisTask=null;
+        setDeactivated();
     }
     public void setActivated()
     {
-        if(!visibleAktivated)
+        if(!activePlayerHasToDoThisTaskAndNear)
         {
-            visibleAktivated=true;
-            currentColor= Color.red;
+            activePlayerHasToDoThisTaskAndNear=true;
+            setColor();
         }
         
     }
     public void setDeactivated()
     {
-        if(visibleAktivated)
+        if(activePlayerHasToDoThisTaskAndNear)
         {
-            visibleAktivated=false;
-            currentColor= Color.white;
+            activePlayerHasToDoThisTaskAndNear=false;
+            setColor();
         }
        
     }
     public void setVisible()
     {
-        gameObject.GetComponent<Renderer>().material.SetColor("_Color",currentColor);
+        activePlayerNear=true;
+        setColor();
     }
     public void setInvisble()
     {
-        gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.white);
+        activePlayerNear=false;
+        setColor();
     }
-
+    protected void setColor()
+    {
+        gameObject.GetComponent<Renderer>().material.SetColor("_Color",currentNeededColor());
+    }
+    private Color currentNeededColor()
+    {
+        if(!activePlayerNear)
+        {
+            return Color.white;
+        }
+        if(playerDoingThisTask==null)
+        {
+            if(activePlayerHasToDoThisTaskAndNear)
+            {
+                return Color.red;
+            }
+            else
+            {
+                return Color.white;
+            }
+        }
+        if(playerDoingThisTask.activePlayer())
+        {
+            return Color.blue;
+        }
+        if(solvingVisible)//other player does this task
+        {
+            if(activePlayerHasToDoThisTaskAndNear)
+            {
+                return (Color.red + Color.blue) / 2;
+            }
+            else
+            {
+                return Color.blue;
+            }
+        }
+        else
+        {
+           if(activePlayerHasToDoThisTaskAndNear)
+            {
+                return Color.red ;
+            }
+            else
+            {
+                return Color.white;
+            } 
+        }
+    }
 }

@@ -50,6 +50,6 @@ public class Sabortage:MonoBehaviour
     public void deactivate()
     {
         active=false;
-        Game.Instance.GUI.stopSabortageCountdown();
+        Game.Instance.stopSabortage();
     }
 }

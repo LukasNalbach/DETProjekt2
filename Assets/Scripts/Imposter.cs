@@ -9,7 +9,6 @@ public class Imposter : Player
     void Start()
     {
         updateRoom=GetComponent<UpdateRoom>();
-        gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.red);
     }
 
     void Awake() {
@@ -144,6 +143,10 @@ public class Imposter : Player
     {
         currentUsedVent=null;
         gameObject.GetComponent<Renderer>().enabled=true;
+    }
+    public override void goToMeeting()
+    {
+        goToMeetingStandard();
     }
     public override bool immobile()
     {

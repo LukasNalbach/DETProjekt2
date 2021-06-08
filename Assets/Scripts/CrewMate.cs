@@ -11,15 +11,18 @@ public class CrewMate : Player
 
     public int taskDone;
 
-    //When a crewMate is doing task, he cannot move
-    private bool doingTask;
+    //Task the crew mate is currently solving(or null).When a crewMate is doing task, he cannot move
+    private Task activeTask;
+
+    private IEnumerator taskCoroutine;
+
     // Start is called before the first frame update
     void Start()
     {
         updateRoom=GetComponent<UpdateRoom>();
         imposter=false;
         taskDone=0;
-        doingTask=false;
+        activeTask=null;
     }
 
     // Update is called once per frame
@@ -84,6 +87,10 @@ public class CrewMate : Player
     {
         taskToDo.AddLast(task);
     }
+    public bool doingTask()
+    {
+        return activeTask!=null;
+    }
     public bool nearPossibleTask()
     {
         foreach (var task in updateRoom.getCurrentRoom().getTasks())
@@ -104,35 +111,49 @@ public class CrewMate : Player
     }
     public bool canDoTask()
     {
-        return !doingTask&&nearPossibleTask();
+        return !doingTask()&&nearPossibleTask();
     }
     void doTask(Task task)
     {
-        StartCoroutine(coTask(task));
+        activeTask=task;
+        taskCoroutine=coTask(activeTask);
+        StartCoroutine(taskCoroutine);
     }
 
     IEnumerator coTask(Task task)
     {
-        task.startSolving();
-        doingTask=true;
+        task.startSolving(this);
         yield return new WaitForSeconds(task.timeToSolve);
-        doingTask=false;
-        if(task.sabortageTask)
+        if(isAlive())
         {
-            ((SabortageTask)task).finishSolving();
+            if(task.sabortageTask)
+            {
+                ((SabortageTask)task).finishSolving();
+            }
+            else
+            {
+                task.endSolving();
+                taskDone++;
+                Game.Instance.increaseTaskProgress();
+                taskToDo.Remove(task);
+            }
         }
-        else
+        activeTask=null;
+        
+    }
+    public void stopAllTasks()
+    {
+        if(doingTask())
         {
-            task.endSolving();
-            taskDone++;
-            Game.Instance.increaseTaskProgress();
-            taskToDo.Remove(task);
+            activeTask.endSolving();
+            activeTask=null;
+            StopCoroutine(taskCoroutine);
         }
     }
-
     public void getKilledByImposter()
     {
         alive=false;
+        stopAllTasks();
         addDeadBody();
         Game.Instance.removeCrewMateFromTaskProgress(this);
         /*
@@ -151,12 +172,11 @@ public class CrewMate : Player
     {
         gameObject.GetComponent<Renderer>().material.SetColor("_Color", Color.black);
     }
-
-    void stopSabotage()
+    public override void goToMeeting()
     {
-
+        goToMeetingStandard();
+        stopAllTasks(); 
     }
-
     public float processByTask()
     {
         return (float)(taskDone)/Game.Instance.Settings.tasks;
@@ -164,7 +184,7 @@ public class CrewMate : Player
 
     public override bool immobile()
     {
-        return doingTask||!isAlive();
+        return doingTask()||!isAlive();
     }
     public override bool visible()
     {
