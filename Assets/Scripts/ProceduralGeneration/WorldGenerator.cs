@@ -29,7 +29,6 @@ public class WorldGenerator : MonoBehaviour
 
         GenRoom rootInside = new GenRoom();
         GenRoom rootOutside = new GenRoom();
-
         while (roomsInside.Count != 0) {
             int randomIndex = random.Next(roomsInside.Count);
             rootInside.addSubroom(roomsInside[randomIndex]);
@@ -40,7 +39,6 @@ public class WorldGenerator : MonoBehaviour
             rootOutside.addSubroom(roomsOutside[randomIndex]);
             roomsOutside.RemoveAt(randomIndex);
         }
-
         GenRoom root = GenRoom.joinRooms(rootInside, rootOutside);
 
         Rectangle worldArea = new Rectangle(0, 0, 600, 400);
