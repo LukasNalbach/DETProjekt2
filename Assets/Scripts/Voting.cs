@@ -110,7 +110,9 @@ public class Voting : MonoBehaviour
             p1 = p;
         }
 
-        if (accuses[p1] != -1) {
+        if (wantsSkip[p1]) {
+            skip(p1);
+        } else if (accuses[p1] != -1) {
             GameObject.Find("Canvas/Players/Player" + accuses[p1] + "/Buttons/buttonAccuse").GetComponent<Image>().color = new Color(0.75f, 0.75f, 0.75f);
         }
 
@@ -196,6 +198,10 @@ public class Voting : MonoBehaviour
         if (!votingActive) return;
         if (p1 == -1) {
             p1 = p;
+        }
+
+        if (accuses[p1] != -1) {
+            accuse(p1, accuses[p1]);
         }
 
         wantsSkip[p1] = !wantsSkip[p1];
