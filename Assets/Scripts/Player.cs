@@ -9,9 +9,11 @@ public abstract class Player : MonoBehaviour
 
     public bool alive = true;
 
+    public bool deadAndInvisible=false;
+
     public Color color;
 
-    
+    public Room lastRoomBeforeMeeting;
     public UpdateRoom updateRoom;
 
     public void create(string name, Color color)
@@ -29,10 +31,12 @@ public abstract class Player : MonoBehaviour
     public void Update()
     {
 
-        if (Input.GetKey(KeyCode.Space)&&activePlayer())
+        if (Input.GetKeyDown(KeyCode.Space)&&activePlayer())
         {
-            if(nearDeadBody())
+            Player deadBody=nearDeadBody();
+            if(deadBody!=null)
             {
+                deadBody.DestroyDeadBody();
                 Game.Instance.startEmergencyMeeting(this);
             }
         }
@@ -96,25 +100,33 @@ public abstract class Player : MonoBehaviour
     {
         
     }
-
-    public bool nearDeadBody()
+    /*
+    returns a dead-Body, that is inside the players vision, or null, if there is no deadBody inside Player vision 
+    */
+    public Player nearDeadBody()
     {
         foreach (var player in Game.Instance.allPlayers)
         {
-            if(!player.isAlive())
+            if(!player.isAlive()&&player.visible())
             {
                 if(Vector3.Distance(gameObject.transform.position, player.transform.position)<=Game.Instance.Settings.viewDistance)
                 {
-                    return true;
+                    return player;
                 }
             }
         }
-        return false;
+        return null;
     }
 
     public bool activePlayer()
     {
         return gameObject==Game.Instance.swapPlayer().currentPlayer;
+    }
+    
+    //just neaded for CrewMates, cause Imposter never have dead Bodies
+    public void DestroyDeadBody()
+    {
+        deadAndInvisible=true;
     }
 
     public abstract bool immobile();

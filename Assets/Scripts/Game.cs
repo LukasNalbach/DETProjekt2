@@ -17,6 +17,8 @@ public class Game : MonoBehaviour
 
     public GUI GUI;
 
+    public Vector3 startPoint=new Vector3(0,0,0);
+
     public int  taskDone;
 
     public int totalTasks;
@@ -83,7 +85,6 @@ public class Game : MonoBehaviour
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("World"));
         GUI.updateTaskProgress(0);
         GUI.stopSabortageCountdown();
-        gameObject.AddComponent<Voting>();
     }
 
     private void createCrew()
@@ -91,7 +92,7 @@ public class Game : MonoBehaviour
         GameObject playerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Player.prefab", typeof(GameObject)) as GameObject;
 
         for (int i = 0; i < Settings.numberPlayers; i++) {
-            Vector3 pos = new Vector3(0, 0, 0);
+            Vector3 pos = startPoint;
             GameObject newPlayer = Instantiate(playerPrefab, pos, new Quaternion());
             if (i >= Settings.numberImposters) {
                 newPlayer.AddComponent<CrewMate>();
@@ -285,7 +286,20 @@ public class Game : MonoBehaviour
     }
     public void startEmergencyMeeting(Player initiator)
     {
-     Debug.Log("Start EmergencyMeeting");
+        foreach(var player in allPlayers)
+        {
+            if(player.isAlive())
+            {
+                player.transform.position=startPoint;
+                player.lastRoomBeforeMeeting=player.updateRoom.getCurrentRoom();
+                player.updateRoom.setCurrentRoom(2);
+            }
+        }
+        gameObject.AddComponent<Voting>();
+    }
+    public void meetingResult(int playerToKill, bool multipleMax)
+    {
+        Debug.Log(playerToKill+", "+multipleMax);
     }
     public swapPlayer swapPlayer()
     {

@@ -25,7 +25,11 @@ public class UpdateRoom : MonoBehaviour
     {
         return currentRoom;
     }
-
+    //for emergencie Meeting
+    public void setCurrentRoom(int roomNr)
+    {
+        Room.getRoom(roomNr);
+    }
     private Room GetNewRoomIfChanged() {
         for (int i = 1; i <= Room.getRooms().Count; i++) {
             if (i != currentRoom.getRoomNum()) {

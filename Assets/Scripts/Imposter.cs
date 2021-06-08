@@ -151,6 +151,6 @@ public class Imposter : Player
     }
     public override bool visible()
     {
-        return currentUsedVent==null;
+        return (currentUsedVent==null)&&!deadAndInvisible;
     }
 }

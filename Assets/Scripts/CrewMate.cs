@@ -168,6 +168,6 @@ public class CrewMate : Player
     }
     public override bool visible()
     {
-        return true;
+        return !deadAndInvisible;
     }
 }
