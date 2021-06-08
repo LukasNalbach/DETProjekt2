@@ -38,13 +38,14 @@ public abstract class Player : MonoBehaviour
         }
     }
 
+
     public void FixedUpdate()
     {
         if(activePlayer())
         {
             foreach (var player in Game.Instance.allPlayers)
             {
-                if(Vector3.Distance(gameObject.transform.position, player.transform.position)<=Game.Instance.Settings.viewDistance)
+                if(player.visible()&&Vector3.Distance(gameObject.transform.position, player.transform.position)<=Game.Instance.Settings.viewDistance)
                 {
                     player.gameObject.GetComponent<Renderer>().enabled=true;
                 }
@@ -64,6 +65,21 @@ public abstract class Player : MonoBehaviour
                     task.setInvisble();
                 }
             }
+           float distance;
+            foreach (var sabTask in Game.Instance.allActiveSabortageTasks())
+            {
+                distance=Vector3.Distance(gameObject.transform.position, sabTask.transform.position);
+                if(distance<=Game.Instance.Settings.viewDistance)
+                {
+                    sabTask.setActivated();
+                    sabTask.setVisible();
+                }
+                else
+                {
+                    sabTask.setInvisble();
+                }
+            }
+        
         }
         
     }
@@ -102,4 +118,6 @@ public abstract class Player : MonoBehaviour
     }
 
     public abstract bool immobile();
+
+    public abstract bool visible();
 }

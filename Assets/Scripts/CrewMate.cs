@@ -25,7 +25,7 @@ public class CrewMate : Player
     // Update is called once per frame
     public void Update()
     {
-        if (Input.GetKey(KeyCode.Return)&&activePlayer())
+        if (Input.GetKeyDown(KeyCode.Return)&&activePlayer())
         {
             if(canDoTask())
             {
@@ -43,6 +43,17 @@ public class CrewMate : Player
                             nearesTaskDistance=distance;
                         }
                     }
+                }
+                foreach (var task in Game.Instance.allActiveSabortageTasks())
+                {
+                    
+                        distance=Vector3.Distance(gameObject.transform.position, task.transform.position);
+                        if(distance<=nearesTaskDistance)
+                        {
+                            taskToDoNow=task;
+                            nearesTaskDistance=distance;
+                        }
+                    
                 }
                 doTask(taskToDoNow);
             }
@@ -71,23 +82,29 @@ public class CrewMate : Player
     }
     public void addTask(Task task)
     {
-        Debug.Log("Player "+name+" gets Task "+task.getTaskNum() +" from Room "+task.getRoom().getRoomNum());
         taskToDo.AddLast(task);
     }
-    public bool nearOwnTask()
+    public bool nearPossibleTask()
     {
         foreach (var task in updateRoom.getCurrentRoom().getTasks())
         {
-            if(taskToDo.Contains(task))
+            if(taskToDo.Contains(task)&&Vector3.Distance(gameObject.transform.position, task.transform.position)<=2f)
             {
-                return Vector3.Distance(gameObject.transform.position, task.transform.position)<=2f;
+                return true;
+            }
+        }
+        foreach (var sabTask in Game.Instance.allActiveSabortageTasks())
+        {
+            if(Vector3.Distance(gameObject.transform.position, sabTask.transform.position)<=2f)
+            {
+                return true;
             }
         }
         return false;
     }
     public bool canDoTask()
     {
-        return !doingTask&&nearOwnTask();
+        return !doingTask&&nearPossibleTask();
     }
     void doTask(Task task)
     {
@@ -98,13 +115,19 @@ public class CrewMate : Player
     {
         task.startSolving();
         doingTask=true;
-        Debug.Log("I do a task");
         yield return new WaitForSeconds(task.timeToSolve);
         doingTask=false;
-        task.endSolving();
-        taskDone++;
-        Game.Instance.increaseTaskProgress();
-        taskToDo.Remove(task);
+        if(task.sabortageTask)
+        {
+            ((SabortageTask)task).finishSolving();
+        }
+        else
+        {
+            task.endSolving();
+            taskDone++;
+            Game.Instance.increaseTaskProgress();
+            taskToDo.Remove(task);
+        }
     }
 
     public void getKilledByImposter()
@@ -142,5 +165,9 @@ public class CrewMate : Player
     public override bool immobile()
     {
         return doingTask||!isAlive();
+    }
+    public override bool visible()
+    {
+        return true;
     }
 }

@@ -5,6 +5,7 @@ using UnityEngine;
 public class Imposter : Player
 {
     // Start is called before the first frame update
+    private Vent currentUsedVent;
     void Start()
     {
         updateRoom=GetComponent<UpdateRoom>();
@@ -18,12 +19,10 @@ public class Imposter : Player
     // Update is called once per frame
     public void Update()
     {
-        if (activePlayer()&&Input.GetKey(KeyCode.Return))
+        if (activePlayer()&&Input.GetKeyDown(KeyCode.Return))
         {
-            Debug.Log("Imposter wonts to Kill");
             if(canKill())
             {
-                Debug.Log("Killing possible");
                 Player playerToKill=null;
                 float nearesPlayerDistance=Mathf.Infinity;
                 float distance;
@@ -41,6 +40,32 @@ public class Imposter : Player
                 }
                 kill((CrewMate)playerToKill);
             }
+        }
+        if(activePlayer()&&Input.GetKeyDown(KeyCode.V))
+        {
+            if(inVent())
+            {
+                leaveVent();
+            }
+            else
+            {
+                Vent vent=nearestVent();
+                if(vent!=null)
+                {
+                    hideVent(vent);
+                }
+            }
+        }
+        if(activePlayer()&&Input.GetKeyDown(KeyCode.Tab))
+        {
+            if(inVent())
+            {
+                changeVentPosition();
+            }
+        }
+        if(activePlayer()&&Input.GetKeyDown(KeyCode.Q))
+        {
+            Game.Instance.startSabortage(Game.Instance.allSabortages[0]);
         }
         base.Update();
     }
@@ -61,6 +86,20 @@ public class Imposter : Player
             }
         }
         return false;
+    }
+    /*
+    Always at most one, because distance of vents should be hy
+    */
+    public Vent nearestVent()
+    {
+        foreach (var vent in Game.Instance.allVents)
+        {
+           if(Vector3.Distance(gameObject.transform.position, vent.transform.position)<=0.5f)
+            {
+                return vent;
+            }
+        }
+        return null;
     }
     public bool canKill()
     {
@@ -83,9 +122,35 @@ public class Imposter : Player
         crewMate.getKilledByImposter();
         Game.Instance.resetKillCooldown();
     }
+    bool inVent()
+    {
+        return currentUsedVent!=null;
+    }
 
+    void hideVent(Vent vent)
+    {
+        currentUsedVent=vent;
+        gameObject.GetComponent<Renderer>().enabled=false;
+        gameObject.transform.position=currentUsedVent.gameObject.transform.position;
+    }
+
+    void changeVentPosition()
+    {
+        currentUsedVent=currentUsedVent.matchedVent;
+        gameObject.transform.position=currentUsedVent.gameObject.transform.position;
+    }
+
+    void leaveVent()
+    {
+        currentUsedVent=null;
+        gameObject.GetComponent<Renderer>().enabled=true;
+    }
     public override bool immobile()
     {
-        return false;
+        return currentUsedVent!=null;
+    }
+    public override bool visible()
+    {
+        return currentUsedVent==null;
     }
 }

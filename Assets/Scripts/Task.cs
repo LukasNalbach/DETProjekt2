@@ -8,14 +8,16 @@ public class Task : MonoBehaviour
     public float timeToSolve=1f;
 
     public bool solvingVisible=true;
-
-    private bool visibleAktivated;
-    private int taskNum {get; set;}
+    public bool sabortageTask=false;
+    protected bool visibleAktivated;
+    protected int taskNum {get; set;}
     public Room room {get; set;}
     public Color currentColor=Color.white;
 
-    public void CreateTask(int taskNum) {
+    public void CreateTask(int taskNum, float timeToSolve, bool solvingVisible) {
         this.taskNum = taskNum;
+        this.timeToSolve=timeToSolve;
+        this.solvingVisible=solvingVisible;
     }
 
     public int getTaskNum() {

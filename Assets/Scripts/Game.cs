@@ -26,6 +26,14 @@ public class Game : MonoBehaviour
     public List<Task>allTasks;
 
     public List<Player>allPlayers;
+
+    public List<Vent>allVents;
+
+    public List<Sabortage>allSabortages;
+
+    //never more than one
+    public Sabortage activeSabortage;
+
     //the prefabs of all weapons
 
     public System.Random random = new System.Random();
@@ -52,6 +60,7 @@ public class Game : MonoBehaviour
         allPlayers=new List<Player>();
         allTasks=new List<Task>();
         allRooms=new List<Room>();
+        allVents=new List<Vent>();
         killCooldown=0;
     }
     public void SetTexture(GameObject obj, string name, float scale) {
@@ -68,11 +77,13 @@ public class Game : MonoBehaviour
         createCrew();
         setRooms();
         setCrewMadesTask();
+        createVentConnections();
+        createSabortageOptions();
         SceneManager.LoadScene("IngameGUI", LoadSceneMode.Additive);
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("World"));
         GUI.updateTaskProgress(0);
-
-         gameObject.AddComponent<Voting>();
+        GUI.stopSabortageCountdown();
+        gameObject.AddComponent<Voting>();
     }
 
     private void createCrew()
@@ -104,8 +115,8 @@ public class Game : MonoBehaviour
             Room room = gameObject.AddComponent<Room>();
             Task task1 = GameObject.Find("Room" + i + "Task1").AddComponent<Task>();
             Task task2 = GameObject.Find("Room" + i + "Task2").AddComponent<Task>();
-            task1.CreateTask(1);
-            task2.CreateTask(2);
+            task1.CreateTask(1,1f,true);
+            task2.CreateTask(2,1f,true);
             room.CreateRoom(i, task1, task2);
             task1.room = room;
             task2.room = room;
@@ -135,6 +146,39 @@ public class Game : MonoBehaviour
                 addCrewMateTasks(crew);
             }
         }
+    }
+    private void createVentConnections()
+    {
+        int i=1;
+        while (true) {
+            GameObject vent=GameObject.Find("Vent" + i );
+            if(vent==null)
+            {
+                break;
+            }
+            Vent ventScript=vent.AddComponent<Vent>();
+            allVents.Add(ventScript);
+            i++;
+        }
+        allVents[0].matchedVent=allVents[3];
+        allVents[1].matchedVent=allVents[2];
+        allVents[2].matchedVent=allVents[1];
+        allVents[3].matchedVent=allVents[0];
+
+    }
+    private void createSabortageOptions()
+    {
+        Sabortage sabortage1=gameObject.AddComponent<Sabortage>();
+        sabortage1.create(1,45f);
+        GameObject stopTask1=GameObject.Find("StopSabortage11");
+        SabortageTask sTask1=stopTask1.AddComponent<SabortageTask>();
+        sTask1.createSabortageTask(1, 1f,sabortage1);
+        GameObject stopTask2=GameObject.Find("StopSabortage12");
+        SabortageTask sTask2=stopTask2.AddComponent<SabortageTask>();
+        sTask2.createSabortageTask(2, 1f,sabortage1);
+        sabortage1.addTask(sTask1);
+        sabortage1.addTask(sTask2);
+        allSabortages.Add(sabortage1);
     }
     private void addCrewMateTasks(CrewMate crewMate)
     {
@@ -169,6 +213,18 @@ public class Game : MonoBehaviour
             killCooldown-=Time.deltaTime;
             GUI.updateKillCooldown((int)killCooldown);
         }
+        if(activeSabortage!=null)
+        {
+            activeSabortage.currentTimeToSolve-=Time.deltaTime;
+            if(activeSabortage.currentTimeToSolve<=0f)
+            {
+                Debug.Log("Imposer wins with Sabortage");
+            }
+            else
+            {
+                 GUI.updateSabortageCountdown((int)activeSabortage.currentTimeToSolve);
+            }
+        }
     }
 
     void OnDestroy()
@@ -202,6 +258,30 @@ public class Game : MonoBehaviour
         totalTasks-=Game.Instance.Settings.tasks;
         taskDone-=lostCrewMate.taskDone;
         GUI.updateTaskProgress((int)(getTaskProgress()*100));
+    }
+    public void startSabortage(Sabortage sabortage)
+    {
+        if(activeSabortage==null)
+        {
+            activeSabortage=sabortage;
+            sabortage.activate();
+        }
+        
+    }
+    public List<SabortageTask> allActiveSabortageTasks()
+    {
+        List<SabortageTask>result=new List<SabortageTask>();
+        if(activeSabortage!=null)
+        {
+            foreach(SabortageTask sTask in activeSabortage.tasksToStop)
+            {
+                if(!sTask.solved)
+                {
+                    result.Add(sTask);
+                }
+            }
+        }
+        return result;
     }
     public void startEmergencyMeeting(Player initiator)
     {

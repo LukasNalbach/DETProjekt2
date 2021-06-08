@@ -26,6 +26,10 @@ public class swapPlayer : MonoBehaviour
 
             currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
             GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>().target = currentPlayer.transform;
+            foreach(Task task in Game.Instance.allTasks)
+            {
+                task.setDeactivated();
+            }
         }
     }
 }
