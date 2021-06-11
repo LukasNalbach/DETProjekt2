@@ -16,10 +16,10 @@ public abstract class Player : MonoBehaviour
     public Room lastRoomBeforeMeeting;
     public UpdateRoom updateRoom;
 
-    public void create(string name, Color color)
+    public void create(Color color)
     {
-        this.name=name;
         this.color=color;
+        gameObject.GetComponent<Renderer>().material.SetColor("_Color",color);
     }
     // Start is called before the first frame update
     void Start()
@@ -129,6 +129,26 @@ public abstract class Player : MonoBehaviour
         deadAndInvisible=true;
     }
 
+    public abstract void goToMeeting();
+    protected void goToMeetingStandard()
+    {
+        if(isAlive())
+        {
+            transform.position=Game.Instance.startPoint;
+            lastRoomBeforeMeeting=updateRoom.getCurrentRoom();
+            updateRoom.setCurrentRoom(2);
+        }
+
+    }
+    public void killAfterMeeting()
+    {
+        alive=false;
+        deadAndInvisible=true;
+        if(!imposter)
+        {
+            Game.Instance.removeCrewMateFromTaskProgress((CrewMate)this);
+        }
+    }
     public abstract bool immobile();
 
     public abstract bool visible();

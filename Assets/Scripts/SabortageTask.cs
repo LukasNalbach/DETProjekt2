@@ -24,10 +24,10 @@ public class SabortageTask : Task
     }
     public void setActivated()
     {
-        if(!visibleAktivated&&mySabortage.active)
+        if(!activePlayerHasToDoThisTaskAndNear&&mySabortage.active&&!solved)
         {
-            visibleAktivated=true;
-            currentColor= Color.red;
+            activePlayerHasToDoThisTaskAndNear=true;
+            setColor();
         }
     }
     public void finishSolving()
@@ -35,7 +35,5 @@ public class SabortageTask : Task
         solved=true;
         mySabortage.maybeDeactivated();
         endSolving();
-        setDeactivated();
-        setVisible();
     }
 }

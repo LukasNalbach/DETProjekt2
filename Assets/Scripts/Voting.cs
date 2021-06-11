@@ -44,9 +44,16 @@ public class Voting : MonoBehaviour
             GameObject.Destroy(GameObject.Find("Canvas/Players/Player" + i));
         }
         GameObject.Find("Canvas/Players/Player" + p + "/textName").GetComponent<TextMeshProUGUI>().color = Color.yellow;
-        GameObject.Find("Canvas/Players/Player" + p + "/Buttons").SetActive(false);
-        GameObject.Find("Canvas/Players/Player" + p + "/Buttons/buttonAccusePublic").SetActive(false);
-        GameObject.Find("Canvas/Players/Player" + p + "/Buttons/buttonDefendPublic").SetActive(false);
+       
+        deactivatePlayerButtons(p);//deaktiviert alle Buttons zum aktiven Spieler
+        for(int i=0;i<Game.Instance.allPlayers.Count;i++)
+        {
+            if(!Game.Instance.allPlayers[i].isAlive())
+            {
+                GameObject.Find("Canvas/Players/Player" + i + "/textName").GetComponent<TextMeshProUGUI>().color = Color.black;
+                deactivatePlayerButtons(i);
+            }
+        }
         votingActive = true;
         yield return new WaitForSeconds(1);
         while (t > 0) {
@@ -66,8 +73,15 @@ public class Voting : MonoBehaviour
         }
         SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("SelectionGUI"));
         Game.Instance.GetComponent<swapPlayer>().currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
+        Game.Instance.endMeeting();
         Destroy(this);
         yield return null;
+    }
+    private void deactivatePlayerButtons(int playerNr)
+    {
+         GameObject.Find("Canvas/Players/Player" + playerNr + "/Buttons").SetActive(false);
+        GameObject.Find("Canvas/Players/Player" + playerNr + "/Buttons/buttonAccusePublic").SetActive(false);
+        GameObject.Find("Canvas/Players/Player" + playerNr + "/Buttons/buttonDefendPublic").SetActive(false);
     }
 
     private void showResults() {

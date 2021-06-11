@@ -59,6 +59,10 @@ public class GameSettings : ScriptableObject
     
     private int[] taskOptions={ 2 , 3, 4, 5, 6};
 
+    private int playerColorPointer;
+
+    private Color[] possiblePlayerColors={Color.yellow, (Color.yellow+Color.red)/2, Color.red, (Color.red+Color.blue)/2, 
+    Color.blue, Color.green, (Color.white+Color.black)/2, /*dark gray*/new Color32(40,79,79,255) ,/*brown*/new Color32(160,82,45,255), /*pink*/new Color32(255,105,180,255)};
     public int getMinPlayers()
     {
         return minPlayers;
@@ -98,6 +102,48 @@ public class GameSettings : ScriptableObject
     public int[] getTaskOptions()
     {
         return taskOptions;
+    }
+    public Color[] getPossibleColors()
+    {
+        return possiblePlayerColors;
+    }
+    public int getPlayerColorPointer()
+    {
+        return playerColorPointer;
+    }
+    public void setColorPointer(int newNr)
+    {
+        playerColorPointer=newNr;
+    }
+    public void increaseColorPointer()
+    {
+        playerColorPointer=(playerColorPointer+1)%possiblePlayerColors.Length;
+    }
+    public void decreaseColorPointer()
+    {
+        playerColorPointer=(playerColorPointer-1);
+        if(playerColorPointer<0)
+        {
+            playerColorPointer+=possiblePlayerColors.Length;
+        }
+    }
+    public Color getPlayerColor()
+    {
+        return possiblePlayerColors[playerColorPointer];
+    }
+    public Color getPreviousColor()
+    {
+        int color=(playerColorPointer-1);
+        if(color<0)
+        {
+            color+=possiblePlayerColors.Length;
+        }
+        return possiblePlayerColors[color];
+    }
+    public Color getNextColor()
+    {
+        int color=(playerColorPointer+1)%possiblePlayerColors.Length;
+        return possiblePlayerColors[color];
     }
    
 }
