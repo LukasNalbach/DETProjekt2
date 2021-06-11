@@ -19,30 +19,73 @@ public class WorldGenerator : MonoBehaviour
         roomsInside.Add(new Statuenraum());
         roomsInside.Add(new Thronsaal());
 
-        roomsOutside.Add(new Hafen());
         roomsOutside.Add(new Grabstaette());
+        roomsOutside.Add(new Hafen());
         roomsOutside.Add(new Wald());
         roomsOutside.Add(new Lavagrube());
+        roomsOutside.Add(new Zeltlager());
 
         Shuffle<RealGenRoom>(roomsInside);
         Shuffle<RealGenRoom>(roomsOutside);
 
-        GenRoom rootInside = new GenRoom();
-        GenRoom rootOutside = new GenRoom();
+        GenRoom rootInside = roomsInside[0];
+        GenRoom rootOutside = roomsOutside[0];
+        roomsInside.RemoveAt(0);
+        roomsOutside.RemoveAt(0);
+
         while (roomsInside.Count != 0) {
             int randomIndex = random.Next(roomsInside.Count);
-            rootInside.addSubroom(roomsInside[randomIndex]);
+            rootInside = rootInside.addSubroom(roomsInside[randomIndex]);
             roomsInside.RemoveAt(randomIndex);
         }
         while (roomsOutside.Count != 0) {
             int randomIndex = random.Next(roomsOutside.Count);
-            rootOutside.addSubroom(roomsOutside[randomIndex]);
+            rootOutside = rootOutside.addSubroom(roomsOutside[randomIndex]);
             roomsOutside.RemoveAt(randomIndex);
         }
-        GenRoom root = GenRoom.joinRooms(rootInside, rootOutside);
 
-        Rectangle worldArea = new Rectangle(0, 0, 600, 400);
+        VirtualGenRoom root = GenRoom.joinRooms(rootInside, rootOutside);
+
+        foreach (GenRoom room in root.getSubrooms()) {
+            room.setRandom(random);
+        }
+
+        Rectangle worldArea = new Rectangle(50, 50, 44 + random.Next(6), 44 + random.Next(6));
         root.generate(worldArea);
+
+        List<Rectangle> corridors = new List<Rectangle>();
+
+        foreach (GenRoom room in root.getSubrooms()) {
+            if (room is RealGenRoom) {
+                Rectangle rect = ((RealGenRoom) room).innerRect;
+                GenerateRectangle(rect.X, rect.Y, rect.Width, rect.Height);
+
+                Rectangle rect2 = ((RealGenRoom) room).outerRect;
+                GenerateRectangleBackground(rect2.X, rect2.Y, rect2.Width, rect2.Height);
+            } else if (room is VirtualGenRoom) {
+                corridors.AddRange(((VirtualGenRoom) room).corridors);
+            }
+        }
+
+        foreach (Rectangle corridor in corridors) {
+            GenerateRectangle(corridor.X, corridor.Y, corridor.Width, corridor.Height);
+        }
+
+        root.generateOutside();
+        root.generateInside();
+    }
+
+    public void GenerateRectangle(int x, int y, int w, int h) {
+        GameObject rectPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/rectPrefab.prefab", typeof(GameObject)) as GameObject;
+        GameObject rect = Instantiate(rectPrefab, new Vector2(x, y), new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
+        rect.transform.localScale = new Vector2(w, -h);
+    }
+
+    public void GenerateRectangleBackground(int x, int y, int w, int h) {
+        GameObject rectPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/rectPrefabBackground.prefab", typeof(GameObject)) as GameObject;
+        GameObject rect = Instantiate(rectPrefab, new Vector2(x, y), new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
+        rect.transform.localScale = new Vector2(w, -h);
+        rect.GetComponent<SpriteRenderer>().color = new UnityEngine.Color((float) random.NextDouble(), (float) random.NextDouble(), (float) random.NextDouble());
     }
 
     private void Shuffle<T>(IList<T> list)

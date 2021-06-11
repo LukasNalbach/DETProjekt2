@@ -7,25 +7,32 @@ using UnityEditor;
 public abstract class RealGenRoom : GenRoom {
     public Rectangle innerRect;
 
-    public RealGenRoom() : base() {
-        
-    }
-
-    public new List<Rectangle> getRects() {
+    public override List<Rectangle> getRects() {
         List<Rectangle> rects = new List<Rectangle>();
         rects.Add(innerRect);
         return rects;
     }
 
-    public new void generate(Rectangle outerRect) {}
-    protected new void generate(Rectangle outerRect, DividerType dividerType) {
+    public override String ToString() {
+        return "R";
+    }
+
+    public void generate(Rectangle newOuterRect) {
+        outerRect = newOuterRect;
+
         int x, y, w, h;
 
-        x = outerRect.X + random.Next(outerRect.Width / 4);
-        y = outerRect.Y + random.Next(outerRect.Height / 4);
-        w = random.Next(3 * outerRect.Width / 4);
-        h = random.Next(3 * outerRect.Height / 4);
+        x = (int) Math.Ceiling((double) outerRect.Width / 11 + random.Next(outerRect.Width / 11));
+        y = (int) Math.Ceiling((double) outerRect.Height / 11 + random.Next(outerRect.Height / 11));
+        w = (int) Math.Floor((double) 9 * outerRect.Width / 11 + random.Next(outerRect.Width / 11) - x);
+        h = (int) Math.Floor((double) 9 * outerRect.Height / 11 + random.Next(outerRect.Height / 11) - y);
 
-        innerRect = new Rectangle(x, y, w, h);
+        innerRect = new Rectangle(outerRect.X + x, outerRect.Y + y, w, h);
     }
+
+    public override int getRoomCount() {
+        return 1;
+    }
+    public abstract void generateInside();
+    public abstract void generateOutside();
 }

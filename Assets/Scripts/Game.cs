@@ -85,6 +85,8 @@ public class Game : MonoBehaviour
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("World"));
         GUI.updateTaskProgress(0);
         GUI.stopSabortageCountdown();
+
+        gameObject.AddComponent<WorldGenerator>();
     }
 
     private void createCrew()
