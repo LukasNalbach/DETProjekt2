@@ -1,14 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.SceneManagement;
 public class WorldGenerator : MonoBehaviour
 {
-    private System.Random random;
+    private System.Random random = new System.Random();
+    public Dictionary<RoomType,Rectangle> rooms = new Dictionary<RoomType,Rectangle>();
+    public List<Rectangle> corridors = new List<Rectangle>();
     public void Awake() {
-        random = new System.Random();
 
         List<RealGenRoom> roomsInside = new List<RealGenRoom>(6);
         List<RealGenRoom> roomsOutside = new List<RealGenRoom>(4);
@@ -53,39 +55,47 @@ public class WorldGenerator : MonoBehaviour
         Rectangle worldArea = new Rectangle(50, 50, 44 + random.Next(6), 44 + random.Next(6));
         root.generate(worldArea);
 
-        List<Rectangle> corridors = new List<Rectangle>();
-
         foreach (GenRoom room in root.getSubrooms()) {
             if (room is RealGenRoom) {
-                Rectangle rect = ((RealGenRoom) room).innerRect;
-                GenerateRectangle(rect.X, rect.Y, rect.Width, rect.Height);
-
-                Rectangle rect2 = ((RealGenRoom) room).outerRect;
-                GenerateRectangleBackground(rect2.X, rect2.Y, rect2.Width, rect2.Height);
+                rooms.Add(GetRoomTypeFromObject((RealGenRoom) room), ((RealGenRoom) room).innerRect);
             } else if (room is VirtualGenRoom) {
                 corridors.AddRange(((VirtualGenRoom) room).corridors);
             }
-        }
-
-        foreach (Rectangle corridor in corridors) {
-            GenerateRectangle(corridor.X, corridor.Y, corridor.Width, corridor.Height);
         }
 
         root.generateOutside();
         root.generateInside();
     }
 
-    public void GenerateRectangle(int x, int y, int w, int h) {
-        GameObject rectPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/rectPrefab.prefab", typeof(GameObject)) as GameObject;
-        GameObject rect = Instantiate(rectPrefab, new Vector2(x, y), new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
-        rect.transform.localScale = new Vector2(w, -h);
+    public static RoomType GetRoomTypeFromObject(RealGenRoom room) {
+        return (RoomType) System.Enum.Parse(typeof(RoomType), room.GetType().ToString(), true);
     }
 
-    public void GenerateRectangleBackground(int x, int y, int w, int h) {
-        GameObject rectPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/rectPrefabBackground.prefab", typeof(GameObject)) as GameObject;
-        GameObject rect = Instantiate(rectPrefab, new Vector2(x, y), new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
-        rect.transform.localScale = new Vector2(w, -h);
-        rect.GetComponent<SpriteRenderer>().color = new UnityEngine.Color((float) random.NextDouble(), (float) random.NextDouble(), (float) random.NextDouble());
+    public string GetNameFromPos(Vector2 pos) {
+        foreach (KeyValuePair<RoomType,Rectangle> room in rooms) {
+            if (IsPosInRectangle(pos, room.Value)) {
+                return room.Key.ToString();
+            }
+        }
+        for(int i = 0; i < corridors.Count; i++) {
+            if (IsPosInRectangle(pos, corridors[i])) {
+                return "Korridor " + i;
+            }
+        }
+        return "Raum/Korridor nicht gefunden";
+    }
+
+    public static bool IsPosInRectangle(Vector2 pos, Rectangle rect) {
+        return (
+            pos.x >= rect.Left && pos.x < rect.Right &&
+            pos.y >= rect.Top && pos.x < rect.Bottom
+        );
+    }
+
+    public void GenerateRectangle(Rectangle rect) {
+        GameObject rectPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/rectPrefab.prefab", typeof(GameObject)) as GameObject;
+        GameObject drawnRect = Instantiate(rectPrefab, new Vector2(rect.X, rect.Y), new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
+        drawnRect.transform.localScale = new Vector2(rect.Width, -rect.Height);
     }
 
     private void Shuffle<T>(IList<T> list)
