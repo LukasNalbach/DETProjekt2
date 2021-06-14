@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 public class Thronsaal : InsideRoom {
-    public override void generateInside() {
+    public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         
     }
 }

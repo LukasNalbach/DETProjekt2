@@ -22,29 +22,29 @@ public class VirtualGenRoom : GenRoom {
         return rects;
     }
 
-    public void generateInside() {
+    public void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         if (leftSubroom is RealGenRoom) {
-            ((RealGenRoom) leftSubroom).generateInside();
+            ((RealGenRoom) leftSubroom).generateInside(corridors, rectInside, rectOutside);
         } else {
-            ((VirtualGenRoom) leftSubroom).generateInside();
+            ((VirtualGenRoom) leftSubroom).generateInside(corridors, rectInside, rectOutside);
         }
         if (rightSubroom is RealGenRoom) {
-            ((RealGenRoom) rightSubroom).generateInside();
+            ((RealGenRoom) rightSubroom).generateInside(corridors, rectInside, rectOutside);
         } else {
-            ((VirtualGenRoom) rightSubroom).generateInside();
+            ((VirtualGenRoom) rightSubroom).generateInside(corridors, rectInside, rectOutside);
         }
     }
 
-    public void generateOutside() {
+    public void generateOutside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         if (leftSubroom is RealGenRoom) {
-            ((RealGenRoom) leftSubroom).generateOutside();
+            ((RealGenRoom) leftSubroom).generateOutside(corridors, rectInside, rectOutside);
         } else {
-            ((VirtualGenRoom) leftSubroom).generateOutside();
+            ((VirtualGenRoom) leftSubroom).generateOutside(corridors, rectInside, rectOutside);
         }
         if (rightSubroom is RealGenRoom) {
-            ((RealGenRoom) rightSubroom).generateOutside();
+            ((RealGenRoom) rightSubroom).generateOutside(corridors, rectInside, rectOutside);
         } else {
-            ((VirtualGenRoom) rightSubroom).generateOutside();
+            ((VirtualGenRoom) rightSubroom).generateOutside(corridors, rectInside, rectOutside);
         }
     }
 
@@ -53,7 +53,11 @@ public class VirtualGenRoom : GenRoom {
     }
 
     public void generate(Rectangle newOuterRect) {
-        generate(newOuterRect, random.NextDouble() > 0.5 ? DividerType.Horizontal : DividerType.Vertical);
+        if (newOuterRect.Width > newOuterRect.Height) {
+            generate(newOuterRect, DividerType.Vertical);
+        } else {
+            generate(newOuterRect, DividerType.Horizontal);
+        }
     }
 
     public void generate(Rectangle newOuterRect, DividerType dividerType) {
@@ -144,23 +148,23 @@ public class VirtualGenRoom : GenRoom {
                     swapped = true;
                 }
 
-                if (rectL.Left >= rectR.Left) {
-                    maxCorridorWidth = Math.Min((rectR.Right - rectL.Left), rectL.Width);
+                if (rectL.X >= rectR.X) {
+                    maxCorridorWidth = Math.Min((rectR.X + rectR.Width - rectL.X), rectL.Width);
                 } else {
-                    maxCorridorWidth = Math.Min((rectL.Right - rectR.Left), rectR.Width);
+                    maxCorridorWidth = Math.Min((rectL.X + rectL.Width - rectR.X), rectR.Width);
                 }
 
                 if (CollidesWith(rectL, rectR, "X")) {
-                    if (rectL.Top >= rectR.Bottom) {
-                        y = rectR.Bottom;
-                        h = rectL.Top - rectR.Bottom;
+                    if (rectL.Y + rectL.Height >= rectR.Y) {
+                        y = rectR.Y + rectR.Height;
+                        h = rectL.Y - (rectR.Y + rectR.Height);
                     } else {
-                        y = rectL.Bottom;
-                        h = rectR.Top - rectL.Bottom;
+                        y = rectL.Y + rectL.Height;
+                        h = rectR.Y - (rectL.Y + rectL.Height);
                     }
 
                     w = 2;
-                    for (int i = 0; i <= maxCorridorWidth - w; i++) {
+                    for (int i = 1; i <= maxCorridorWidth - (w + 1); i++) {
                         positions.Add(i);
                     }
                     found = false;
@@ -170,19 +174,19 @@ public class VirtualGenRoom : GenRoom {
                         pos = positions[iPos];
                         positions.RemoveAt(iPos);
 
-                        if (rectL.Left >= rectR.Left) {
-                            x = rectL.Left + pos;
+                        if (rectL.X >= rectR.X) {
+                            x = rectL.X + pos;
                         } else {
-                            x = rectR.Left + pos;
+                            x = rectR.X + pos;
                         }
 
+                        corridor = new Rectangle(x, y, w, h);
+                    
                         if (dividerType == DividerType.Vertical) {
-                            corridor = new Rectangle(y, x, h, w);
-                        } else {
-                            corridor = new Rectangle(x, y, w, h);
+                            corridor = Rotate(corridor);
                         }
 
-                        if (!Touches(corridor, otherRects, "XY") && !Touches(corridor, corridors, "XY")) {
+                        if (!Touches2(corridor, otherRects, "XY") && !Touches2(corridor, corridors, "XY")) {
                             corridors.Add(corridor);
                             found = true;
                         }
@@ -206,7 +210,6 @@ public class VirtualGenRoom : GenRoom {
         }
 
         int wantedCorridorAmount = Math.Min((int) Math.Ceiling((double) Math.Min(leftSubroom.getRoomCount(), rightSubroom.getRoomCount()) / 2), corridors.Count);
-        Debug.Log(wantedCorridorAmount + " : " + getRoomCount());
         if (wantedCorridorAmount < corridors.Count) {
             corridors.Sort((r1, r2) => Math.Max(r1.Width, r1.Height) - Math.Max(r2.Width, r2.Height));
             corridors.RemoveRange(Math.Max(wantedCorridorAmount, 0), Math.Max(corridors.Count - wantedCorridorAmount, 0));
@@ -221,12 +224,26 @@ public class VirtualGenRoom : GenRoom {
         return n;
     }
 
+    public static Rectangle Rotate(Rectangle rect) {
+        return new Rectangle(rect.Y, rect.X, rect.Height, rect.Width);
+    }
+
+    public static bool CollidesWith(Vector2 pos, Rectangle r2, String mode) {
+        Rectangle r1 = new Rectangle((int) pos.x, (int) pos.y, 1, 1);
+        return CollidesWith(r1, r2, mode);
+    }
+
+    public static bool CollidesWith(Vector2 pos, List<Rectangle> otherRects, String mode) {
+        Rectangle rect = new Rectangle((int) pos.x, (int) pos.y, 1, 1);
+        return CollidesWith(rect, otherRects, mode);
+    }
+
     public static bool CollidesWith(Rectangle r1, Rectangle r2, String mode) {
         if (mode == "X") {
             return (
-                (r1.Left >= r2.Left && r1.Left < r2.Right) ||
-                (r1.Right > r2.Left && r1.Right <= r2.Right) ||
-                (r1.Left < r2.Left && r1.Right > r2.Right)
+                (r1.X >= r2.X && r1.X < r2.X + r2.Width) ||
+                (r1.X + r1.Width > r2.X && r1.X + r1.Width <= r2.X + r2.Width) ||
+                (r1.X < r2.X && r1.X + r1.Width > r2.X + r2.Width)
             );
         } else if (mode == "Y") {
             return CollidesWith(Rotate(r1), Rotate(r2), "X");
@@ -247,8 +264,8 @@ public class VirtualGenRoom : GenRoom {
     }
 
     public static bool Touches(Rectangle r1, Rectangle r2, String mode) {
-        Rectangle r1_ = new Rectangle(r1.X - 1, r1.Y - 1, r1.Width + 2, r2.Height + 2);
-        return CollidesWith(r1_, r2, mode);
+        Rectangle r2_ = new Rectangle(r2.X - 1, r2.Y - 1, r2.Width + 2, r2.Height + 2);
+        return CollidesWith(r1, r2_, mode);
     }
 
     public static bool Touches(Rectangle rect, List<Rectangle> otherRects, String mode) {
@@ -260,7 +277,37 @@ public class VirtualGenRoom : GenRoom {
         return false;
     }
 
-    public static Rectangle Rotate(Rectangle rect) {
-        return new Rectangle(rect.Y, rect.X, rect.Height, rect.Width);
+    public static bool Touches(Vector2 pos, Rectangle r2, String mode) {
+        Rectangle r1 = new Rectangle((int) pos.x, (int) pos.y, 1, 1);
+        return Touches(r1, r2, mode);
+    }
+
+    public static bool Touches(Vector2 pos, List<Rectangle> otherRects, String mode) {
+        Rectangle rect = new Rectangle((int) pos.x, (int) pos.y, 1, 1);
+        return Touches(rect, otherRects, mode);
+    }
+
+    public static bool Touches2(Rectangle r1, Rectangle r2, String mode) {
+        Rectangle r2_ = new Rectangle(r2.X - 2, r2.Y - 2, r2.Width + 4, r2.Height + 4);
+        return CollidesWith(r1, r2_, mode);
+    }
+
+    public static bool Touches2(Rectangle rect, List<Rectangle> otherRects, String mode) {
+        foreach (Rectangle otherRect in otherRects) {
+            if (Touches2(rect, otherRect, mode)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static bool Touches2(Vector2 pos, Rectangle r2, String mode) {
+        Rectangle r1 = new Rectangle((int) pos.x, (int) pos.y, 1, 1);
+        return Touches2(r1, r2, mode);
+    }
+
+    public static bool Touches2(Vector2 pos, List<Rectangle> otherRects, String mode) {
+        Rectangle rect = new Rectangle((int) pos.x, (int) pos.y, 1, 1);
+        return Touches2(rect, otherRects, mode);
     }
 }

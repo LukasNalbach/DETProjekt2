@@ -19,20 +19,33 @@ public abstract class RealGenRoom : GenRoom {
 
     public void generate(Rectangle newOuterRect) {
         outerRect = newOuterRect;
+        Rectangle innerOuterRect = new Rectangle(outerRect.X + 1, outerRect.Y + 1, outerRect.Width - 2, outerRect.Height - 2);
 
         int x, y, w, h;
 
-        x = (int) Math.Ceiling((double) outerRect.Width / 11 + random.Next(outerRect.Width / 11));
-        y = (int) Math.Ceiling((double) outerRect.Height / 11 + random.Next(outerRect.Height / 11));
-        w = (int) Math.Floor((double) 9 * outerRect.Width / 11 + random.Next(outerRect.Width / 11) - x);
-        h = (int) Math.Floor((double) 9 * outerRect.Height / 11 + random.Next(outerRect.Height / 11) - y);
+        x = (int) Math.Ceiling((double) innerOuterRect.Width / 9 + random.Next(innerOuterRect.Width / 9));
+        y = (int) Math.Ceiling((double) innerOuterRect.Height / 9 + random.Next(innerOuterRect.Height / 9));
+        w = (int) Math.Ceiling((double) 7 * innerOuterRect.Width / 9 + random.Next(innerOuterRect.Width / 9) - x);
+        h = (int) Math.Ceiling((double) 7 * innerOuterRect.Height / 9 + random.Next(innerOuterRect.Height / 9) - y);
 
-        innerRect = new Rectangle(outerRect.X + x, outerRect.Y + y, w, h);
+        innerRect = new Rectangle(innerOuterRect.X + x, innerOuterRect.Y + y, w, h);
+    }
+
+    public bool IsPosFree(Vector2 pos, List<Rectangle> corridors, List<GameObject> placedObjects) {
+        foreach (GameObject obj in placedObjects) {
+            if (VirtualGenRoom.Touches(pos, WorldGenerator.GetRectangleFromTransform(obj.transform), "XY")) {
+                return false;
+            }
+        }
+        if (VirtualGenRoom.Touches2(pos, corridors, "XY")) {
+            return false;
+        }
+        return true;
     }
 
     public override int getRoomCount() {
         return 1;
     }
-    public abstract void generateInside();
-    public abstract void generateOutside();
+    public abstract void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside);
+    public abstract void generateOutside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside);
 }

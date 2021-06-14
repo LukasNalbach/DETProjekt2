@@ -5,7 +5,7 @@ public enum RoomType {
     Statuenraum,
     Thronsaal,
     Grabstaette,
-    Hafen,
+    Brunnen,
     Lavagrube,
     Wald,
     Zeltlager
