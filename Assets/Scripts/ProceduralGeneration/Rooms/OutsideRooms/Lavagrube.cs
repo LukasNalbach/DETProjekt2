@@ -28,7 +28,7 @@ public class Lavagrube : OutsideRoom {
         int n = innerRect.Width * innerRect.Height / 2;
         for (int i = 0; i < n; i++) {
             Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + random.Next(innerRect.Height));
-            if (!VirtualGenRoom.CollidesWith(pos, lavaCollisionRect, "XY") && IsPosFree(pos, corridors, placedObjects)) {
+            if (!VirtualGenRoom.IsCloserToThan(pos, lavaCollisionRect, "XY", 0) && IsPosFree(pos, corridors, placedObjects)) {
                 GameObject obj;
 
                 double rn = random.NextDouble();

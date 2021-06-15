@@ -40,7 +40,7 @@ public class Statuenraum : InsideRoom {
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {
             for (int y = innerRect.Y; y < innerRect.Y + innerRect.Height; y++) {
                 Vector2 pos = new Vector2(x, y);
-                if (VirtualGenRoom.CollidesWith(pos, podestRect, "XY")) {
+                if (VirtualGenRoom.IsCloserToThan(pos, podestRect, "XY", 0)) {
                     wGen.CreateStoneGround(new Vector2(x, y));
                 } else {
                     wGen.CreateGrassGround(pos, 0.04, 0.01, 0.5);

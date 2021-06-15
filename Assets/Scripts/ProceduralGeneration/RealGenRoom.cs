@@ -33,11 +33,11 @@ public abstract class RealGenRoom : GenRoom {
 
     public bool IsPosFree(Vector2 pos, List<Rectangle> corridors, List<GameObject> placedObjects) {
         foreach (GameObject obj in placedObjects) {
-            if (VirtualGenRoom.Touches(pos, WorldGenerator.GetRectangleFromTransform(obj.transform), "XY")) {
+            if (VirtualGenRoom.IsCloserToThan(pos, WorldGenerator.GetRectangleFromTransform(obj.transform), "XY", 1)) {
                 return false;
             }
         }
-        if (VirtualGenRoom.Touches2(pos, corridors, "XY")) {
+        if (VirtualGenRoom.IsCloserToThan(pos, corridors, "XY", 2)) {
             return false;
         }
         return true;

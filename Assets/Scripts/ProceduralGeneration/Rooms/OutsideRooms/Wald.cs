@@ -39,7 +39,7 @@ public class Wald : OutsideRoom {
 
                 if (rn <= 0.2) {
                     obj = wGen.CreateGrassOnTileWithProb(pos, 1);
-                } else if (rn <= 0.4 || VirtualGenRoom.CollidesWith(pos, signRect, "XY")) {
+                } else if (rn <= 0.4 || VirtualGenRoom.IsCloserToThan(pos, signRect, "XY", 0)) {
                     obj = wGen.CreateBushOnTile(pos);
                 } else {
                     obj = wGen.CreateTreeOnTile(pos);

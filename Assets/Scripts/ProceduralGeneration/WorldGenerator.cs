@@ -20,13 +20,13 @@ public class WorldGenerator : MonoBehaviour
         roomsInside.Add(new Opferstaette());
         roomsInside.Add(new Schatzkammer());
         roomsInside.Add(new Statuenraum());
-        //roomsInside.Add(new Thronsaal());
+        roomsInside.Add(new Thronsaal());
 
         roomsOutside.Add(new Grabstaette());
         roomsOutside.Add(new Brunnen());
         roomsOutside.Add(new Wald());
         roomsOutside.Add(new Lavagrube());
-        //roomsOutside.Add(new Zeltlager());
+        roomsOutside.Add(new Zeltlager());
 
         Shuffle<RealGenRoom>(roomsInside);
         Shuffle<RealGenRoom>(roomsOutside);

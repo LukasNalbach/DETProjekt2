@@ -141,7 +141,7 @@ public class VirtualGenRoom : GenRoom {
                 }
 
                 swapped = false;
-                if (!CollidesWith(rectL, rectR, "X")) {
+                if (!IsCloserToThan(rectL, rectR, "X", 0)) {
                     tmpRectSwap = rectL;
                     rectL = rectR;
                     rectR = tmpRectSwap;
@@ -154,7 +154,7 @@ public class VirtualGenRoom : GenRoom {
                     maxCorridorWidth = Math.Min((rectL.X + rectL.Width - rectR.X), rectR.Width);
                 }
 
-                if (CollidesWith(rectL, rectR, "X")) {
+                if (IsCloserToThan(rectL, rectR, "X", 0)) {
                     if (rectL.Y + rectL.Height >= rectR.Y) {
                         y = rectR.Y + rectR.Height;
                         h = rectL.Y - (rectR.Y + rectR.Height);
@@ -186,7 +186,7 @@ public class VirtualGenRoom : GenRoom {
                             corridor = Rotate(corridor);
                         }
 
-                        if (!Touches2(corridor, otherRects, "XY") && !Touches2(corridor, corridors, "XY")) {
+                        if (!IsCloserToThan(corridor, otherRects, "XY", 2) && !IsCloserToThan(corridor, corridors, "XY", 2)) {
                             corridors.Add(corridor);
                             found = true;
                         }
@@ -228,86 +228,58 @@ public class VirtualGenRoom : GenRoom {
         return new Rectangle(rect.Y, rect.X, rect.Height, rect.Width);
     }
 
-    public static bool CollidesWith(Vector2 pos, Rectangle r2, String mode) {
-        Rectangle r1 = new Rectangle((int) pos.x, (int) pos.y, 1, 1);
-        return CollidesWith(r1, r2, mode);
-    }
-
-    public static bool CollidesWith(Vector2 pos, List<Rectangle> otherRects, String mode) {
-        Rectangle rect = new Rectangle((int) pos.x, (int) pos.y, 1, 1);
-        return CollidesWith(rect, otherRects, mode);
-    }
-
-    public static bool CollidesWith(Rectangle r1, Rectangle r2, String mode) {
-        if (mode == "X") {
-            return (
-                (r1.X >= r2.X && r1.X < r2.X + r2.Width) ||
-                (r1.X + r1.Width > r2.X && r1.X + r1.Width <= r2.X + r2.Width) ||
-                (r1.X < r2.X && r1.X + r1.Width > r2.X + r2.Width)
-            );
-        } else if (mode == "Y") {
-            return CollidesWith(Rotate(r1), Rotate(r2), "X");
-        } else if (mode == "XY") {
-            return CollidesWith(r1, r2, "X") && CollidesWith(r1, r2, "Y");
+    public static bool IsCloserToThan(Rectangle r1, Rectangle r2, String mode, int distance) {
+        if (distance != 0) {
+            Rectangle r2_ = new Rectangle(r2.X - distance, r2.Y - distance, r2.Width + 2 * distance, r2.Height + 2 * distance);
+            return IsCloserToThan(r1, r2_, mode, 0);
         } else {
-            return false;
+            if (mode == "X") {
+                return (
+                    (r1.X >= r2.X && r1.X < r2.X + r2.Width) ||
+                    (r1.X + r1.Width > r2.X && r1.X + r1.Width <= r2.X + r2.Width) ||
+                    (r1.X < r2.X && r1.X + r1.Width > r2.X + r2.Width)
+                );
+            } else if (mode == "Y") {
+                return IsCloserToThan(Rotate(r1), Rotate(r2), "X", 0);
+            } else if (mode == "XY") {
+                return IsCloserToThan(r1, r2, "X", 0) && IsCloserToThan(r1, r2, "Y", 0);
+            } else {
+                return false;
+            }
         }
     }
 
-    public static bool CollidesWith(Rectangle rect, List<Rectangle> otherRects, String mode) {
+    public static bool IsCloserToThan(Rectangle rect, List<Rectangle> otherRects, String mode, int distance) {
         foreach (Rectangle otherRect in otherRects) {
-            if (CollidesWith(rect, otherRect, mode)) {
+            if (IsCloserToThan(rect, otherRect, mode, distance)) {
                 return true;
             }
         }
         return false;
     }
 
-    public static bool Touches(Rectangle r1, Rectangle r2, String mode) {
-        Rectangle r2_ = new Rectangle(r2.X - 1, r2.Y - 1, r2.Width + 2, r2.Height + 2);
-        return CollidesWith(r1, r2_, mode);
-    }
-
-    public static bool Touches(Rectangle rect, List<Rectangle> otherRects, String mode) {
-        foreach (Rectangle otherRect in otherRects) {
-            if (Touches(rect, otherRect, mode)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static bool Touches(Vector2 pos, Rectangle r2, String mode) {
+    public static bool IsCloserToThan(Vector2 pos, Rectangle r2, String mode, int distance) {
         Rectangle r1 = new Rectangle((int) pos.x, (int) pos.y, 1, 1);
-        return Touches(r1, r2, mode);
+        return IsCloserToThan(r1, r2, mode, distance);
     }
 
-    public static bool Touches(Vector2 pos, List<Rectangle> otherRects, String mode) {
+    public static bool IsCloserToThan(Vector2 pos, List<Rectangle> otherRects, String mode, int distance) {
         Rectangle rect = new Rectangle((int) pos.x, (int) pos.y, 1, 1);
-        return Touches(rect, otherRects, mode);
+        return IsCloserToThan(rect, otherRects, mode, distance);
     }
 
-    public static bool Touches2(Rectangle r1, Rectangle r2, String mode) {
-        Rectangle r2_ = new Rectangle(r2.X - 2, r2.Y - 2, r2.Width + 4, r2.Height + 4);
-        return CollidesWith(r1, r2_, mode);
+    public static bool IsCloserToThan(Vector2 pos1, Vector2 pos2, String mode, int distance) {
+        Rectangle r1 = new Rectangle((int) pos1.x, (int) pos1.y, 1, 1);
+        Rectangle r2 = new Rectangle((int) pos2.x, (int) pos2.y, 1, 1);
+        return IsCloserToThan(r1, r2, mode, distance);
     }
 
-    public static bool Touches2(Rectangle rect, List<Rectangle> otherRects, String mode) {
-        foreach (Rectangle otherRect in otherRects) {
-            if (Touches2(rect, otherRect, mode)) {
+    public static bool IsCloserToThan(Vector2 pos, List<Vector2> otherPoss, String mode, int distance) {
+        foreach (Vector2 otherPos in otherPoss) {
+            if (IsCloserToThan(pos, otherPos, mode, distance)) {
                 return true;
             }
         }
         return false;
-    }
-
-    public static bool Touches2(Vector2 pos, Rectangle r2, String mode) {
-        Rectangle r1 = new Rectangle((int) pos.x, (int) pos.y, 1, 1);
-        return Touches2(r1, r2, mode);
-    }
-
-    public static bool Touches2(Vector2 pos, List<Rectangle> otherRects, String mode) {
-        Rectangle rect = new Rectangle((int) pos.x, (int) pos.y, 1, 1);
-        return Touches2(rect, otherRects, mode);
     }
 }

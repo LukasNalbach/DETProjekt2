@@ -39,7 +39,7 @@ public class Brunnen : OutsideRoom {
 
                 if (rn <= 0.7) {
                     obj = wGen.CreateGrassOnTileWithProb(pos, 1);
-                } else if (rn <= 0.9 || VirtualGenRoom.CollidesWith(pos, brunnenRect, "XY")) {
+                } else if (rn <= 0.9 || VirtualGenRoom.IsCloserToThan(pos, brunnenRect, "XY", 0)) {
                     obj = wGen.CreateBushOnTile(pos);
                 } else {
                     obj = wGen.CreateTreeOnTile(pos);

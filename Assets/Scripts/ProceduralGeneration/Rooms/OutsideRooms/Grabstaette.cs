@@ -40,7 +40,7 @@ public class Grabstaette : OutsideRoom {
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {
             for (int y = innerRect.Y; y < innerRect.Y + innerRect.Height; y++) {
                 Vector2 pos = new Vector2(x, y);
-                if (VirtualGenRoom.CollidesWith(pos, podestRect, "XY")) {
+                if (VirtualGenRoom.IsCloserToThan(pos, podestRect, "XY", 0)) {
                     wGen.CreateGrassGround(pos, 0, 0, 0);
                 } else {
                     wGen.CreateGrassGround(pos, 0.6, 0.05, 0.25);

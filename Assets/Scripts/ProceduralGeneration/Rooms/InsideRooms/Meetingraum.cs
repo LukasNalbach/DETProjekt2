@@ -63,7 +63,7 @@ public class Meetingraum : InsideRoom {
         for (int i = 0; i < n; i++) {
             Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + random.Next(innerRect.Height));
             Debug.Log(pos);
-            if (!VirtualGenRoom.Touches(pos, centerRect, "XY") && IsPosFree(pos, corridors, placedObjects)) {
+            if (!VirtualGenRoom.IsCloserToThan(pos, centerRect, "XY", 1) && IsPosFree(pos, corridors, placedObjects)) {
                 placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(pos.x + 0.5f, pos.y), pillars[random.Next(pillars.Length)]));
             }
         }

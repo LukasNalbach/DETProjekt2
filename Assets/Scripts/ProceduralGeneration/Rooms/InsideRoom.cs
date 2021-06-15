@@ -27,12 +27,12 @@ public abstract class InsideRoom : RealGenRoom {
             for (int y = rectInside.Y - 10; y < rectInside.Y + rectInside.Height + 10; y++) {
                 Vector2 pos = new Vector2(x, y);
 
-                if (!VirtualGenRoom.CollidesWith(pos, corridors, "XY")) { // is not in corridor
+                if (!VirtualGenRoom.IsCloserToThan(pos, corridors, "XY", 0)) { // is not in corridor
                     bool touchesCorr = false;
                     Rectangle touchedCorridor;
                     
                     foreach (Rectangle corridor in corridors) {
-                        if (VirtualGenRoom.Touches(pos, corridor, "XY")) {
+                        if (VirtualGenRoom.IsCloserToThan(pos, corridor, "XY", 1)) {
                             touchesCorr = true;
                             touchedCorridor = corridor;
                             break;
@@ -58,12 +58,12 @@ public abstract class InsideRoom : RealGenRoom {
             for (int y = rectInside.Y - 10; y < rectInside.Y + rectInside.Height + 10; y++) {
                 Vector2 pos = new Vector2(x, y);
 
-                if (!VirtualGenRoom.CollidesWith(pos, corridors, "XY")) { // is not in corridor
+                if (!VirtualGenRoom.IsCloserToThan(pos, corridors, "XY", 0)) { // is not in corridor
                     bool touchesCorr = false;
                     Rectangle touchedCorridor;
                     
                     foreach (Rectangle corridor in corridors) {
-                        if (VirtualGenRoom.Touches(pos, corridor, "XY")) {
+                        if (VirtualGenRoom.IsCloserToThan(pos, corridor, "XY", 1)) {
                             touchesCorr = true;
                             touchedCorridor = corridor;
                             break;
@@ -89,12 +89,12 @@ public abstract class InsideRoom : RealGenRoom {
             for (int x = rectInside.X - 10; x < rectInside.X + rectInside.Width + 10; x++) {
                 Vector2 pos = new Vector2(x, y);
 
-                if (!VirtualGenRoom.CollidesWith(pos, corridors, "XY")) { // is not in corridor
+                if (!VirtualGenRoom.IsCloserToThan(pos, corridors, "XY", 0)) { // is not in corridor
                     bool touchesCorr = false;
                     Rectangle touchedCorridor;
                     
                     foreach (Rectangle corridor in corridors) {
-                        if (VirtualGenRoom.Touches(pos, corridor, "XY")) {
+                        if (VirtualGenRoom.IsCloserToThan(pos, corridor, "XY", 1)) {
                             touchesCorr = true;
                             touchedCorridor = corridor;
                             break;
@@ -120,12 +120,12 @@ public abstract class InsideRoom : RealGenRoom {
             for (int x = rectInside.X - 10; x < rectInside.X + rectInside.Width + 10; x++) {
                 Vector2 pos = new Vector2(x, y);
 
-                if (!VirtualGenRoom.CollidesWith(pos, corridors, "XY")) { // is not in corridor
+                if (!VirtualGenRoom.IsCloserToThan(pos, corridors, "XY", 0)) { // is not in corridor
                     bool touchesCorr = false;
                     Rectangle touchedCorridor;
                     
                     foreach (Rectangle corridor in corridors) {
-                        if (VirtualGenRoom.Touches(pos, corridor, "XY")) {
+                        if (VirtualGenRoom.IsCloserToThan(pos, corridor, "XY", 1)) {
                             touchesCorr = true;
                             touchedCorridor = corridor;
                             break;
@@ -156,15 +156,15 @@ public abstract class InsideRoom : RealGenRoom {
                 if (WorldGenerator.IsPosInRectangle(pos, innerRect)) { // in room
                     //wGen.CreateStoneGround(pos);
                 } else { // outside room
-                    if (VirtualGenRoom.CollidesWith(pos, corridors, "XY")) { // in corridor
+                    if (VirtualGenRoom.IsCloserToThan(pos, corridors, "XY", 0)) { // in corridor
                         wGen.CreateGrassGround(pos, 0.02, 0.01, 0.97);
-                    } else if (!VirtualGenRoom.Touches(pos, rectOutside, "XY")) { // in wall and not at edge to outside
-                        bool touchesRoom = VirtualGenRoom.Touches(pos, innerRect, "XY");
+                    } else if (!VirtualGenRoom.IsCloserToThan(pos, rectOutside, "XY", 1)) { // in wall and not at edge to outside
+                        bool touchesRoom = VirtualGenRoom.IsCloserToThan(pos, innerRect, "XY", 1);
                         bool touchesCorr = false;
                         Rectangle touchedCorridor;
                         
                         foreach (Rectangle corridor in corridors) {
-                            if (VirtualGenRoom.Touches(pos, corridor, "XY")) {
+                            if (VirtualGenRoom.IsCloserToThan(pos, corridor, "XY", 1)) {
                                 touchesCorr = true;
                                 touchedCorridor = corridor;
                                 break;

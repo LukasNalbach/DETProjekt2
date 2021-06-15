@@ -15,7 +15,7 @@ public class Opferstaette : InsideRoom {
         Vector2 posAltar;
 
         if (innerRect.Width >= innerRect.Height) { // sideways 
-            float y = innerRect.Y + ((float) innerRect.Height) / 2;
+            float y = innerRect.Y + ((float) innerRect.Height) / 2 - 1;
             if (random.NextDouble() <= 0.5) { // altar is left
                 placementMode = "LEFT";
                 posAltar = new Vector2(safeRect.X, y);
@@ -75,7 +75,7 @@ public class Opferstaette : InsideRoom {
 
                 foreach (int y in ys) {
                     Vector2 pos = new Vector2(x, y);
-                    if (IsPosFree(pos, corridors, placedObjects)) {
+                    if (!VirtualGenRoom.IsCloserToThan(pos, posAltar, "XY", 2) && IsPosFree(pos, corridors, placedObjects)) {
                         placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(x + 0.5f, y), wallObjects[random.Next(wallObjects.Length)]));
                     }
                 }
@@ -87,7 +87,7 @@ public class Opferstaette : InsideRoom {
 
                 foreach (int x in xs) {
                     Vector2 pos = new Vector2(x, y);
-                    if (IsPosFree(pos, corridors, placedObjects)) {
+                    if (!VirtualGenRoom.IsCloserToThan(pos, posAltar, "XY", 2) && IsPosFree(pos, corridors, placedObjects)) {
                         placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(x + 0.5f, y), wallObjects[random.Next(wallObjects.Length)]));
                     }
                 }
@@ -102,7 +102,7 @@ public class Opferstaette : InsideRoom {
         int n = innerRect.Width * innerRect.Height / 20;
         for (int i = 0; i < n; i++) {
             Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + random.Next(innerRect.Height));
-            if (IsPosFree(pos, corridors, placedObjects)) {
+            if (!VirtualGenRoom.IsCloserToThan(pos, posAltar, "XY", 2) && IsPosFree(pos, corridors, placedObjects)) {
                 placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(pos.x + 0.5f, pos.y), pillars[random.Next(pillars.Length)]));
             }
         }
