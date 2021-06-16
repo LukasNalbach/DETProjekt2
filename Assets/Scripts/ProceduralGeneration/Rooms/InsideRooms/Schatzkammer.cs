@@ -25,7 +25,7 @@ public class Schatzkammer : InsideRoom {
             "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Pot B.prefab",
             "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Pot C.prefab"
         };
-        for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x += 1 +random.Next(1)) {
+        for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x += 1 + random.Next(2)) {
             if (random.NextDouble() <= 0.5) {
                 int[] ys = {innerRect.Y, innerRect.Y + innerRect.Height - 1};
 
@@ -37,7 +37,7 @@ public class Schatzkammer : InsideRoom {
                 }
             }
         }
-        for (int y = innerRect.Y; y < innerRect.Y + innerRect.Height; y += 1 +random.Next(1)) {
+        for (int y = innerRect.Y; y < innerRect.Y + innerRect.Height; y += 1 + random.Next(2)) {
             if (random.NextDouble() <= 0.5) {
                 int[] xs = {innerRect.X, innerRect.X + innerRect.Width - 1};
 

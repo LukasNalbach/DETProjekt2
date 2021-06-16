@@ -8,5 +8,5 @@ public enum RoomType {
     Brunnen,
     Lavagrube,
     Wald,
-    Zeltlager
+    Steinbruch
 }

@@ -26,7 +26,7 @@ public class WorldGenerator : MonoBehaviour
         roomsOutside.Add(new Brunnen());
         roomsOutside.Add(new Wald());
         roomsOutside.Add(new Lavagrube());
-        roomsOutside.Add(new Zeltlager());
+        roomsOutside.Add(new Steinbruch());
 
         Shuffle<RealGenRoom>(roomsInside);
         Shuffle<RealGenRoom>(roomsOutside);
