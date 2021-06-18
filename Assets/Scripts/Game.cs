@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.SceneManagement;
@@ -78,32 +79,43 @@ public class Game : MonoBehaviour
 
     private void Start()
     {
+        WorldGenerator wGen = gameObject.AddComponent<WorldGenerator>();
+        
         createCrew();
         setRooms();
         setCrewMadesTask();
         createVentConnections();
         createSabortageOptions();
-        SceneManager.LoadScene("IngameGUI", LoadSceneMode.Additive);
+        AsyncOperation op = SceneManager.LoadSceneAsync("IngameGUI", LoadSceneMode.Additive);
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("World"));
-        GUI.updateTaskProgress(0);
-        GUI.stopSabortageCountdown();
-
-        gameObject.AddComponent<WorldGenerator>();
     }
 
     private void createCrew()
     {
         GameObject playerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Player.prefab", typeof(GameObject)) as GameObject;
+        List<Vector2> positions = new List<Vector2>();
+        RealGenRoom meetingraum;
+        GetComponent<WorldGenerator>().rooms.TryGetValue(RoomType.Meetingraum, out meetingraum);
+        List<Rectangle> placedObjectsRects = meetingraum.placedObjects.ConvertAll((GameObject obj) => WorldGenerator.GetRectangleFromTransform(obj.transform));
+        Rectangle spawnRect = new Rectangle((int) ((Meetingraum) meetingraum).emergencyButton.transform.position.x - 2, (int) ((Meetingraum) meetingraum).emergencyButton.transform.position.y - 2, 5, 5);
 
         for (int i = 0; i < Settings.numberPlayers; i++) {
-            Vector3 pos = startPoint;
-            GameObject newPlayer = Instantiate(playerPrefab, pos, new Quaternion());
+            while (positions.Count == i) {
+                Vector2 pos = new Vector2(spawnRect.X + random.Next(spawnRect.Width), spawnRect.Y + random.Next(spawnRect.Height));
+                if (
+                    !VirtualGenRoom.IsCloserToThan(pos, positions, "XY", 0) &&
+                    !VirtualGenRoom.IsCloserToThan(pos, placedObjectsRects, "XY", 0)
+                ) {
+                    positions.Add(pos);
+                }
+            }
+            GameObject newPlayer = Instantiate(playerPrefab, positions[positions.Count - 1], new Quaternion());
             if (i >= Settings.numberImposters) {
                 newPlayer.AddComponent<CrewMate>();
             } else {
                 newPlayer.AddComponent<Imposter>();
             }
-            Color nextColor=Settings.getPossibleColors()[(Settings.getPlayerColorPointer()+i)%Settings.getPossibleColors().Length];
+            UnityEngine.Color nextColor=Settings.getPossibleColors()[(Settings.getPlayerColorPointer()+i)%Settings.getPossibleColors().Length];
             newPlayer.GetComponent<Player>().create(nextColor);
             allPlayers.Add(newPlayer.GetComponent<Player>());
         }
@@ -117,19 +129,15 @@ public class Game : MonoBehaviour
     }
 
     private void setRooms() {
-        int i = 1;
-        while (GameObject.Find("Room" + i + "_1")) {
+        int i = 0;
+        while (i < 10) {
             Room room = gameObject.AddComponent<Room>();
-            Task task1 = GameObject.Find("Room" + i + "Task1").AddComponent<Task>();
-            Task task2 = GameObject.Find("Room" + i + "Task2").AddComponent<Task>();
-            task1.CreateTask(1,1f,true);
-            task2.CreateTask(2,1f,true);
-            room.CreateRoom(i, task1, task2);
-            task1.room = room;
-            task2.room = room;
+            Task task = GameObject.Find("Room" + i + "Task").AddComponent<Task>();
+            task.CreateTask(1,1f,true);
+            room.CreateRoom(i, task);
+            task.room = room;
             addRoom(room);
-            addTask(task1);
-            addTask(task2);
+            addTask(task);
             i++;
         }
     }
@@ -220,7 +228,7 @@ public class Game : MonoBehaviour
              if(killCooldown>0)
             {
                 killCooldown-=Time.deltaTime;
-                GUI.updateKillCooldown((int)killCooldown);
+                GUI.updateKillCooldown(1 - killCooldown / Settings.cooldownTime);
             }
             if(activeSabortage!=null)
             {
@@ -231,7 +239,7 @@ public class Game : MonoBehaviour
                 }
                 else
                 {
-                    GUI.updateSabortageCountdown((int)activeSabortage.currentTimeToSolve);
+                    GUI.updateSabortageCountdown(activeSabortage.currentTimeToSolve / activeSabortage.timeToSolve);
                 }
             }
         }
@@ -251,8 +259,7 @@ public class Game : MonoBehaviour
     }
     public void resetKillCooldown()
     {
-        killCooldown=Settings.cooldownTime;
-        GUI.updateKillCooldown((int)killCooldown);
+        GUI.updateKillCooldown(1);
     }
     public float getTaskProgress()
     {
@@ -261,13 +268,13 @@ public class Game : MonoBehaviour
     public void increaseTaskProgress()
     {
         taskDone++;
-        GUI.updateTaskProgress((int)(getTaskProgress()*100));
+        GUI.updateTaskProgress(getTaskProgress());
     }
     public void removeCrewMateFromTaskProgress(CrewMate lostCrewMate)
     {
         totalTasks-=Game.Instance.Settings.tasks;
         taskDone-=lostCrewMate.taskDone;
-        GUI.updateTaskProgress((int)(getTaskProgress()*100));
+        GUI.updateTaskProgress(getTaskProgress());
     }
     public void startSabortage(Sabortage sabortage)
     {
@@ -281,7 +288,6 @@ public class Game : MonoBehaviour
     public void stopSabortage()
     {
         activeSabortage=null;
-        GUI.stopSabortageCountdown();
     }
     public List<SabortageTask> allActiveSabortageTasks()
     {

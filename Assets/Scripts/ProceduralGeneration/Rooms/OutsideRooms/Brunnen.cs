@@ -7,7 +7,6 @@ using UnityEditor;
 public class Brunnen : OutsideRoom {
     public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
-        List<GameObject> placedObjects = new List<GameObject>();
 
         // create ground
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {
@@ -26,6 +25,7 @@ public class Brunnen : OutsideRoom {
         }
         GameObject brunnen = wGen.CreateAssetFromPrefab(new Vector2(posBrunnen.x + 0.5f, posBrunnen.y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Well.prefab");
         placedObjects.Add(brunnen);
+        task = brunnen;
         Rectangle brunnenRect = new Rectangle((int) posBrunnen.x - 1, (int)  posBrunnen.y - 4, 3, 5);
 
         // place random Plants

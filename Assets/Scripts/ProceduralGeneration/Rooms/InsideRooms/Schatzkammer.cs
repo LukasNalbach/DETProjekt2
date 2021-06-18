@@ -7,7 +7,6 @@ using UnityEditor;
 public class Schatzkammer : InsideRoom {
     public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
-        List<GameObject> placedObjects = new List<GameObject>();
 
         // create ground
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {
@@ -60,6 +59,7 @@ public class Schatzkammer : InsideRoom {
         }
         GameObject openChest = wGen.CreateAssetFromPrefab(new Vector2(posOpenChest.x + 0.5f, posOpenChest.y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Chest Open.prefab");
         placedObjects.Add(openChest);
+        task = openChest;
 
         // place random pillars
         string[] pillars = {

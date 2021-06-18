@@ -7,7 +7,6 @@ using UnityEditor;
 public class Statuenraum : InsideRoom {
     public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
-        List<GameObject> placedObjects = new List<GameObject>();
         
         // set statue position
         string placementMode = "";
@@ -32,6 +31,7 @@ public class Statuenraum : InsideRoom {
         // create statue
         GameObject statue = wGen.CreateAssetFromPrefab(posStatue + new Vector2(0.5f, 0.0f), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Statue.prefab");
         placedObjects.Add(statue);
+        task = statue;
 
         // set statue podest area
         Rectangle podestRect = new Rectangle((int) posStatue.x - 1, (int) posStatue.y - 1, 3, 3);

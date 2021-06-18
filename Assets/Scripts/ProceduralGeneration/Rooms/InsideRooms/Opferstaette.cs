@@ -7,7 +7,6 @@ using UnityEditor;
 public class Opferstaette : InsideRoom {
     public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
-        List<GameObject> placedObjects = new List<GameObject>();
         
         // set altar position
         string placementMode = "";
@@ -32,6 +31,7 @@ public class Opferstaette : InsideRoom {
         // create altar
         GameObject altar = wGen.CreateAssetFromPrefab(posAltar, "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Altar.prefab");
         placedObjects.Add(altar);
+        task = altar;
 
         // create ground
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {

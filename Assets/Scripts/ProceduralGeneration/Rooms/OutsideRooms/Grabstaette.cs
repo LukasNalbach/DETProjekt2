@@ -7,7 +7,6 @@ using UnityEditor;
 public class Grabstaette : OutsideRoom {
     public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
-        List<GameObject> placedObjects = new List<GameObject>();
         
         // set cross position
         string placementMode = "";
@@ -32,6 +31,7 @@ public class Grabstaette : OutsideRoom {
         // create cross
         GameObject cross = wGen.CreateAssetFromPrefab(posCross + new Vector2(0.5f, 0.0f), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Gravestone B.prefab");
         placedObjects.Add(cross);
+        task = cross;
 
         // set cross podest area
         Rectangle podestRect = new Rectangle((int) posCross.x - 1, (int) posCross.y - 1, 3, 3);

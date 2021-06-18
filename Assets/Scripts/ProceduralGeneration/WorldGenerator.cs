@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 public class WorldGenerator : MonoBehaviour
 {
     private System.Random random = new System.Random();
-    public Dictionary<RoomType,Rectangle> rooms = new Dictionary<RoomType,Rectangle>();
+    public Dictionary<RoomType,RealGenRoom> rooms = new Dictionary<RoomType,RealGenRoom>();
     public List<Rectangle> corridors = new List<Rectangle>();
     public void Awake() {
 
@@ -64,7 +64,7 @@ public class WorldGenerator : MonoBehaviour
 
         foreach (GenRoom room in root.getSubrooms()) {
             if (room is RealGenRoom) {
-                rooms.Add(GetRoomTypeFromObject((RealGenRoom) room), ((RealGenRoom) room).innerRect);
+                rooms.Add(GetRoomTypeFromObject((RealGenRoom) room), (RealGenRoom) room);
             } else if (room is VirtualGenRoom) {
                 corridors.AddRange(((VirtualGenRoom) room).corridors);
             }
@@ -75,6 +75,16 @@ public class WorldGenerator : MonoBehaviour
 
         InsideRoom.generateRuinEdge(corridors, rootInside.outerRect, rootOutside.outerRect);
         OutsideRoom.GenerateForestOutside(corridors, rootInside.outerRect, rootOutside.outerRect);
+
+        List<KeyValuePair<RoomType,RealGenRoom>> roomsList = rooms.ToList<KeyValuePair<RoomType,RealGenRoom>>();
+        for (int i = 0; i < roomsList.Count; i++) {
+            roomsList[i].Value.task.name = "Room" + i + "Task";
+        }
+
+        RealGenRoom meetingraum;
+        rooms.TryGetValue(RoomType.Meetingraum, out meetingraum);
+        Destroy(((Meetingraum) meetingraum).emergencyButton.GetComponent<Rigidbody2D>());
+        
 
         /*
         foreach (KeyValuePair<RoomType,Rectangle> room in rooms) {
@@ -90,18 +100,19 @@ public class WorldGenerator : MonoBehaviour
         return (RoomType) System.Enum.Parse(typeof(RoomType), room.GetType().ToString(), true);
     }
 
-    public string GetNameFromPos(Vector2 pos) {
-        foreach (KeyValuePair<RoomType,Rectangle> room in rooms) {
-            if (IsPosInRectangle(pos, room.Value)) {
-                return room.Key.ToString();
+    public KeyValuePair<int,string> GetPlaceFromPos(Vector2 pos) {
+        List<KeyValuePair<RoomType,RealGenRoom>> roomsList = rooms.ToList<KeyValuePair<RoomType,RealGenRoom>>();
+        for (int i = 0; i < roomsList.Count; i++) {
+            if (IsPosInRectangle(pos, roomsList[i].Value.innerRect)) {
+                return new KeyValuePair<int,string>(i, roomsList[i].Key.ToString());
             }
         }
         for(int i = 0; i < corridors.Count; i++) {
             if (IsPosInRectangle(pos, corridors[i])) {
-                return "Korridor " + i;
+                return new KeyValuePair<int,string>(i, "Korridor " + i);
             }
         }
-        return "Raum/Korridor nicht gefunden";
+        return new KeyValuePair<int,string>(- 1, "Raum/Korridor nicht gefunden");
     }
 
     public static bool IsPosInRectangle(Vector2 pos, Rectangle rect) {

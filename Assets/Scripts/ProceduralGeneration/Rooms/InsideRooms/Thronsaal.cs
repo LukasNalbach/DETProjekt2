@@ -7,7 +7,6 @@ using UnityEditor;
 public class Thronsaal : InsideRoom {
     public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
-        List<GameObject> placedObjects = new List<GameObject>();
         
         // set throne position
         string placementMode = "";
@@ -32,6 +31,7 @@ public class Thronsaal : InsideRoom {
         // create throne
         GameObject throne = wGen.CreateAssetFromPrefab(posThrone + new Vector2(0.5f, 1.0f), "Assets/Prefabs/throne.prefab");
         placedObjects.Add(throne);
+        task = throne;
 
         // set throne podest area
         Rectangle podestRect = new Rectangle((int) posThrone.x - 1, (int) posThrone.y - 1, 3, 3);
@@ -111,7 +111,7 @@ public class Thronsaal : InsideRoom {
         int n = innerRect.Width * innerRect.Height / 20;
         for (int i = 0; i < n; i++) {
             Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + random.Next(innerRect.Height));
-            if (IsPosFree(pos, corridors, placedObjects)) {
+            if (!VirtualGenRoom.IsCloserToThan(pos, posThrone, "XY", 2) && IsPosFree(pos, corridors, placedObjects)) {
                 placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(pos.x + 0.5f, pos.y), pillars[random.Next(pillars.Length)]));
             }
         }

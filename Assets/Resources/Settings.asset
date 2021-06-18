@@ -19,5 +19,5 @@ MonoBehaviour:
   viewDistance: 5
   killDistance: 2
   cooldownTime: 30
-  tasks: 4
+  tasks: 10
   votingTime: 5

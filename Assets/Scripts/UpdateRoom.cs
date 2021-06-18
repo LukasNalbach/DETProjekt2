@@ -9,16 +9,20 @@ public class UpdateRoom : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        currentRoom = Room.getRoom(2);
+        currentRoom = Room.getRoom(0);
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        Room newRoom = GetNewRoomIfChanged();
-        if (newRoom) {
-            currentRoom = newRoom;
-            Game.Instance.GUI.updateRoom(newRoom.getRoomNum());
+        KeyValuePair<int,string> place = Game.Instance.GetComponent<WorldGenerator>().GetPlaceFromPos(gameObject.transform.position);
+        if (place.Key != - 1) {
+            if (gameObject.Equals(Game.Instance.GetComponent<swapPlayer>().currentPlayer)) {
+                Game.Instance.GUI.updateRoom(place.Value);
+            }
+            if (!place.Value.StartsWith("Korridor")) {
+                currentRoom = Room.getRoom(place.Key);
+            }
         }
     }
     public Room getCurrentRoom()
@@ -29,24 +33,6 @@ public class UpdateRoom : MonoBehaviour
     public void setCurrentRoom(int roomNr)
     {
         Room.getRoom(roomNr);
-    }
-    private Room GetNewRoomIfChanged() {
-        for (int i = 1; i <= Room.getRooms().Count; i++) {
-            if (i != currentRoom.getRoomNum()) {
-                int j = 1;
-                GameObject obj = GameObject.Find("Room" + i + "_" + j);
-                while (obj) {
-                    if (isInRectangle(gameObject.transform.position, obj.transform.position, obj.transform.localScale)) {
-                        return Room.getRoom(i);
-                    }
-                    
-                    j++;
-
-                    obj = GameObject.Find("Room" + i + "_" + j);
-                }
-            }
-        }
-        return null;
     }
 
     public static bool isInRectangle(Vector2 pos, Vector2 rectPos, Vector2 rectScale) {

@@ -30,6 +30,9 @@ public class swapPlayer : MonoBehaviour
             {
                 task.setDeactivated();
             }
+
+            Game.Instance.GUI.setImposterGui(Game.Instance.allPlayers[currentPlayerIndex] is Imposter);
+            Debug.Log(Game.Instance.allPlayers[currentPlayerIndex] is Imposter);
         }
     }
 }

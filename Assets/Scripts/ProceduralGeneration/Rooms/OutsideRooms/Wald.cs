@@ -7,7 +7,6 @@ using UnityEditor;
 public class Wald : OutsideRoom {
     public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
-        List<GameObject> placedObjects = new List<GameObject>();
 
         // create ground
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {
@@ -26,6 +25,7 @@ public class Wald : OutsideRoom {
         }
         GameObject sign = wGen.CreateAssetFromPrefab(new Vector2(posSign.x + 0.5f, posSign.y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Road Sign E.prefab");
         placedObjects.Add(sign);
+        task = sign;
         Rectangle signRect = new Rectangle((int) posSign.x - 1, (int)  posSign.y - 4, 3, 5);
 
         // place random Plants
