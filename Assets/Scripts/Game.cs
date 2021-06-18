@@ -115,17 +115,24 @@ public class Game : MonoBehaviour
             } else {
                 newPlayer.AddComponent<Imposter>();
             }
+            newPlayer.GetComponent<Player>().startPos = positions[positions.Count - 1];
             UnityEngine.Color nextColor=Settings.getPossibleColors()[(Settings.getPlayerColorPointer()+i)%Settings.getPossibleColors().Length];
             newPlayer.GetComponent<Player>().create(nextColor);
             allPlayers.Add(newPlayer.GetComponent<Player>());
         }
 
-        GameObject currentPlayer = allPlayers[random.Next(Settings.numberPlayers)].gameObject;
+        int currentPlayerIndex = random.Next(Settings.numberPlayers);
+        GameObject currentPlayer = allPlayers[currentPlayerIndex].gameObject;
         
         currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
         GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>().target = currentPlayer.transform;
         
         GetComponent<swapPlayer>().currentPlayer = currentPlayer;
+        GetComponent<swapPlayer>().currentPlayerIndex = currentPlayerIndex;
+
+        Cainos.PixelArtTopDown_Basic.CameraFollow cameraFollow = GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>();
+        cameraFollow.target = currentPlayer.transform;
+        cameraFollow.transform.position = currentPlayer.transform.position + cameraFollow.offset;
     }
 
     private void setRooms() {
@@ -183,17 +190,35 @@ public class Game : MonoBehaviour
     }
     private void createSabortageOptions()
     {
-        Sabortage sabortage1=gameObject.AddComponent<Sabortage>();
-        sabortage1.create(1,45f);
-        GameObject stopTask1=GameObject.Find("StopSabortage11");
-        SabortageTask sTask1=stopTask1.AddComponent<SabortageTask>();
-        sTask1.createSabortageTask(1, 1f,sabortage1);
-        GameObject stopTask2=GameObject.Find("StopSabortage12");
-        SabortageTask sTask2=stopTask2.AddComponent<SabortageTask>();
-        sTask2.createSabortageTask(2, 1f,sabortage1);
-        sabortage1.addTask(sTask1);
-        sabortage1.addTask(sTask2);
-        allSabortages.Add(sabortage1);
+        Sabortage sabortage;
+        SabortageTask sTask1, sTask2;
+        GameObject stopTask1, stopTask2;
+
+        sabortage=gameObject.AddComponent<Sabortage>();
+        sabortage.create(1,45f);
+        stopTask1=GameObject.Find("Stopsabortage11");
+        sTask1=stopTask1.AddComponent<SabortageTask>();
+        sTask1.createSabortageTask(1, 1f,sabortage);
+        stopTask2=GameObject.Find("Stopsabortage12");
+        sTask2=stopTask2.AddComponent<SabortageTask>();
+        sTask2.createSabortageTask(2, 1f,sabortage);
+        sabortage.addTask(sTask1);
+        sabortage.addTask(sTask2);
+
+        allSabortages.Add(sabortage);
+
+        sabortage=gameObject.AddComponent<Sabortage>();
+        sabortage.create(1,45f);
+        stopTask1=GameObject.Find("Stopsabortage21");
+        sTask1=stopTask1.AddComponent<SabortageTask>();
+        sTask1.createSabortageTask(1, 1f,sabortage);
+        stopTask2=GameObject.Find("Stopsabortage22");
+        sTask2=stopTask2.AddComponent<SabortageTask>();
+        sTask2.createSabortageTask(2, 1f,sabortage);
+        sabortage.addTask(sTask1);
+        sabortage.addTask(sTask2);
+
+        allSabortages.Add(sabortage);
     }
     private void addCrewMateTasks(CrewMate crewMate)
     {
@@ -213,7 +238,7 @@ public class Game : MonoBehaviour
     }
     public void Shuffle<T>(List<T> list)  
     {  
-        int n = list.Count;  
+        int n = list.Count;
         while (n > 1) {  
             n--;  
             int k = random.Next(n + 1);  
@@ -221,6 +246,10 @@ public class Game : MonoBehaviour
             list[k] = list[n];  
             list[n] = value;  
         }  
+    }
+
+    private void Update() {
+        Game.Instance.GUI.setSabotageGui(activeSabortage != null);
     }
     private void FixedUpdate() {
         if(!meetingNow)
@@ -283,7 +312,6 @@ public class Game : MonoBehaviour
             activeSabortage=sabortage;
             sabortage.activate();
         }
-        
     }
     public void stopSabortage()
     {

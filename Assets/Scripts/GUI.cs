@@ -6,7 +6,9 @@ using TMPro;
 
 public class GUI 
 {
-    public bool imposterGuiEnabled = false;
+    public bool imposterGuiEnabled = true;
+    public bool sabotageGuiEnabled = true;
+    public bool standardGuiEnabled = true;
     public void updateRoom(string roomName)
     {
         GameObject.Find("Canvas/panelRoom/text").GetComponent<TextMeshProUGUI>().SetText(roomName);
@@ -35,11 +37,26 @@ public class GUI
         GameObject.Find("Canvas/panelSabotageCooldown/panelProgressBar/progressBarRest").GetComponent<RectTransform>().sizeDelta = new Vector2(390f * (1f - sabotageCountdown), 88f);
     }
 
+    public void setStandardGui(bool active) {
+        if (GameObject.Find("Canvas") != null && active != standardGuiEnabled) {
+            setActiveRecursive(GameObject.Find("Canvas/panelTaskProgress"), active);
+            setActiveRecursive(GameObject.Find("Canvas/panelRoom"), active);
+            setActiveRecursive(GameObject.Find("Canvas2/controlsInfo"), active);
+            standardGuiEnabled = active;
+        }
+    }
+
     public void setImposterGui(bool active) {
-        if (active != imposterGuiEnabled) {
-            setActiveRecursive(GameObject.Find("Canvas/panelSabotageCooldown"), active);
+        if (GameObject.Find("Canvas") != null && active != imposterGuiEnabled) {
             setActiveRecursive(GameObject.Find("Canvas/panelKillCooldown"), active);
-            imposterGuiEnabled = !imposterGuiEnabled;
+            imposterGuiEnabled = active;
+        }
+    }
+
+    public void setSabotageGui(bool active) {
+        if (GameObject.Find("Canvas") != null && active != sabotageGuiEnabled) {
+            setActiveRecursive(GameObject.Find("Canvas/panelSabotageCooldown"), active);
+            sabotageGuiEnabled = active;
         }
     }
 

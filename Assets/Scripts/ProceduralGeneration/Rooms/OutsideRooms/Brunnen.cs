@@ -28,6 +28,21 @@ public class Brunnen : OutsideRoom {
         task = brunnen;
         Rectangle brunnenRect = new Rectangle((int) posBrunnen.x - 1, (int)  posBrunnen.y - 4, 3, 5);
 
+        Rectangle ventRect = new Rectangle(0, 0, 0, 0);
+        if (ventName != "") {
+            Vector2 posVent = new Vector2(0, 0);
+            while (posVent.x == 0) {
+                Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + 2 + random.Next(innerRect.Height - 2));
+                if (IsPosFree(pos, corridors, placedObjects)) {
+                    posVent = pos;
+                }
+            }
+            GameObject vent = wGen.CreateAssetFromPrefab(posVent + new Vector2(0.5f, 0), "Assets/Prefabs/Vent.prefab");
+            ventRect = new Rectangle((int) posVent.x - 1, (int)  posVent.y - 4, 3, 5);
+            placedObjects.Add(vent);
+            vent.name = ventName;
+        }
+
         // place random Plants
         int n = innerRect.Width * innerRect.Height / 2;
         for (int i = 0; i < n; i++) {
@@ -39,7 +54,7 @@ public class Brunnen : OutsideRoom {
 
                 if (rn <= 0.7) {
                     obj = wGen.CreateGrassOnTileWithProb(pos, 1);
-                } else if (rn <= 0.9 || VirtualGenRoom.IsCloserToThan(pos, brunnenRect, "XY", 0)) {
+                } else if (rn <= 0.9 || VirtualGenRoom.IsCloserToThan(pos, brunnenRect, "XY", 0) || VirtualGenRoom.IsCloserToThan(pos, ventRect, "XY", 0)) {
                     obj = wGen.CreateBushOnTile(pos);
                 } else {
                     obj = wGen.CreateTreeOnTile(pos);

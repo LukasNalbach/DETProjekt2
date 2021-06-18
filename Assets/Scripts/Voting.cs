@@ -28,6 +28,8 @@ public class Voting : MonoBehaviour
             defendsPublic[i] = new bool[n];
         }
 
+        Game.Instance.GUI.setStandardGui(false);
+
         AsyncOperation op = SceneManager.LoadSceneAsync("SelectionGUI", LoadSceneMode.Additive);
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("World"));
 
@@ -74,6 +76,7 @@ public class Voting : MonoBehaviour
         SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("SelectionGUI"));
         Game.Instance.GetComponent<swapPlayer>().currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
         Game.Instance.endMeeting();
+        Game.Instance.GUI.setStandardGui(true);
         Destroy(this);
         yield return null;
     }

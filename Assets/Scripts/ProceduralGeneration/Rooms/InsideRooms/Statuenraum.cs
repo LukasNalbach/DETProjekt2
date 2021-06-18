@@ -33,6 +33,19 @@ public class Statuenraum : InsideRoom {
         placedObjects.Add(statue);
         task = statue;
 
+        if (ventName != "") {
+            Vector2 posVent = new Vector2(0, 0);
+            while (posVent.x == 0) {
+                Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + 2 + random.Next(innerRect.Height - 2));
+                if (IsPosFree(pos, corridors, placedObjects)) {
+                    posVent = pos;
+                }
+            }
+            GameObject vent = wGen.CreateAssetFromPrefab(posVent + new Vector2(0.5f, 0), "Assets/Prefabs/Vent.prefab");
+            placedObjects.Add(vent);
+            vent.name = ventName;
+        }
+
         // set statue podest area
         Rectangle podestRect = new Rectangle((int) posStatue.x - 1, (int) posStatue.y - 1, 3, 3);
 

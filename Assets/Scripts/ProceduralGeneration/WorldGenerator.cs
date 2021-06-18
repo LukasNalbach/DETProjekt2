@@ -59,7 +59,7 @@ public class WorldGenerator : MonoBehaviour
             room.setRandom(random);
         }
 
-        Rectangle worldArea = new Rectangle(50, 50, 50 + random.Next(20), 50 + random.Next(20));
+        Rectangle worldArea = new Rectangle(-100, 50, 50 + random.Next(20), 50 + random.Next(20));
         root.generate(worldArea);
 
         foreach (GenRoom room in root.getSubrooms()) {
@@ -69,6 +69,30 @@ public class WorldGenerator : MonoBehaviour
                 corridors.AddRange(((VirtualGenRoom) room).corridors);
             }
         }
+
+        List<RealGenRoom> ventRoomsInside = new List<RealGenRoom>();
+        List<RealGenRoom> ventRoomsOutside = new List<RealGenRoom>();
+        List<GenRoom> realRoomsInside = rootInside.getSubrooms().Where((room) => room is RealGenRoom).ToList<GenRoom>();
+        List<GenRoom> realRoomsOutside = rootOutside.getSubrooms().Where((room) => room is RealGenRoom).ToList<GenRoom>();
+
+        int index = random.Next(realRoomsInside.Count);
+        ventRoomsInside.Add((RealGenRoom) realRoomsInside[index]);
+        realRoomsInside.RemoveAt(index);
+        index = random.Next(realRoomsInside.Count);
+        ventRoomsInside.Add((RealGenRoom) realRoomsInside[index]);
+        realRoomsInside.RemoveAt(index);
+
+        ventRoomsOutside.Add((RealGenRoom) realRoomsOutside[index]);
+        realRoomsOutside.RemoveAt(index);
+        index = random.Next(realRoomsOutside.Count);
+        ventRoomsOutside.Add((RealGenRoom) realRoomsOutside[index]);
+        realRoomsOutside.RemoveAt(index);
+
+        ventRoomsInside[0].ventName = "Vent1";
+        ventRoomsInside[1].ventName = "Vent2";
+
+        ventRoomsOutside[0].ventName = "Vent3";
+        ventRoomsOutside[1].ventName = "Vent4";
 
         root.generateOutside(corridors, rootInside.outerRect, rootOutside.outerRect);
         root.generateInside(corridors, rootInside.outerRect, rootOutside.outerRect);

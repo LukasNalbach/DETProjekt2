@@ -9,6 +9,8 @@ public abstract class RealGenRoom : GenRoom {
     public GameObject task;
     public List<GameObject> placedObjects = new List<GameObject>();
 
+    public string ventName = "";
+
     public override List<Rectangle> getRects() {
         List<Rectangle> rects = new List<Rectangle>();
         rects.Add(innerRect);

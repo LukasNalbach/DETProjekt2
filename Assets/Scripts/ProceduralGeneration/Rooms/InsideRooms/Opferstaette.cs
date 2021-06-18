@@ -33,6 +33,19 @@ public class Opferstaette : InsideRoom {
         placedObjects.Add(altar);
         task = altar;
 
+        if (ventName != "") {
+            Vector2 posVent = new Vector2(0, 0);
+            while (posVent.x == 0) {
+                Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + 2 + random.Next(innerRect.Height - 2));
+                if (IsPosFree(pos, corridors, placedObjects)) {
+                    posVent = pos;
+                }
+            }
+            GameObject vent = wGen.CreateAssetFromPrefab(posVent + new Vector2(0.5f, 0), "Assets/Prefabs/Vent.prefab");
+            placedObjects.Add(vent);
+            vent.name = ventName;
+        }
+
         // create ground
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {
             for (int y = innerRect.Y; y < innerRect.Y + innerRect.Height; y++) {

@@ -49,6 +49,33 @@ public class Schatzkammer : InsideRoom {
             }
         }
 
+        if (ventName != "") {
+            Vector2 posVent = new Vector2(0, 0);
+            while (posVent.x == 0) {
+                Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + 2 + random.Next(innerRect.Height - 2));
+                if (IsPosFree(pos, corridors, placedObjects)) {
+                    posVent = pos;
+                }
+            }
+            GameObject vent = wGen.CreateAssetFromPrefab(posVent + new Vector2(0.5f, 0), "Assets/Prefabs/Vent.prefab");
+            placedObjects.Add(vent);
+            vent.name = ventName;
+        }
+
+        // place closed chests
+        List<GameObject> closedChests = new List<GameObject>();
+        while (closedChests.Count < 2) {
+            Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + random.Next(innerRect.Height));
+            if (IsPosFree(pos, corridors, placedObjects)) {
+                GameObject obj = wGen.CreateAssetFromPrefab(new Vector2(pos.x + 0.5f, pos.y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Chest.prefab");
+
+                placedObjects.Add(obj);
+                closedChests.Add(obj);
+            }
+        }
+        closedChests[0].name = "Stopsabortage21";
+        closedChests[1].name = "Stopsabortage22";
+
         // place open chest
         Vector2 posOpenChest = new Vector2(0, 0);
         while (posOpenChest.x == 0) {

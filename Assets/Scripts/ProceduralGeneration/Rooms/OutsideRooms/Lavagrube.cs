@@ -23,6 +23,21 @@ public class Lavagrube : OutsideRoom {
         task = rune;
         Rectangle runeCollisionRect = new Rectangle((int) posRune.x - 1, (int)  posRune.y - 4, 3, 5);
 
+        Rectangle ventRect = new Rectangle(0, 0, 0, 0);
+        if (ventName != "") {
+            Vector2 posVent = new Vector2(0, 0);
+            while (posVent.x == 0) {
+                Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + 2 + random.Next(innerRect.Height - 2));
+                if (IsPosFree(pos, corridors, placedObjects)) {
+                    posVent = pos;
+                }
+            }
+            GameObject vent = wGen.CreateAssetFromPrefab(posVent + new Vector2(0.5f, 0), "Assets/Prefabs/Vent.prefab");
+            ventRect = new Rectangle((int) posVent.x - 1, (int)  posVent.y - 4, 3, 5);
+            placedObjects.Add(vent);
+            vent.name = ventName;
+        }
+
         // create ground and lava
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {
             for (int y = innerRect.Y; y < innerRect.Y + innerRect.Height; y++) {
@@ -39,7 +54,12 @@ public class Lavagrube : OutsideRoom {
         int n = innerRect.Width * innerRect.Height / 2;
         for (int i = 0; i < n; i++) {
             Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + random.Next(innerRect.Height));
-            if (!VirtualGenRoom.IsCloserToThan(pos, runeCollisionRect, "XY", 0) &&  !VirtualGenRoom.IsCloserToThan(pos, lavaCollisionRect, "XY", 0) && IsPosFree(pos, corridors, placedObjects)) {
+            if (
+                !VirtualGenRoom.IsCloserToThan(pos, ventRect, "XY", 0) &&
+                !VirtualGenRoom.IsCloserToThan(pos, runeCollisionRect, "XY", 0) &&
+                !VirtualGenRoom.IsCloserToThan(pos, lavaCollisionRect, "XY", 0) &&
+                IsPosFree(pos, corridors, placedObjects)
+            ) {
                 GameObject obj;
 
                 double rn = random.NextDouble();
