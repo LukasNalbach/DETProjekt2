@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class Game : MonoBehaviour
 {
+    public GameObject buttonPrefab;
     /// <summary>
     /// The singleton instance.
     /// </summary>
@@ -42,6 +43,11 @@ public class Game : MonoBehaviour
 
     private float killCooldown{get; set;}
 
+    //so the imposter cannot spam sabortage
+    private float sabortageStartCooldown{get;set;}
+
+    private float maxSabortageStartCooldown=15f;
+
     private bool meetingNow=false;
     private void Awake()
     {
@@ -66,6 +72,7 @@ public class Game : MonoBehaviour
         allRooms=new List<Room>();
         allVents=new List<Vent>();
         killCooldown=0;
+        sabortageStartCooldown=0;
     }
     public void SetTexture(GameObject obj, string name, float scale) {
         Texture2D tex = new Texture2D(500, 500);
@@ -78,9 +85,9 @@ public class Game : MonoBehaviour
 
     private void Start()
     {
-        createCrew();
+        //createCrew();
         setRooms();
-        setCrewMadesTask();
+        //setCrewMadesTask();
         createVentConnections();
         createSabortageOptions();
         SceneManager.LoadScene("IngameGUI", LoadSceneMode.Additive);
@@ -116,7 +123,7 @@ public class Game : MonoBehaviour
         GetComponent<swapPlayer>().currentPlayer = currentPlayer;
     }
 
-    private void setRooms() {
+    public void setRooms() {
         int i = 1;
         while (GameObject.Find("Room" + i + "_1")) {
             Room room = gameObject.AddComponent<Room>();
@@ -222,6 +229,10 @@ public class Game : MonoBehaviour
                 killCooldown-=Time.deltaTime;
                 GUI.updateKillCooldown((int)killCooldown);
             }
+            if(sabortageStartCooldown>0)
+            {
+                sabortageStartCooldown-=Time.deltaTime;
+            }
             if(activeSabortage!=null)
             {
                 activeSabortage.currentTimeToSolve-=Time.deltaTime;
@@ -269,19 +280,28 @@ public class Game : MonoBehaviour
         taskDone-=lostCrewMate.taskDone;
         GUI.updateTaskProgress((int)(getTaskProgress()*100));
     }
+    public static void startSabortageBournTrees()
+    {
+        Game.Instance.startSabortage(Game.Instance.allSabortages[0]);
+    }
     public void startSabortage(Sabortage sabortage)
     {
-        if(activeSabortage==null)
+        if(sabortagePossible())
         {
             activeSabortage=sabortage;
             sabortage.activate();
         }
         
     }
+    public bool sabortagePossible()
+    {
+        return activeSabortage==null&&sabortageStartCooldown<=0;
+    }
     public void stopSabortage()
     {
         activeSabortage=null;
         GUI.stopSabortageCountdown();
+        sabortageStartCooldown=maxSabortageStartCooldown;
     }
     public List<SabortageTask> allActiveSabortageTasks()
     {
@@ -322,6 +342,12 @@ public class Game : MonoBehaviour
     {
         meetingNow=false;
     }
+    //return the only human player in the end
+    public Player activePlayer()
+    {
+        return swapPlayer().currentPlayer.GetComponent<Player>();
+    }
+
     public swapPlayer swapPlayer()
     {
         return gameObject.GetComponent<swapPlayer>();

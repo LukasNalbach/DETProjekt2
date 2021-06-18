@@ -33,16 +33,16 @@ public class GUI
         var textField=GameObject.Find("Canvas/CountdownSabortage");
         if(textField!=null)
         {
-            textField.SetActive(true);
             textField.GetComponent<TextMeshProUGUI>().SetText("CountDown Sabortage: " + secounds);
         }
     }
     public void stopSabortageCountdown()
     {
+
         var textField=GameObject.Find("Canvas/CountdownSabortage");
         if(textField!=null)
         {
-            textField.SetActive(false);
+            textField.GetComponent<TextMeshProUGUI>().SetText("CountDown Sabortage: -");
         }
     }
 
