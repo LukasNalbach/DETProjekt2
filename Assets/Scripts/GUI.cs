@@ -52,7 +52,6 @@ public class GUI
             imposterGuiEnabled = active;
         }
     }
-
     public void setSabotageGui(bool active) {
         if (GameObject.Find("Canvas") != null && active != sabotageGuiEnabled) {
             setActiveRecursive(GameObject.Find("Canvas/panelSabotageCooldown"), active);

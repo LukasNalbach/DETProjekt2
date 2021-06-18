@@ -7,7 +7,7 @@ public class CrewMate : Player
     public string name="Player";
     public bool ki=false;
 
-    private LinkedList<Task>taskToDo=new LinkedList<Task>();
+    public LinkedList<Task>taskToDo=new LinkedList<Task>();
 
     public int taskDone;
 

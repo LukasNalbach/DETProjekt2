@@ -45,14 +45,15 @@ public class Voting : MonoBehaviour
         for (int i=n; i<10; i++) {
             GameObject.Destroy(GameObject.Find("Canvas/Players/Player" + i));
         }
-        GameObject.Find("Canvas/Players/Player" + p + "/textName").GetComponent<TextMeshProUGUI>().color = Color.yellow;
-       
         deactivatePlayerButtons(p);//deaktiviert alle Buttons zum aktiven Spieler
         for(int i=0;i<Game.Instance.allPlayers.Count;i++)
         {
+            TextMeshProUGUI text=GameObject.Find("Canvas/Players/Player" + i + "/textName").GetComponent<TextMeshProUGUI>();
+            text.color=Game.Instance.allPlayers[i].color;
             if(!Game.Instance.allPlayers[i].isAlive())
             {
-                GameObject.Find("Canvas/Players/Player" + i + "/textName").GetComponent<TextMeshProUGUI>().color = Color.black;
+                
+               text.SetText(StrikeThrough(text.text));
                 deactivatePlayerButtons(i);
             }
         }
@@ -80,13 +81,22 @@ public class Voting : MonoBehaviour
         Destroy(this);
         yield return null;
     }
+
     private void deactivatePlayerButtons(int playerNr)
     {
          GameObject.Find("Canvas/Players/Player" + playerNr + "/Buttons").SetActive(false);
         GameObject.Find("Canvas/Players/Player" + playerNr + "/Buttons/buttonAccusePublic").SetActive(false);
         GameObject.Find("Canvas/Players/Player" + playerNr + "/Buttons/buttonDefendPublic").SetActive(false);
     }
-
+    public string StrikeThrough(string s)
+    {
+        string strikethrough = "";
+        foreach (char c in s)
+        {
+            strikethrough = strikethrough + c + '\u0336';
+        }
+        return strikethrough;
+    }
     private void showResults() {
         int[] accusedBy = new int[n];
         int iMax = -1;

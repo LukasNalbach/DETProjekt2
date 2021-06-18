@@ -63,6 +63,11 @@ public class GameSettings : ScriptableObject
 
     private Color[] possiblePlayerColors={Color.yellow, (Color.yellow+Color.red)/2, Color.red, (Color.red+Color.blue)/2, 
     Color.blue, Color.green, (Color.white+Color.black)/2, /*dark gray*/new Color32(40,79,79,255) ,/*brown*/new Color32(160,82,45,255), /*pink*/new Color32(255,105,180,255)};
+    
+    private int playerRolePointer;
+
+    private string[] possibleRoles={"Random", "Imposter", "Crew Mate"};
+
     public int getMinPlayers()
     {
         return minPlayers;
@@ -144,6 +149,26 @@ public class GameSettings : ScriptableObject
     {
         int color=(playerColorPointer+1)%possiblePlayerColors.Length;
         return possiblePlayerColors[color];
+    }
+    public void setRolePointer(int newNr)
+    {
+        playerRolePointer=newNr;
+    }
+    public void increaseRolePointer()
+    {
+        playerRolePointer=(playerRolePointer+1)%possibleRoles.Length;
+    }
+    public void decreaseRolePointer()
+    {
+        playerRolePointer=(playerRolePointer-1);
+        if(playerRolePointer<0)
+        {
+            playerRolePointer+=possibleRoles.Length;
+        }
+    }
+    public string getPlayerRole()
+    {
+        return possibleRoles[playerRolePointer];
     }
    
 }

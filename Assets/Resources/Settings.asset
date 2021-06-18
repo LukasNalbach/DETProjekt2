@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Settings
   m_EditorClassIdentifier: 
   size: 0
-  numberPlayers: 4
-  numberImposters: 1
-  playerSpeed: 2
+  numberPlayers: 0
+  numberImposters: 0
+  playerSpeed: 20
   viewDistance: 5
   killDistance: 2
   cooldownTime: 30
