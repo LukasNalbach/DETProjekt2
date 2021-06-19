@@ -4,7 +4,8 @@ using UnityEngine;
 
 public abstract class Player : MonoBehaviour
 {
-    public string name;
+    public Vector2 startPos;
+    public new string name;
     protected bool imposter;
 
     public bool alive = true;
@@ -134,7 +135,7 @@ public abstract class Player : MonoBehaviour
     {
         if(isAlive())
         {
-            transform.position=Game.Instance.startPoint;
+            transform.position=startPos;
             lastRoomBeforeMeeting=updateRoom.getCurrentRoom();
             updateRoom.setCurrentRoom(2);
         }

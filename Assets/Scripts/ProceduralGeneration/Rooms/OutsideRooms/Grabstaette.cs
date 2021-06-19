@@ -7,7 +7,6 @@ using UnityEditor;
 public class Grabstaette : OutsideRoom {
     public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
-        List<GameObject> placedObjects = new List<GameObject>();
         
         // set cross position
         string placementMode = "";
@@ -32,9 +31,25 @@ public class Grabstaette : OutsideRoom {
         // create cross
         GameObject cross = wGen.CreateAssetFromPrefab(posCross + new Vector2(0.5f, 0.0f), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Gravestone B.prefab");
         placedObjects.Add(cross);
+        task = cross;
 
         // set cross podest area
         Rectangle podestRect = new Rectangle((int) posCross.x - 1, (int) posCross.y - 1, 3, 3);
+
+        Rectangle ventRect = new Rectangle(0, 0, 0, 0);
+        if (ventName != "") {
+            Vector2 posVent = new Vector2(0, 0);
+            while (posVent.x == 0) {
+                Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + 2 + random.Next(innerRect.Height - 2));
+                if (IsPosFree(pos, corridors, placedObjects)) {
+                    posVent = pos;
+                }
+            }
+            GameObject vent = wGen.CreateAssetFromPrefab(posVent + new Vector2(0.5f, 0), "Assets/Prefabs/Vent.prefab");
+            ventRect = new Rectangle((int) posVent.x - 1, (int)  posVent.y - 4, 3, 5);
+            placedObjects.Add(vent);
+            vent.name = ventName;
+        }
 
         // create ground and cross podest
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {

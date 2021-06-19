@@ -7,7 +7,7 @@ public class Room : MonoBehaviour
 
     private int roomNum {get; set;}
 
-    private Task[] tasks = new Task[2];
+    private Task[] tasks = new Task[1];
 
     void Start()
     {
@@ -20,15 +20,14 @@ public class Room : MonoBehaviour
         
     }
 
-    public void CreateRoom(int roomNum, Task task1, Task task2) {
+    public void CreateRoom(int roomNum, Task task) {
         this.roomNum = roomNum;
-        tasks[0] = task1;
-        tasks[1] = task2;
+        tasks[0] = task;
         rooms.Add(this);
     }
 
     public static Room getRoom(int i) {
-        return rooms[i-1];
+        return rooms[i];
     }
 
     public static List<Room> getRooms() {
@@ -44,6 +43,6 @@ public class Room : MonoBehaviour
     }
 
     public Task getTask(int i) {
-        return tasks[i-1];
+        return tasks[i];
     }
 }

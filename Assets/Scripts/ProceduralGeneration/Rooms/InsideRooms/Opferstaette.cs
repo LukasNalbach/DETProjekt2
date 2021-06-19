@@ -7,7 +7,6 @@ using UnityEditor;
 public class Opferstaette : InsideRoom {
     public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
-        List<GameObject> placedObjects = new List<GameObject>();
         
         // set altar position
         string placementMode = "";
@@ -32,6 +31,7 @@ public class Opferstaette : InsideRoom {
         // create altar
         GameObject altar = wGen.CreateAssetFromPrefab(posAltar, "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Altar.prefab");
         placedObjects.Add(altar);
+        task = altar;
 
         // create ground
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {
@@ -59,6 +59,19 @@ public class Opferstaette : InsideRoom {
                     placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(x + 0.5f, y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Stone Bench S.prefab"));
                 }
             }
+        }
+
+        if (ventName != "") {
+            Vector2 posVent = new Vector2(0, 0);
+            while (posVent.x == 0) {
+                Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + 2 + random.Next(innerRect.Height - 2));
+                if (IsPosFree(pos, corridors, placedObjects)) {
+                    posVent = pos;
+                }
+            }
+            GameObject vent = wGen.CreateAssetFromPrefab(posVent + new Vector2(0.5f, 0), "Assets/Prefabs/Vent.prefab");
+            placedObjects.Add(vent);
+            vent.name = ventName;
         }
 
         // create objects at the wall

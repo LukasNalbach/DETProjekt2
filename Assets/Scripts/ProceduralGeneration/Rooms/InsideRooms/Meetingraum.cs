@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 public class Meetingraum : InsideRoom {
+    public GameObject emergencyButton;
     public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
-        List<GameObject> placedObjects = new List<GameObject>();
 
         // create ground
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {
@@ -17,8 +17,33 @@ public class Meetingraum : InsideRoom {
         }
 
         Vector2 posEmergencyButton = new Vector2((float) innerRect.X + ((float) innerRect.Width) / 2, (float) innerRect.Y + ((float) innerRect.Height) / 2);
-        placedObjects.Add(wGen.CreateAssetFromPrefab(posEmergencyButton, "Assets/Prefabs/emergencyButton.prefab"));
+        emergencyButton = wGen.CreateAssetFromPrefab(posEmergencyButton, "Assets/Prefabs/emergencyButton.prefab");
+        placedObjects.Add(emergencyButton);
         Rectangle centerRect = new Rectangle((int) posEmergencyButton.x - 2, (int) posEmergencyButton.y - 2, 5, 5);
+
+        Vector2 posRune = new Vector2(0, 0);
+        while (posRune.x == 0) {
+            Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + 2 + random.Next(innerRect.Height - 2));
+            if (IsPosFree(pos, corridors, placedObjects)) {
+                posRune = pos;
+            }
+        }
+        GameObject rune = wGen.CreateAssetFromPrefab(posRune + new Vector2(0.5f, 0), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Rune Pillar X2.prefab");
+        placedObjects.Add(rune);
+        task = rune;
+
+        if (ventName != "") {
+            Vector2 posVent = new Vector2(0, 0);
+            while (posVent.x == 0) {
+                Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + 2 + random.Next(innerRect.Height - 2));
+                if (IsPosFree(pos, corridors, placedObjects)) {
+                    posVent = pos;
+                }
+            }
+            GameObject vent = wGen.CreateAssetFromPrefab(posVent + new Vector2(0.5f, 0), "Assets/Prefabs/Vent.prefab");
+            placedObjects.Add(vent);
+            vent.name = ventName;
+        }
 
         // create objects at the wall
         string[] wallObjects = {
@@ -62,7 +87,6 @@ public class Meetingraum : InsideRoom {
         int n = innerRect.Width * innerRect.Height / 5;
         for (int i = 0; i < n; i++) {
             Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + random.Next(innerRect.Height));
-            Debug.Log(pos);
             if (!VirtualGenRoom.IsCloserToThan(pos, centerRect, "XY", 1) && IsPosFree(pos, corridors, placedObjects)) {
                 placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(pos.x + 0.5f, pos.y), pillars[random.Next(pillars.Length)]));
             }

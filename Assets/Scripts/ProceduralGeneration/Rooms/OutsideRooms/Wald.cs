@@ -7,7 +7,6 @@ using UnityEditor;
 public class Wald : OutsideRoom {
     public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
-        List<GameObject> placedObjects = new List<GameObject>();
 
         // create ground
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {
@@ -26,7 +25,39 @@ public class Wald : OutsideRoom {
         }
         GameObject sign = wGen.CreateAssetFromPrefab(new Vector2(posSign.x + 0.5f, posSign.y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Road Sign E.prefab");
         placedObjects.Add(sign);
+        task = sign;
         Rectangle signRect = new Rectangle((int) posSign.x - 1, (int)  posSign.y - 4, 3, 5);
+
+        // place krüge
+        List<GameObject> kruege = new List<GameObject>();
+        List<Rectangle> krugRects = new List<Rectangle>();
+        while (kruege.Count < 2) {
+            Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + random.Next(innerRect.Height));
+            if (IsPosFree(pos, corridors, placedObjects)) {
+                GameObject obj = wGen.CreateAssetFromPrefab(new Vector2(pos.x + 0.5f, pos.y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Pot B.prefab");
+
+                placedObjects.Add(obj);
+                kruege.Add(obj);
+                krugRects.Add(new Rectangle((int) pos.x - 1, (int)  pos.y - 4, 3, 5));
+            }
+        }
+        kruege[0].name = "Stopsabortage11";
+        kruege[1].name = "Stopsabortage12";
+
+        Rectangle ventRect = new Rectangle(0, 0, 0, 0);
+        if (ventName != "") {
+            Vector2 posVent = new Vector2(0, 0);
+            while (posVent.x == 0) {
+                Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + 2 + random.Next(innerRect.Height - 2));
+                if (IsPosFree(pos, corridors, placedObjects)) {
+                    posVent = pos;
+                }
+            }
+            GameObject vent = wGen.CreateAssetFromPrefab(posVent + new Vector2(0.5f, 0), "Assets/Prefabs/Vent.prefab");
+            ventRect = new Rectangle((int) posVent.x - 1, (int)  posVent.y - 4, 3, 5);
+            placedObjects.Add(vent);
+            vent.name = ventName;
+        }
 
         // place random Plants
         int n = 2 * innerRect.Width * innerRect.Height;
@@ -39,7 +70,12 @@ public class Wald : OutsideRoom {
 
                 if (rn <= 0.2) {
                     obj = wGen.CreateGrassOnTileWithProb(pos, 1);
-                } else if (rn <= 0.4 || VirtualGenRoom.IsCloserToThan(pos, signRect, "XY", 0)) {
+                } else if (
+                    rn <= 0.4 ||
+                    VirtualGenRoom.IsCloserToThan(pos, signRect, "XY", 0) ||
+                    VirtualGenRoom.IsCloserToThan(pos, krugRects, "XY", 0) ||
+                    VirtualGenRoom.IsCloserToThan(pos, ventRect, "XY", 0)
+                ) {
                     obj = wGen.CreateBushOnTile(pos);
                 } else {
                     obj = wGen.CreateTreeOnTile(pos);

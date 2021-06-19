@@ -6,6 +6,10 @@ using UnityEngine;
 using UnityEditor;
 public abstract class RealGenRoom : GenRoom {
     public Rectangle innerRect;
+    public GameObject task;
+    public List<GameObject> placedObjects = new List<GameObject>();
+
+    public string ventName = "";
 
     public override List<Rectangle> getRects() {
         List<Rectangle> rects = new List<Rectangle>();
@@ -31,7 +35,7 @@ public abstract class RealGenRoom : GenRoom {
         innerRect = new Rectangle(innerOuterRect.X + x, innerOuterRect.Y + y, w, h);
     }
 
-    public bool IsPosFree(Vector2 pos, List<Rectangle> corridors, List<GameObject> placedObjects) {
+    public static bool IsPosFree(Vector2 pos, List<Rectangle> corridors, List<GameObject> placedObjects) {
         foreach (GameObject obj in placedObjects) {
             if (VirtualGenRoom.IsCloserToThan(pos, WorldGenerator.GetRectangleFromTransform(obj.transform), "XY", 1)) {
                 return false;

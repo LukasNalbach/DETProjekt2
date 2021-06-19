@@ -9,7 +9,6 @@ public abstract class GenRoom {
     protected System.Random random;
     public Rectangle outerRect;
     protected GenRoom leftSubroom, rightSubroom;
-    private int subroomCount = 0;
 
     public GenRoom() {
 
