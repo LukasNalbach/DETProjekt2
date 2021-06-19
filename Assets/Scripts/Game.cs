@@ -358,11 +358,7 @@ public class Game : MonoBehaviour
     public void stopSabortage()
     {
         activeSabortage=null;
-<<<<<<< HEAD
-=======
-        GUI.stopSabortageCountdown();
         sabortageStartCooldown=maxSabortageStartCooldown;
->>>>>>> 480dda846f05e17f5751c170fa4a222fe55043e5
     }
     public List<SabortageTask> allActiveSabortageTasks()
     {
