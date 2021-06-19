@@ -16,7 +16,7 @@ public class Imposter : Player
     }
 
     // Update is called once per frame
-    public void Update()
+    public new void Update()
     {
         if (activePlayer()&&Input.GetKeyDown(KeyCode.Return))
         {
@@ -68,7 +68,7 @@ public class Imposter : Player
         }
         base.Update();
     }
-    public void FixedUpdate()
+    public new void FixedUpdate()
     {
         base.FixedUpdate();
     }

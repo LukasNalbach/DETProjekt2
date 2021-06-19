@@ -10,7 +10,6 @@ public class CrewMateAgent : Agent
      Rigidbody2D rBody;
     void Start () {
         rBody = GetComponent<Rigidbody2D>();
-        Game.Instance.setRooms();
     }
     public Transform Target;
     /*public override void Initialize() { 
