@@ -9,6 +9,9 @@ public class Sabortage:MonoBehaviour
     public float currentTimeToSolve;
     public bool active;
     public List<SabortageTask> tasksToStop;
+
+    public GameObject startButton;
+    private Vector3 position=new Vector3(-1,-1,-1);//created by first call of getPosition
     void Start()
     {
 
@@ -52,4 +55,17 @@ public class Sabortage:MonoBehaviour
         active=false;
         Game.Instance.stopSabortage();
     }
+    public Vector3 getPosition()
+    {
+        if(position[0]==-1&&position[1]==-1&&position[2]==-1)
+        {
+            Vector3 sumPositions=new Vector3(0,0,0);
+            foreach(Task task in tasksToStop)
+            {
+                sumPositions+=task.transform.position;
+            }
+            position=sumPositions/tasksToStop.Count;
+        }
+        return position;
+    }    
 }

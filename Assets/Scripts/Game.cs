@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class Game : MonoBehaviour
 {
+    public GameObject buttonPrefab;
     /// <summary>
     /// The singleton instance.
     /// </summary>
@@ -43,6 +44,11 @@ public class Game : MonoBehaviour
 
     private float killCooldown{get; set;}
 
+    //so the imposter cannot spam sabortage
+    private float sabortageStartCooldown{get;set;}
+
+    private float maxSabortageStartCooldown=15f;
+
     private bool meetingNow=false;
     private void Awake()
     {
@@ -67,6 +73,7 @@ public class Game : MonoBehaviour
         allRooms=new List<Room>();
         allVents=new List<Vent>();
         killCooldown=0;
+        sabortageStartCooldown=0;
     }
     public void SetTexture(GameObject obj, string name, float scale) {
         Texture2D tex = new Texture2D(500, 500);
@@ -92,6 +99,10 @@ public class Game : MonoBehaviour
 
     private void createCrew()
     {
+        if(Settings.numberPlayers==0)
+        {
+            return;
+        }
         GameObject playerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Player.prefab", typeof(GameObject)) as GameObject;
         List<Vector2> positions = new List<Vector2>();
         RealGenRoom meetingraum;
@@ -259,12 +270,16 @@ public class Game : MonoBehaviour
                 killCooldown-=Time.deltaTime;
                 GUI.updateKillCooldown(1 - killCooldown / Settings.cooldownTime);
             }
+            if(sabortageStartCooldown>0)
+            {
+                sabortageStartCooldown-=Time.deltaTime;
+            }
             if(activeSabortage!=null)
             {
                 activeSabortage.currentTimeToSolve-=Time.deltaTime;
                 if(activeSabortage.currentTimeToSolve<=0f)
                 {
-                    Debug.Log("Imposer wins with Sabortage");
+                    impostersWin(true);
                 }
                 else
                 {
@@ -292,7 +307,26 @@ public class Game : MonoBehaviour
     }
     public float getTaskProgress()
     {
-        return 1.0f*taskDone/totalTasks;
+        float progress=1.0f*taskDone/totalTasks;
+        float visibleProgress=0f;
+        if(progress>=0.25f)
+        {
+            visibleProgress=0.25f;
+        }
+        if(progress>=0.5f)
+        {
+            visibleProgress=0.5f;
+        }
+        if(progress>=0.75f)
+        {
+            visibleProgress=0.75f;
+        }
+        if(taskDone==totalTasks)
+        {
+            visibleProgress=1f;
+            crewMatesWin(true);
+        }
+        return visibleProgress;
     }
     public void increaseTaskProgress()
     {
@@ -305,17 +339,26 @@ public class Game : MonoBehaviour
         taskDone-=lostCrewMate.taskDone;
         GUI.updateTaskProgress(getTaskProgress());
     }
+    public static void startSabortageBournTrees()
+    {
+        Game.Instance.startSabortage(Game.Instance.allSabortages[0]);
+    }
     public void startSabortage(Sabortage sabortage)
     {
-        if(activeSabortage==null)
+        if(sabortagePossible())
         {
             activeSabortage=sabortage;
             sabortage.activate();
         }
     }
+    public bool sabortagePossible()
+    {
+        return activeSabortage==null&&sabortageStartCooldown<=0;
+    }
     public void stopSabortage()
     {
         activeSabortage=null;
+        sabortageStartCooldown=maxSabortageStartCooldown;
     }
     public List<SabortageTask> allActiveSabortageTasks()
     {
@@ -351,11 +394,18 @@ public class Game : MonoBehaviour
     public void meetingResult(int playerToKill)
     {
         allPlayers[playerToKill].killAfterMeeting();
+        checkWinningOverPlayers();
     }
     public void endMeeting()
     {
         meetingNow=false;
     }
+    //return the only human player in the end
+    public Player activePlayer()
+    {
+        return swapPlayer().currentPlayer.GetComponent<Player>();
+    }
+
     public swapPlayer swapPlayer()
     {
         return gameObject.GetComponent<swapPlayer>();
@@ -374,5 +424,86 @@ public class Game : MonoBehaviour
 
     public static void skip() {
         Game.Instance.gameObject.GetComponent<Voting>().skip(-1);
+    }
+    /*
+    checks wheter imposter wins because the number of imposters is equal to the number of crewMates
+    checks wheter crew Mates wins because the number of imposters=0
+    */
+    public void checkWinningOverPlayers()
+    {
+        int imposters=0;
+        int crewMates=0;
+        foreach(Player player in allPlayers)
+        {
+            if(player.isAlive())
+            {
+                if(player.isImposter())
+                {
+                    imposters++;
+                }
+                else
+                {
+                    crewMates++;
+                }
+            }
+        }
+        if(imposters>=crewMates)
+        {
+            impostersWin(false);
+        }
+        else if(imposters==0)
+        {
+            crewMatesWin(false);
+        }
+    }
+    public bool impostersWin()
+    {
+        int imposters=0;
+        int crewMates=0;
+        foreach(Player player in allPlayers)
+        {
+            if(player.isAlive())
+            {
+                if(player.isImposter())
+                {
+                    imposters++;
+                }
+                else
+                {
+                    crewMates++;
+                }
+            }
+        }
+        if(imposters>=crewMates)
+        {
+            return true;
+        }
+        return false;
+    }
+    public void impostersWin(bool withSabortage)
+    {
+        string line="Imposters wins";
+        if(withSabortage)
+        {
+            line+=" with Sabortage";
+        }
+        Debug.Log(line);
+    }
+    public void crewMatesWin(bool withTasks)
+    {
+        if(impostersWin())
+        {
+            impostersWin(false);
+        }
+        else
+        {
+            string line="Crew wins";
+            if(withTasks)
+            {
+                line+=" with Tasks";
+            }
+            Debug.Log(line);
+        }
+        
     }
 }

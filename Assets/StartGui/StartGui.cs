@@ -21,6 +21,7 @@ public class StartGui : UIBehaviour, ICancelHandler
 
     private int pointerTaskOptions;
 
+
     void Awake()
     {
         Settings = GameSettings.Load();
@@ -49,6 +50,8 @@ public class StartGui : UIBehaviour, ICancelHandler
 
         Settings.setColorPointer(2);
 
+        Settings.setRolePointer(0);
+
         GameObject.Find("Canvas/Spieleranzahl/Spieleranzahl").GetComponent<TextMeshProUGUI>().SetText("Number of Players: " + Settings.numberPlayers);
         GameObject.Find("Canvas/Imposter/Imposter").GetComponent<TextMeshProUGUI>().SetText("Number of Imposters: " + Settings.numberImposters);
         GameObject.Find("Canvas/Speed/Speed").GetComponent<TextMeshProUGUI>().SetText("Player Speed: x" + Settings.playerSpeed);
@@ -57,7 +60,8 @@ public class StartGui : UIBehaviour, ICancelHandler
         GameObject.Find("Canvas/CooldownTime/CooldownTime").GetComponent<TextMeshProUGUI>().SetText("Cooldown Time: " + Settings.cooldownTime);
         GameObject.Find("Canvas/Tasks/Tasks").GetComponent<TextMeshProUGUI>().SetText("Task per Player: " + Settings.tasks);
         setColorMenu();
-    
+        GameObject.Find("Canvas/Role/Role").GetComponent<TextMeshProUGUI>().SetText("Role: " + Settings.getPlayerRole());
+        
         //GameObject.Find("Canvas/Tasks/Senken").GetComponent<TextMeshProUGUI>().color = Color.red;
     }
     void Update()
@@ -238,6 +242,16 @@ public class StartGui : UIBehaviour, ICancelHandler
         GameObject.Find("Canvas/Color/Color").GetComponent<TextMeshProUGUI>().color=Settings.getPlayerColor();
         //GameObject.Find("Canvas/Color/Senken/Text").GetComponent<TextMeshProUGUI>().color=Settings.getPreviousColor();
         //GameObject.Find("Canvas/Color/Steigern/Text").GetComponent<TextMeshProUGUI>().color=Settings.getNextColor();
+    }
+     public void decreaseRole()
+    {
+        Settings.decreaseRolePointer();
+        GameObject.Find("Canvas/Role/Role").GetComponent<TextMeshProUGUI>().SetText("Role: " + Settings.getPlayerRole());
+    }
+    public void increaseRole()
+    {
+        Settings.increaseRolePointer();
+        GameObject.Find("Canvas/Role/Role").GetComponent<TextMeshProUGUI>().SetText("Role: " + Settings.getPlayerRole());
     }
     public void startGame()
     {

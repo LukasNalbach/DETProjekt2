@@ -102,6 +102,10 @@ public class Imposter : Player
     }
     public bool canKill()
     {
+        if(inVent())
+        {
+            return false;
+        }
         bool result=Game.Instance.getKillCooldown()<=0;
         if(!result)
         {
@@ -120,6 +124,7 @@ public class Imposter : Player
         Debug.Log("Imposter kills CrewMate");
         crewMate.getKilledByImposter();
         Game.Instance.resetKillCooldown();
+        Game.Instance.checkWinningOverPlayers();
     }
     bool inVent()
     {
