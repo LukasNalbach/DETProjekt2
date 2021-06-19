@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CrewMate : Player
 {
-    public string name="Player";
+    public new string name="Player";
     public bool ki=false;
 
     public LinkedList<Task>taskToDo=new LinkedList<Task>();
@@ -26,7 +26,7 @@ public class CrewMate : Player
     }
 
     // Update is called once per frame
-    public void Update()
+    public new void Update()
     {
         if (Input.GetKeyDown(KeyCode.Return)&&activePlayer())
         {
@@ -63,7 +63,7 @@ public class CrewMate : Player
         }
         base.Update();
     }
-    void FixedUpdate()
+    public new void FixedUpdate()
     {
         if(activePlayer())
         {

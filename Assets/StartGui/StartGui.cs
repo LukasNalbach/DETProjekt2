@@ -22,12 +22,12 @@ public class StartGui : UIBehaviour, ICancelHandler
     private int pointerTaskOptions;
 
 
-    void Awake()
+    public new void Awake()
     {
         Settings = GameSettings.Load();
         DontDestroyOnLoad(Settings);
     }
-    void Start()
+    public new void Start()
     {
 
         Settings.numberPlayers=5;

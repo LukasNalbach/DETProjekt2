@@ -22,7 +22,7 @@ public class SabortageTask : Task
     {
         
     }
-    public void setActivated()
+    public new void setActivated()
     {
         if(!activePlayerHasToDoThisTaskAndNear&&mySabortage.active&&!solved)
         {

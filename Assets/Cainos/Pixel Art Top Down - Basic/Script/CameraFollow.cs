@@ -26,7 +26,7 @@ namespace Cainos.PixelArtTopDown_Basic
             if (target == null) return;
 
             targetPos = target.position + offset;
-            if (Vector2.Distance(transform.position, targetPos) > 0.8) {
+            if (Vector2.Distance(transform.position, targetPos) > 1) {
                 transform.position = targetPos;
             } else {
                 transform.position = Vector3.Lerp(transform.position, targetPos, lerpSpeed * Time.deltaTime);

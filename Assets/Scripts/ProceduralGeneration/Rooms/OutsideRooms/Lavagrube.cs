@@ -44,6 +44,7 @@ public class Lavagrube : OutsideRoom {
                 Vector2 pos = new Vector2(x, y);
                 if (WorldGenerator.IsPosInRectangle(pos, lavaRect)) {
                     wGen.CreateLavaTile(pos);
+                    wGen.CreateColliderTile(pos);
                 } else {
                     wGen.CreateGrassGround(pos, 0.8, 0.2, 0);
                 }

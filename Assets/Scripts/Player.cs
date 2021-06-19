@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class Player : MonoBehaviour
 {
     public Vector2 startPos;
-    public string name;
+    public new string name;
     protected bool imposter;
 
     public bool alive = true;

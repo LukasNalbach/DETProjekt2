@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Settings
   m_EditorClassIdentifier: 
   size: 0
-  numberPlayers: 0
+  numberPlayers: 4
   numberImposters: 0
   playerSpeed: 20
   viewDistance: 5
