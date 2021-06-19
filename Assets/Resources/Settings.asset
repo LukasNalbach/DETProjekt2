@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   size: 0
   numberPlayers: 4
-  numberImposters: 0
+  numberImposters: 1
   playerSpeed: 20
   viewDistance: 5
   killDistance: 2

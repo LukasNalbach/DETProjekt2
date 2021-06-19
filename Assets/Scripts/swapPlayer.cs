@@ -16,11 +16,14 @@ public class swapPlayer : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.F1) && !Game.Instance.GetComponent<Voting>()) {
-            if (currentPlayerIndex+1 >= Game.Instance.allPlayers.Count) {
-                currentPlayerIndex = 0;
-            } else {
-                currentPlayerIndex++;
-            }
+            do {
+                if (currentPlayerIndex+1 >= Game.Instance.allPlayers.Count) {
+                    currentPlayerIndex = 0;
+                } else {
+                    currentPlayerIndex++;
+                }
+            } while (!Game.Instance.allPlayers[currentPlayerIndex].isAlive());
+            
             currentPlayer.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
             currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = false;
             currentPlayer = Game.Instance.allPlayers[currentPlayerIndex].gameObject;

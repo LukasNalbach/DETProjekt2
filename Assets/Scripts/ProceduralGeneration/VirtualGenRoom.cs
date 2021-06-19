@@ -186,7 +186,7 @@ public class VirtualGenRoom : GenRoom {
                             corridor = Rotate(corridor);
                         }
 
-                        if (!IsCloserToThan(corridor, otherRects, "XY", 2) && !IsCloserToThan(corridor, corridors, "XY", 2)) {
+                        if (!IsCloserToThan(corridor, otherRects, "XY", 3) && !IsCloserToThan(corridor, corridors, "XY", 3)) {
                             corridors.Add(corridor);
                             found = true;
                         }
