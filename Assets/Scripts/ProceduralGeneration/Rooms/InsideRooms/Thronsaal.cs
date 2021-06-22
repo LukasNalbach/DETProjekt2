@@ -5,8 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 public class Thronsaal : InsideRoom {
-    public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
-        WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
+    public override void generateInside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         
         // set throne position
         string placementMode = "";

@@ -5,8 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 public class Wald : OutsideRoom {
-    public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
-        WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
+    public override void generateInside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
 
         // create ground
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {
@@ -35,7 +34,7 @@ public class Wald : OutsideRoom {
             Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + random.Next(innerRect.Height));
             if (IsPosFree(pos, corridors, placedObjects)) {
                 GameObject obj = wGen.CreateAssetFromPrefab(new Vector2(pos.x + 0.5f, pos.y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Pot B.prefab");
-
+                WorldGenerator.Destroy(obj.GetComponent<Rigidbody2D>());
                 placedObjects.Add(obj);
                 kruege.Add(obj);
                 krugRects.Add(new Rectangle((int) pos.x - 1, (int)  pos.y - 4, 3, 5));

@@ -50,6 +50,6 @@ public abstract class RealGenRoom : GenRoom {
     public override int getRoomCount() {
         return 1;
     }
-    public abstract void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside);
-    public abstract void generateOutside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside);
+    public abstract void generateInside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside);
+    public abstract void generateOutside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside);
 }

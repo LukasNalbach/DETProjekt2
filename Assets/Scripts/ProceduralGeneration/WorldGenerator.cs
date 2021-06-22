@@ -11,6 +11,7 @@ public class WorldGenerator : MonoBehaviour
     private System.Random random = new System.Random();
     public Dictionary<RoomType,RealGenRoom> rooms = new Dictionary<RoomType,RealGenRoom>();
     public List<Rectangle> corridors = new List<Rectangle>();
+    public Rectangle worldArea;
     public void Awake() {
 
         List<RealGenRoom> roomsInside = new List<RealGenRoom>(6);
@@ -59,7 +60,7 @@ public class WorldGenerator : MonoBehaviour
             room.setRandom(random);
         }
 
-        Rectangle worldArea = new Rectangle(-100, 50, 50 + random.Next(20), 50 + random.Next(20));
+        worldArea = new Rectangle(0, 0, 50 + random.Next(20), 50 + random.Next(20));
         root.generate(worldArea);
 
         foreach (GenRoom room in root.getSubrooms()) {
@@ -94,11 +95,11 @@ public class WorldGenerator : MonoBehaviour
         ventRoomsOutside[0].ventName = "Vent3";
         ventRoomsOutside[1].ventName = "Vent4";
 
-        root.generateOutside(corridors, rootInside.outerRect, rootOutside.outerRect);
-        root.generateInside(corridors, rootInside.outerRect, rootOutside.outerRect);
+        root.generateOutside(this, corridors, rootInside.outerRect, rootOutside.outerRect);
+        root.generateInside(this, corridors, rootInside.outerRect, rootOutside.outerRect);
 
-        InsideRoom.generateRuinEdge(corridors, rootInside.outerRect, rootOutside.outerRect);
-        OutsideRoom.GenerateForestOutside(corridors, rootInside.outerRect, rootOutside.outerRect);
+        InsideRoom.generateRuinEdge(this, corridors, rootInside.outerRect, rootOutside.outerRect);
+        OutsideRoom.GenerateForestOutside(this, corridors, rootInside.outerRect, rootOutside.outerRect);
 
         List<KeyValuePair<RoomType,RealGenRoom>> roomsList = rooms.ToList<KeyValuePair<RoomType,RealGenRoom>>();
         for (int i = 0; i < roomsList.Count; i++) {
@@ -162,6 +163,10 @@ public class WorldGenerator : MonoBehaviour
         GameObject prefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/ColliderTile.prefab", typeof(GameObject)) as GameObject;
         GameObject obj = Instantiate(prefab, new Vector2(pos.x + 0.5f, pos.y + 0.5f), new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
         return obj;
+    }
+
+    public static void DestroyGameObject(GameObject obj) {
+        Destroy(obj);
     }
 
     public GameObject CreateGrassOnTileWithProb(Vector2 pos, double prob) {

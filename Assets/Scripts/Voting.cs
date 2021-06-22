@@ -52,8 +52,7 @@ public class Voting : MonoBehaviour
             text.color=Game.Instance.allPlayers[i].color;
             if(!Game.Instance.allPlayers[i].isAlive())
             {
-                
-               text.SetText(StrikeThrough(text.text));
+                text.fontStyle = FontStyles.Strikethrough | FontStyles.Bold;
                 deactivatePlayerButtons(i);
             }
         }
@@ -67,7 +66,7 @@ public class Voting : MonoBehaviour
         yield return new WaitForSeconds(1);
         votingActive = false;
         GameObject.Find("Canvas/Players/Player" + p + "/Buttons").SetActive(true);
-        showResults();
+        int result = results();
         t = 6;
         while (t > 0) {
             t--;
@@ -75,9 +74,7 @@ public class Voting : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
         SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("SelectionGUI"));
-        Game.Instance.GetComponent<swapPlayer>().currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
-        Game.Instance.endMeeting();
-        Game.Instance.GUI.setStandardGui(true);
+        StartCoroutine(Game.Instance.meetingResult(result));
         Destroy(this);
         yield return null;
     }
@@ -87,17 +84,11 @@ public class Voting : MonoBehaviour
          GameObject.Find("Canvas/Players/Player" + playerNr + "/Buttons").SetActive(false);
         GameObject.Find("Canvas/Players/Player" + playerNr + "/Buttons/buttonAccusePublic").SetActive(false);
         GameObject.Find("Canvas/Players/Player" + playerNr + "/Buttons/buttonDefendPublic").SetActive(false);
+        GameObject.Find("Canvas/Players/Player" + playerNr + "/Votings").SetActive(false);
+        GameObject.Find("Canvas/Players/Player" + playerNr + "/Votings/VotingsDefensive").SetActive(false);
+        GameObject.Find("Canvas/Players/Player" + playerNr + "/Votings/VotingsAttacking").SetActive(false);
     }
-    public string StrikeThrough(string s)
-    {
-        string strikethrough = "";
-        foreach (char c in s)
-        {
-            strikethrough = strikethrough + c + '\u0336';
-        }
-        return strikethrough;
-    }
-    private void showResults() {
+    private int results() {
         int[] accusedBy = new int[n];
         int iMax = -1;
         bool multipleMax = true;
@@ -135,9 +126,10 @@ public class Voting : MonoBehaviour
             }
             if (skipWantedBy < accusedBy[iMax]) {
                 GameObject.Find("Canvas/Players/Player" + iMax + "/textName").GetComponent<TextMeshProUGUI>().color = Color.red;
-                Game.Instance.meetingResult(iMax);
+                return iMax;
             }
         }
+        return iMax;
     }
 
     public void accuse(int p1, int p2) {
@@ -150,7 +142,7 @@ public class Voting : MonoBehaviour
         if (wantsSkip[p1]) {
             skip(p1);
         } else if (accuses[p1] != -1) {
-            GameObject.Find("Canvas/Players/Player" + accuses[p1] + "/Buttons/buttonAccuse").GetComponent<Image>().color = new Color(0.75f, 0.75f, 0.75f);
+            GameObject.Find("Canvas/Players/Player" + accuses[p1] + "/Buttons/buttonAccuse").GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
         }
 
         if (accuses[p1] == p2) {
@@ -180,7 +172,7 @@ public class Voting : MonoBehaviour
             if (accusesPublic[p1][p2]) {
                 newColor = Color.red;
             } else {
-                newColor = new Color(0.75f, 0.75f, 0.75f);
+                newColor = new Color(0.5f, 0.5f, 0.5f);
             }
             
             GameObject.Find("Canvas/Players/Player" + p2 + "/Buttons/buttonAccusePublic").GetComponent<Image>().color = newColor;
@@ -215,7 +207,7 @@ public class Voting : MonoBehaviour
             if (defendsPublic[p1][p2]) {
                 newColor = Color.green;
             } else {
-                newColor = new Color(0.75f, 0.75f, 0.75f);
+                newColor = new Color(0.5f, 0.5f, 0.5f);
             }
             
             GameObject.Find("Canvas/Players/Player" + p2 + "/Buttons/buttonDefendPublic").GetComponent<Image>().color = newColor;
@@ -244,9 +236,9 @@ public class Voting : MonoBehaviour
         wantsSkip[p1] = !wantsSkip[p1];
 
         if (wantsSkip[p1]) {
-            GameObject.Find("Canvas/skip").GetComponent<Image>().color = Color.blue;
+            GameObject.Find("Canvas/skip").GetComponent<Image>().color = new Color(0.75f, 0.75f, 0.75f);
         } else {
-            GameObject.Find("Canvas/skip").GetComponent<Image>().color = new Color(0.45f, 0.45f, 0.45f);
+            GameObject.Find("Canvas/skip").GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
         }
     }
 }

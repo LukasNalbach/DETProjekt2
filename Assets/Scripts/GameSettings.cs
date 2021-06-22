@@ -37,7 +37,7 @@ public class GameSettings : ScriptableObject
     [Tooltip("how far can a player see")]
     public int viewDistance;
 
-    private int[] viewDistanceOptions={2, 4, 5, 6, 8};
+    private int[] viewDistanceOptions={3, 4, 5, 6, 8};
 
     [Tooltip("what is the minimal time between to imposter kills in secounds")]
     public int killDistance;
@@ -66,7 +66,7 @@ public class GameSettings : ScriptableObject
     
     private int playerRolePointer;
 
-    private string[] possibleRoles={"Random", "Imposter", "Crew Mate"};
+    private string[] possibleRoles={"RNG", "IMP", "CM"};
 
     public int getMinPlayers()
     {

@@ -50,24 +50,26 @@ public class Game : MonoBehaviour
     private float maxSabortageStartCooldown=15f;
 
     private bool meetingNow=false;
+    public bool escMenuOpenend = false;
     private void Awake()
     {
         // there can be only one...
         if (Instance)
         {
-            Debug.LogError("only one Level instance allowed");
+            //Debug.LogError("only one Level instance allowed");
             Destroy(gameObject); // exercise: what would be different if we used Destroy(this) instead?
             return;
         }
         else
         {
             Instance = this;
-            Debug.Log("registered Level instance", Instance);
+            //Debug.Log("registered Level instance", Instance);
         }
         
         // load settings
         Settings = GameSettings.Load();
-        GUI=new GUI();
+        GUI=gameObject.AddComponent<GUI>();
+        GUI.scaleFactor = Screen.width / 1920f;
         allPlayers=new List<Player>();
         allTasks=new List<Task>();
         allRooms=new List<Room>();
@@ -93,7 +95,6 @@ public class Game : MonoBehaviour
         setCrewMadesTask();
         createVentConnections();
         createSabortageOptions();
-        AsyncOperation op = SceneManager.LoadSceneAsync("IngameGUI", LoadSceneMode.Additive);
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("World"));
     }
 
@@ -261,14 +262,21 @@ public class Game : MonoBehaviour
 
     private void Update() {
         Game.Instance.GUI.setSabotageGui(activeSabortage != null);
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            if (escMenuOpenend) {
+                CloseEscMenu();
+            } else {
+                OpenEscMenu();
+            }
+        }
     }
     private void FixedUpdate() {
         if(!meetingNow)
         {
              if(killCooldown>0)
             {
-                killCooldown-=Time.deltaTime;
-                GUI.updateKillCooldown(1 - killCooldown / Settings.cooldownTime);
+                killCooldown -= Time.deltaTime / Settings.cooldownTime;
+                GUI.updateKillCooldown(1 - killCooldown);
             }
             if(sabortageStartCooldown>0)
             {
@@ -294,7 +302,7 @@ public class Game : MonoBehaviour
         if (Instance == this)
         {
             Instance = null;
-            Debug.Log("unregistered Level instance", Instance);
+            //Debug.Log("unregistered Level instance", Instance);
         }
     }
     public float getKillCooldown()
@@ -303,7 +311,8 @@ public class Game : MonoBehaviour
     }
     public void resetKillCooldown()
     {
-        GUI.updateKillCooldown(1);
+        killCooldown = 1;
+        GUI.updateKillCooldown(1 - killCooldown);
     }
     public float getTaskProgress()
     {
@@ -391,10 +400,45 @@ public class Game : MonoBehaviour
         }
         gameObject.AddComponent<Voting>();
     }
-    public void meetingResult(int playerToKill)
+
+    public void OpenEscMenu() {
+        GetComponent<swapPlayer>().currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = false;
+        escMenuOpenend = true;
+        SceneManager.LoadSceneAsync("EscGUI", LoadSceneMode.Additive);
+    }
+    public void CloseEscMenu() {
+        SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("EscGUI"));
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName("World"));
+        GetComponent<swapPlayer>().currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
+        escMenuOpenend = false;
+    }
+    public void OpenMainMenu() {
+        
+    }
+    public void QuitGame() {
+        Application.Quit();
+    }
+    public IEnumerator meetingResult(int playerToKill)
     {
-        allPlayers[playerToKill].killAfterMeeting();
-        checkWinningOverPlayers();
+        GameObject currentPlayer = GetComponent<swapPlayer>().currentPlayer;
+        if (playerToKill != -1) {
+            Game.Instance.GUI.showMessage("Player " + playerToKill + " kicked out", 4);
+            checkWinningOverPlayers();
+            RealGenRoom room;
+            GetComponent<WorldGenerator>().rooms.TryGetValue(RoomType.Lavagrube, out room);
+            Rectangle lavaRect = ((Lavagrube) room).lavaRect;
+            allPlayers[playerToKill].transform.position = new Vector2(lavaRect.X + lavaRect.Width / 2, lavaRect.Y + lavaRect.Height / 2);
+            GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>().target = allPlayers[playerToKill].transform;
+            yield return new WaitForSeconds(4);
+            GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>().target = currentPlayer.transform;
+            allPlayers[playerToKill].killAfterMeeting();
+        } else {
+            Game.Instance.GUI.showMessage("Noone was kicked out", 4);
+        }
+        currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
+        GUI.setStandardGui(true);
+        endMeeting();
+        yield return null;
     }
     public void endMeeting()
     {
@@ -482,12 +526,12 @@ public class Game : MonoBehaviour
     }
     public void impostersWin(bool withSabortage)
     {
-        string line="Imposters wins";
+        string line="Imposters win";
         if(withSabortage)
         {
-            line+=" with Sabortage";
+            line+=" with Sabotage";
         }
-        Debug.Log(line);
+        Game.Instance.GUI.showMessage(line, 10);
     }
     public void crewMatesWin(bool withTasks)
     {
@@ -502,8 +546,7 @@ public class Game : MonoBehaviour
             {
                 line+=" with Tasks";
             }
-            Debug.Log(line);
+            Game.Instance.GUI.showMessage(line, 10);
         }
-        
     }
 }

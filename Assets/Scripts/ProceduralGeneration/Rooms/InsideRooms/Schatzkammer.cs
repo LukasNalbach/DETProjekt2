@@ -5,8 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 public class Schatzkammer : InsideRoom {
-    public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
-        WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
+    public override void generateInside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
 
         // create ground
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {

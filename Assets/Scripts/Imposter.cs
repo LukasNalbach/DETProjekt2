@@ -109,19 +109,19 @@ public class Imposter : Player
         bool result=Game.Instance.getKillCooldown()<=0;
         if(!result)
         {
-            Debug.Log("Kill Cooldown active");
+            //Debug.Log("Kill Cooldown active");
             return result;
         }
         result=nearOtherPlayer();
         if(!result)
         {
-            Debug.Log("No Player to kill near imposter");
+            //Debug.Log("No Player to kill near imposter");
         }
         return result;
     }
     void kill(CrewMate crewMate)
     {
-        Debug.Log("Imposter kills CrewMate");
+        //Debug.Log("Imposter kills CrewMate");
         crewMate.getKilledByImposter();
         Game.Instance.resetKillCooldown();
         Game.Instance.checkWinningOverPlayers();

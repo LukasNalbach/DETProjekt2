@@ -5,8 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 public class Steinbruch : OutsideRoom {
-    public override void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
-        WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
+    public override void generateInside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         
         // set stone area
         Rectangle stoneRect = new Rectangle(innerRect.X + 1, innerRect.Y + 1, innerRect.Width - 2, innerRect.Height - 2);
@@ -28,6 +27,7 @@ public class Steinbruch : OutsideRoom {
         }
         GameObject crate = wGen.CreateAssetFromPrefab(new Vector2(posCrate.x + 0.5f, posCrate.y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Crate.prefab");
         placedObjects.Add(crate);
+        WorldGenerator.Destroy(crate.GetComponent<Rigidbody2D>());
         task = crate;
         Rectangle crateRect = new Rectangle((int) posCrate.x - 1, (int)  posCrate.y - 4, 3, 5);
 

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
+using System.Drawing;
 using TMPro;
 public class StartGui : UIBehaviour, ICancelHandler
 {
@@ -26,9 +27,59 @@ public class StartGui : UIBehaviour, ICancelHandler
     {
         Settings = GameSettings.Load();
         DontDestroyOnLoad(Settings);
+        WorldGenerator worldGenerator = gameObject.AddComponent<WorldGenerator>();
+        StartCoroutine(cameraMovement(worldGenerator.worldArea));
+    }
+
+    private IEnumerator cameraMovement(Rectangle worldArea) {
+        System.Random random = new System.Random();
+        GameObject camera = GameObject.Find("MainCamera");
+        Vector2 cameraOffset = new Vector2(camera.GetComponent<Camera>().pixelWidth / 2, camera.GetComponent<Camera>().pixelHeight / 2);
+
+        camera.transform.position = new Vector2(worldArea.X + random.Next(worldArea.Width), worldArea.Y + random.Next(worldArea.Height));
+        float movementAngle = (float) random.NextDouble() * 360;
+
+        yield return new WaitForEndOfFrame();
+        while (true) {
+            Vector2 newPos = camera.transform.position + new Vector3(Mathf.Cos(movementAngle), Mathf.Sin(movementAngle), 0) * Time.deltaTime;
+
+            if (!WorldGenerator.IsPosInRectangle(newPos, worldArea)) {
+                if (newPos.x < worldArea.X) { // left of worldArea
+                    movementAngle = (float) random.NextDouble() * 180f;
+                } else if (newPos.y < worldArea.Y) { // right of worldArea
+                    movementAngle = 180f + (float) random.NextDouble() * 180f;
+                } else if (newPos.x > worldArea.X + worldArea.Width) { // above of worldArea
+                    movementAngle = 90f + (float) random.NextDouble() * 180f;
+                } else { // below worldArea
+                    movementAngle = (270f + (float) random.NextDouble() * 180f) % 360f;
+                }
+            } else {
+                camera.transform.position = newPos;
+                yield return new WaitForEndOfFrame();
+            }
+        }
     }
     public new void Start()
     {
+        switchToMainMenu();
+    }
+
+    public void QuitGame() {
+        Application.Quit();
+    }
+
+    public void switchToMainMenu() {
+        GUI.setActiveRecursive(GameObject.Find("Canvas/Options"), false);
+        GUI.setActiveRecursive(GameObject.Find("Canvas/MainMenu"), true);
+        GameObject.Find("Canvas/Options").transform.SetSiblingIndex(1);
+        GameObject.Find("Canvas/MainMenu").transform.SetSiblingIndex(0);
+    }
+
+    public void switchToSettings() {
+        GUI.setActiveRecursive(GameObject.Find("Canvas/Options"), true);
+        GUI.setActiveRecursive(GameObject.Find("Canvas/MainMenu"), false);
+        GameObject.Find("Canvas/Options").transform.SetSiblingIndex(0);
+        GameObject.Find("Canvas/MainMenu").transform.SetSiblingIndex(1);
 
         Settings.numberPlayers=5;
         Settings.numberImposters=1;
@@ -52,15 +103,15 @@ public class StartGui : UIBehaviour, ICancelHandler
 
         Settings.setRolePointer(0);
 
-        GameObject.Find("Canvas/Spieleranzahl/Spieleranzahl").GetComponent<TextMeshProUGUI>().SetText("Number of Players: " + Settings.numberPlayers);
-        GameObject.Find("Canvas/Imposter/Imposter").GetComponent<TextMeshProUGUI>().SetText("Number of Imposters: " + Settings.numberImposters);
-        GameObject.Find("Canvas/Speed/Speed").GetComponent<TextMeshProUGUI>().SetText("Player Speed: x" + Settings.playerSpeed);
-        GameObject.Find("Canvas/View/View").GetComponent<TextMeshProUGUI>().SetText("View Distance: " + Settings.viewDistance);
-        GameObject.Find("Canvas/KillDistance/KillDistance").GetComponent<TextMeshProUGUI>().SetText("Kill Distance: " + Settings.killDistance);
-        GameObject.Find("Canvas/CooldownTime/CooldownTime").GetComponent<TextMeshProUGUI>().SetText("Cooldown Time: " + Settings.cooldownTime);
-        GameObject.Find("Canvas/Tasks/Tasks").GetComponent<TextMeshProUGUI>().SetText("Task per Player: " + Settings.tasks);
+        GameObject.Find("Canvas/Options/panelNumberPlayers/valueNumberPlayers").GetComponent<TextMeshProUGUI>().SetText(Settings.numberPlayers.ToString());
+        GameObject.Find("Canvas/Options/panelNumberImposters/valueNumberImposters").GetComponent<TextMeshProUGUI>().SetText(Settings.numberImposters.ToString());
+        GameObject.Find("Canvas/Options/panelPlayerSpeed/valuePlayerSpeed").GetComponent<TextMeshProUGUI>().SetText(Settings.playerSpeed.ToString());
+        GameObject.Find("Canvas/Options/panelViewDistance/valueViewDistance").GetComponent<TextMeshProUGUI>().SetText(Settings.viewDistance.ToString());
+        //GameObject.Find("Canvas/KillDistance/KillDistance").GetComponent<TextMeshProUGUI>().SetText("Kill Distance: " + Settings.killDistance);
+        GameObject.Find("Canvas/Options/panelCooldownTime/valueCooldownTime").GetComponent<TextMeshProUGUI>().SetText(Settings.cooldownTime.ToString());
+        GameObject.Find("Canvas/Options/panelTasksPerPlayer/valueTasksPerPlayer").GetComponent<TextMeshProUGUI>().SetText(Settings.tasks.ToString());
         setColorMenu();
-        GameObject.Find("Canvas/Role/Role").GetComponent<TextMeshProUGUI>().SetText("Role: " + Settings.getPlayerRole());
+        GameObject.Find("Canvas/Options/panelPlayerRole/valuePlayerRole").GetComponent<TextMeshProUGUI>().SetText(Settings.getPlayerRole());
         
         //GameObject.Find("Canvas/Tasks/Senken").GetComponent<TextMeshProUGUI>().color = Color.red;
     }
@@ -71,7 +122,7 @@ public class StartGui : UIBehaviour, ICancelHandler
      public void OnQuitClicked()
     {
     #if UNITY_EDITOR
-        Debug.Log("Quit");
+        //Debug.Log("Quit");
     #endif
     Application.Quit(); // note: this does nothing in the Editor
     }
@@ -94,7 +145,7 @@ public class StartGui : UIBehaviour, ICancelHandler
             return;
         }
         Settings.numberPlayers--;
-        GameObject.Find("Canvas/Spieleranzahl/Spieleranzahl").GetComponent<TextMeshProUGUI>().SetText("Number of Players: " + Settings.numberPlayers);
+        GameObject.Find("Canvas/Options/panelNumberPlayers/valueNumberPlayers").GetComponent<TextMeshProUGUI>().SetText(Settings.numberPlayers.ToString());
         if(Settings.getMaxImposters(Settings.numberPlayers)<Settings.numberImposters)
         {
             decreaseImposterAmount();
@@ -107,7 +158,7 @@ public class StartGui : UIBehaviour, ICancelHandler
             return;
         }
         Settings.numberPlayers++;
-        GameObject.Find("Canvas/Spieleranzahl/Spieleranzahl").GetComponent<TextMeshProUGUI>().SetText("Number of Players: " + Settings.numberPlayers);
+        GameObject.Find("Canvas/Options/panelNumberPlayers/valueNumberPlayers").GetComponent<TextMeshProUGUI>().SetText(Settings.numberPlayers.ToString());
     }
     public void decreaseImposterAmount()
     {
@@ -116,7 +167,7 @@ public class StartGui : UIBehaviour, ICancelHandler
             return;
         }
         Settings.numberImposters--;
-        GameObject.Find("Canvas/Imposter/Imposter").GetComponent<TextMeshProUGUI>().SetText("Number of Imposters: " + Settings.numberImposters);
+        GameObject.Find("Canvas/Options/panelNumberImposters/valueNumberImposters").GetComponent<TextMeshProUGUI>().SetText(Settings.numberImposters.ToString());
     }
     public void increaseImposterAmount()
     {
@@ -125,7 +176,7 @@ public class StartGui : UIBehaviour, ICancelHandler
             return;
         }
         Settings.numberImposters++;
-        GameObject.Find("Canvas/Imposter/Imposter").GetComponent<TextMeshProUGUI>().SetText("Number of Imposters: " + Settings.numberImposters);
+        GameObject.Find("Canvas/Options/panelNumberImposters/valueNumberImposters").GetComponent<TextMeshProUGUI>().SetText(Settings.numberImposters.ToString());
     }
     public void decreasePlayerSpeed()
     {
@@ -135,7 +186,7 @@ public class StartGui : UIBehaviour, ICancelHandler
         }
         pointerPlayerSpeedOptions--;
         Settings.playerSpeed=Settings.getPlayerSpeedOptions()[pointerPlayerSpeedOptions];
-        GameObject.Find("Canvas/Speed/Speed").GetComponent<TextMeshProUGUI>().SetText("Player Speed: x" + Settings.playerSpeed);
+        GameObject.Find("Canvas/Options/panelPlayerSpeed/valuePlayerSpeed").GetComponent<TextMeshProUGUI>().SetText(Settings.playerSpeed.ToString());
     }
     public void increasePlayerSpeed()
     {
@@ -145,7 +196,7 @@ public class StartGui : UIBehaviour, ICancelHandler
         }
         pointerPlayerSpeedOptions++;
         Settings.playerSpeed=Settings.getPlayerSpeedOptions()[pointerPlayerSpeedOptions];
-        GameObject.Find("Canvas/Speed/Speed").GetComponent<TextMeshProUGUI>().SetText("Player Speed: x" + Settings.playerSpeed);
+        GameObject.Find("Canvas/Options/panelPlayerSpeed/valuePlayerSpeed").GetComponent<TextMeshProUGUI>().SetText(Settings.playerSpeed.ToString());
     }
     public void decreaseViewDistance()
     {
@@ -155,7 +206,7 @@ public class StartGui : UIBehaviour, ICancelHandler
         }
         pointerViewDistanceOptions--;
         Settings.viewDistance=Settings.getViewDistanceOptions()[pointerViewDistanceOptions];
-        GameObject.Find("Canvas/View/View").GetComponent<TextMeshProUGUI>().SetText("View Distance: " + Settings.viewDistance);
+        GameObject.Find("Canvas/Options/panelViewDistance/valueViewDistance").GetComponent<TextMeshProUGUI>().SetText(Settings.viewDistance.ToString());
     }
     public void increaseViewDistance()
     {
@@ -165,8 +216,9 @@ public class StartGui : UIBehaviour, ICancelHandler
         }
         pointerViewDistanceOptions++;
         Settings.viewDistance=Settings.getViewDistanceOptions()[pointerViewDistanceOptions];
-        GameObject.Find("Canvas/View/View").GetComponent<TextMeshProUGUI>().SetText("View Distance: " + Settings.viewDistance);
+        GameObject.Find("Canvas/Options/panelViewDistance/valueViewDistance").GetComponent<TextMeshProUGUI>().SetText(Settings.viewDistance.ToString());
     }
+    /*
     public void decreaseKillDistance()
     {
         if(pointerKillDistanceOptions==0)
@@ -187,6 +239,7 @@ public class StartGui : UIBehaviour, ICancelHandler
         Settings.killDistance=Settings.getKillDistanceOptions()[pointerKillDistanceOptions];
         GameObject.Find("Canvas/KillDistance/KillDistance").GetComponent<TextMeshProUGUI>().SetText("Kill Distance: " + Settings.killDistance);
     }
+    */
     public void decreaseCooldownTime()
     {
         if(pointerCooldownTimeOptions==0)
@@ -195,8 +248,9 @@ public class StartGui : UIBehaviour, ICancelHandler
         }
         pointerCooldownTimeOptions--;
         Settings.cooldownTime=Settings.getCooldownTimeOptions()[pointerCooldownTimeOptions];
-        GameObject.Find("Canvas/CooldownTime/CooldownTime").GetComponent<TextMeshProUGUI>().SetText("Cooldown Time: " + Settings.cooldownTime);
+        GameObject.Find("Canvas/Options/panelCooldownTime/valueCooldownTime").GetComponent<TextMeshProUGUI>().SetText(Settings.cooldownTime.ToString());
     }
+    
     public void increaseCooldownTime()
     {
         if(pointerCooldownTimeOptions>=Settings.getCooldownTimeOptions().Length-1)
@@ -205,7 +259,7 @@ public class StartGui : UIBehaviour, ICancelHandler
         }
         pointerCooldownTimeOptions++;
         Settings.cooldownTime=Settings.getCooldownTimeOptions()[pointerCooldownTimeOptions];
-        GameObject.Find("Canvas/CooldownTime/CooldownTime").GetComponent<TextMeshProUGUI>().SetText("Cooldown Time: " + Settings.cooldownTime);
+        GameObject.Find("Canvas/Options/panelCooldownTime/valueCooldownTime").GetComponent<TextMeshProUGUI>().SetText(Settings.cooldownTime.ToString());
     }
     public void decreaseTasks()
     {
@@ -215,7 +269,7 @@ public class StartGui : UIBehaviour, ICancelHandler
         }
         pointerTaskOptions--;
         Settings.tasks=Settings.getTaskOptions()[pointerTaskOptions];
-        GameObject.Find("Canvas/Tasks/Tasks").GetComponent<TextMeshProUGUI>().SetText("Task per Player: " + Settings.tasks);
+        GameObject.Find("Canvas/Options/panelTasksPerPlayer/valueTasksPerPlayer").GetComponent<TextMeshProUGUI>().SetText(Settings.tasks.ToString());
     }
     public void increaseTasks()
     {
@@ -225,7 +279,7 @@ public class StartGui : UIBehaviour, ICancelHandler
         }
         pointerTaskOptions++;
         Settings.tasks=Settings.getTaskOptions()[pointerTaskOptions];
-        GameObject.Find("Canvas/Tasks/Tasks").GetComponent<TextMeshProUGUI>().SetText("Task per Player: " + Settings.tasks);
+        GameObject.Find("Canvas/Options/panelTasksPerPlayer/valueTasksPerPlayer").GetComponent<TextMeshProUGUI>().SetText(Settings.tasks.ToString());
     }
      public void decreaseColor()
     {
@@ -239,19 +293,19 @@ public class StartGui : UIBehaviour, ICancelHandler
     }
     public void setColorMenu()
     {
-        GameObject.Find("Canvas/Color/Color").GetComponent<TextMeshProUGUI>().color=Settings.getPlayerColor();
+        GameObject.Find("Canvas/Options/panelPlayerColor/valuePlayerColor").GetComponent<UnityEngine.UI.Image>().color=Settings.getPlayerColor();
         //GameObject.Find("Canvas/Color/Senken/Text").GetComponent<TextMeshProUGUI>().color=Settings.getPreviousColor();
         //GameObject.Find("Canvas/Color/Steigern/Text").GetComponent<TextMeshProUGUI>().color=Settings.getNextColor();
     }
      public void decreaseRole()
     {
         Settings.decreaseRolePointer();
-        GameObject.Find("Canvas/Role/Role").GetComponent<TextMeshProUGUI>().SetText("Role: " + Settings.getPlayerRole());
+        GameObject.Find("Canvas/Options/panelPlayerRole/valuePlayerRole").GetComponent<TextMeshProUGUI>().SetText(Settings.getPlayerRole());
     }
     public void increaseRole()
     {
         Settings.increaseRolePointer();
-        GameObject.Find("Canvas/Role/Role").GetComponent<TextMeshProUGUI>().SetText("Role: " + Settings.getPlayerRole());
+        GameObject.Find("Canvas/Options/panelPlayerRole/valuePlayerRole").GetComponent<TextMeshProUGUI>().SetText(Settings.getPlayerRole());
     }
     public void startGame()
     {

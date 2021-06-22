@@ -22,29 +22,29 @@ public class VirtualGenRoom : GenRoom {
         return rects;
     }
 
-    public void generateInside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
+    public void generateInside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         if (leftSubroom is RealGenRoom) {
-            ((RealGenRoom) leftSubroom).generateInside(corridors, rectInside, rectOutside);
+            ((RealGenRoom) leftSubroom).generateInside(wGen, corridors, rectInside, rectOutside);
         } else {
-            ((VirtualGenRoom) leftSubroom).generateInside(corridors, rectInside, rectOutside);
+            ((VirtualGenRoom) leftSubroom).generateInside(wGen, corridors, rectInside, rectOutside);
         }
         if (rightSubroom is RealGenRoom) {
-            ((RealGenRoom) rightSubroom).generateInside(corridors, rectInside, rectOutside);
+            ((RealGenRoom) rightSubroom).generateInside(wGen, corridors, rectInside, rectOutside);
         } else {
-            ((VirtualGenRoom) rightSubroom).generateInside(corridors, rectInside, rectOutside);
+            ((VirtualGenRoom) rightSubroom).generateInside(wGen, corridors, rectInside, rectOutside);
         }
     }
 
-    public void generateOutside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
+    public void generateOutside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         if (leftSubroom is RealGenRoom) {
-            ((RealGenRoom) leftSubroom).generateOutside(corridors, rectInside, rectOutside);
+            ((RealGenRoom) leftSubroom).generateOutside(wGen, corridors, rectInside, rectOutside);
         } else {
-            ((VirtualGenRoom) leftSubroom).generateOutside(corridors, rectInside, rectOutside);
+            ((VirtualGenRoom) leftSubroom).generateOutside(wGen, corridors, rectInside, rectOutside);
         }
         if (rightSubroom is RealGenRoom) {
-            ((RealGenRoom) rightSubroom).generateOutside(corridors, rectInside, rectOutside);
+            ((RealGenRoom) rightSubroom).generateOutside(wGen, corridors, rectInside, rectOutside);
         } else {
-            ((VirtualGenRoom) rightSubroom).generateOutside(corridors, rectInside, rectOutside);
+            ((VirtualGenRoom) rightSubroom).generateOutside(wGen, corridors, rectInside, rectOutside);
         }
     }
 

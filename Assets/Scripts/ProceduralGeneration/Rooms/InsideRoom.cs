@@ -6,9 +6,7 @@ using UnityEngine;
 using UnityEditor;
 public abstract class InsideRoom : RealGenRoom {
 
-    public static void FillRectWithInsideWall(Rectangle rect) {
-        WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
-        
+    public static void FillRectWithInsideWall(WorldGenerator wGen, Rectangle rect) {
         for (int x = rect.X; x < rect.X + rect.Width; x++) {
             for (int y = rect.Y; y < rect.Y + rect.Height; y++) {
                 wGen.CreateWall(new Vector2(x, y), "Inside");
@@ -20,8 +18,7 @@ public abstract class InsideRoom : RealGenRoom {
         }
     }
 
-    public static void generateRuinEdge(List<Rectangle> corridors, Rectangle rectInside,  Rectangle rectOutside) {
-        WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
+    public static void generateRuinEdge(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside,  Rectangle rectOutside) {
         if (rectInside.X + rectInside.Width == rectOutside.X) { // outside is right of inside
             int x = rectInside.X + rectInside.Width - 1;
             for (int y = rectInside.Y - 10; y < rectInside.Y + rectInside.Height + 10; y++) {
@@ -50,9 +47,9 @@ public abstract class InsideRoom : RealGenRoom {
                     }
                 }
             }
-            FillRectWithInsideWall(new Rectangle(rectInside.X - 10, rectInside.Y - 10, 10, rectInside.Height + 20));
-            FillRectWithInsideWall(new Rectangle(rectInside.X, rectInside.Y - 10, rectInside.Width - 1, 10));
-            FillRectWithInsideWall(new Rectangle(rectInside.X, rectInside.Y + rectInside.Height, rectInside.Width - 1, 10));
+            FillRectWithInsideWall(wGen,  new Rectangle(rectInside.X - 10, rectInside.Y - 10, 10, rectInside.Height + 20));
+            FillRectWithInsideWall(wGen, new Rectangle(rectInside.X, rectInside.Y - 10, rectInside.Width - 1, 10));
+            FillRectWithInsideWall(wGen, new Rectangle(rectInside.X, rectInside.Y + rectInside.Height, rectInside.Width - 1, 10));
         } else if (rectInside.X == rectOutside.X + rectOutside.Width) { // outside is left of inside
             int x = rectInside.X;
             for (int y = rectInside.Y - 10; y < rectInside.Y + rectInside.Height + 10; y++) {
@@ -81,9 +78,9 @@ public abstract class InsideRoom : RealGenRoom {
                     }
                 }
             }
-            FillRectWithInsideWall(new Rectangle(rectInside.X + rectInside.Width, rectInside.Y - 10, 10, rectInside.Height + 20));
-            FillRectWithInsideWall(new Rectangle(rectInside.X + 1, rectInside.Y - 10, rectInside.Width - 1, 10));
-            FillRectWithInsideWall(new Rectangle(rectInside.X + 1, rectInside.Y + rectInside.Height, rectInside.Width - 1, 10));
+            FillRectWithInsideWall(wGen, new Rectangle(rectInside.X + rectInside.Width, rectInside.Y - 10, 10, rectInside.Height + 20));
+            FillRectWithInsideWall(wGen, new Rectangle(rectInside.X + 1, rectInside.Y - 10, rectInside.Width - 1, 10));
+            FillRectWithInsideWall(wGen, new Rectangle(rectInside.X + 1, rectInside.Y + rectInside.Height, rectInside.Width - 1, 10));
         } else if (rectInside.Y + rectInside.Height == rectOutside.Y) { // outside is above inside
             int y = rectInside.Y + rectInside.Height - 1;
             for (int x = rectInside.X - 10; x < rectInside.X + rectInside.Width + 10; x++) {
@@ -112,9 +109,9 @@ public abstract class InsideRoom : RealGenRoom {
                     }
                 }
             }
-            FillRectWithInsideWall(new Rectangle(rectInside.X - 10, rectInside.Y, 10, rectInside.Height - 1));
-            FillRectWithInsideWall(new Rectangle(rectInside.X + rectInside.Width, rectInside.Y, 10, rectInside.Height - 1));
-            FillRectWithInsideWall(new Rectangle(rectInside.X - 10, rectInside.Y - 10, rectInside.Width + 20, 10));
+            FillRectWithInsideWall(wGen, new Rectangle(rectInside.X - 10, rectInside.Y, 10, rectInside.Height - 1));
+            FillRectWithInsideWall(wGen, new Rectangle(rectInside.X + rectInside.Width, rectInside.Y, 10, rectInside.Height - 1));
+            FillRectWithInsideWall(wGen, new Rectangle(rectInside.X - 10, rectInside.Y - 10, rectInside.Width + 20, 10));
         } else { // outside is below inside
             int y = rectInside.Y;
             for (int x = rectInside.X - 10; x < rectInside.X + rectInside.Width + 10; x++) {
@@ -143,13 +140,12 @@ public abstract class InsideRoom : RealGenRoom {
                     }
                 }
             }
-            FillRectWithInsideWall(new Rectangle(rectInside.X - 10, rectInside.Y + 1, 10, rectInside.Height - 1));
-            FillRectWithInsideWall(new Rectangle(rectInside.X + rectInside.Width, rectInside.Y + 1, 10, rectInside.Height - 1));
-            FillRectWithInsideWall(new Rectangle(rectInside.X - 10, rectInside.Y + rectInside.Height, rectInside.Width + 20, 10));
+            FillRectWithInsideWall(wGen, new Rectangle(rectInside.X - 10, rectInside.Y + 1, 10, rectInside.Height - 1));
+            FillRectWithInsideWall(wGen, new Rectangle(rectInside.X + rectInside.Width, rectInside.Y + 1, 10, rectInside.Height - 1));
+            FillRectWithInsideWall(wGen, new Rectangle(rectInside.X - 10, rectInside.Y + rectInside.Height, rectInside.Width + 20, 10));
         }
     }
-    public override void generateOutside(List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
-        WorldGenerator wGen = Game.Instance.GetComponent<WorldGenerator>();
+    public override void generateOutside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
         for (int x = outerRect.X; x < outerRect.X + outerRect.Width; x++) {
             for (int y = outerRect.Y; y < outerRect.Y + outerRect.Height; y++) {
                 Vector2 pos = new Vector2(x, y);
