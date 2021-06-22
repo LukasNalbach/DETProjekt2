@@ -27,10 +27,10 @@ public abstract class RealGenRoom : GenRoom {
 
         int x, y, w, h;
 
-        x = (int) Math.Ceiling((double) innerOuterRect.Width / 9 + random.Next(innerOuterRect.Width / 9));
-        y = (int) Math.Ceiling((double) innerOuterRect.Height / 9 + random.Next(innerOuterRect.Height / 9));
-        w = (int) Math.Ceiling((double) 7 * innerOuterRect.Width / 9 + random.Next(innerOuterRect.Width / 9) - x);
-        h = (int) Math.Ceiling((double) 7 * innerOuterRect.Height / 9 + random.Next(innerOuterRect.Height / 9) - y);
+        x = (int) Math.Ceiling((double) innerOuterRect.Width / 13 + random.Next(innerOuterRect.Width / 13));
+        y = (int) Math.Ceiling((double) innerOuterRect.Height / 13 + random.Next(innerOuterRect.Height / 13));
+        w = (int) Math.Ceiling((double) 11 * innerOuterRect.Width / 13 + random.Next(innerOuterRect.Width / 13) - x);
+        h = (int) Math.Ceiling((double) 11 * innerOuterRect.Height / 13 + random.Next(innerOuterRect.Height / 13) - y);
 
         innerRect = new Rectangle(innerOuterRect.X + x, innerOuterRect.Y + y, w, h);
     }

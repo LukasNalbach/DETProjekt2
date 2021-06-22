@@ -103,7 +103,7 @@ public class StartGui : UIBehaviour, ICancelHandler
         pointerTaskOptions=(Settings.getTaskOptions().Length-1)/2;
         Settings.tasks=Settings.getTaskOptions()[pointerTaskOptions];
 
-        Settings.setColorPointer(2);
+        Settings.setColorPointer(0);
 
         Settings.setRolePointer(0);
 
