@@ -7,7 +7,7 @@ using UnityEditor;
 public class Meetingraum : InsideRoom {
     public GameObject emergencyButton;
     public override void generateInside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
-
+        Debug.Log("Starting to generate " + this.GetType() + ", Vents " + (ventName != "" ? "enabled" : "disabled") + "innerRect: " + innerRect.Width + "x" + innerRect.Height);
         // create ground
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {
             for (int y = innerRect.Y; y < innerRect.Y + innerRect.Height; y++) {
@@ -22,7 +22,7 @@ public class Meetingraum : InsideRoom {
 
         Vector2 posRune = new Vector2(0, 0);
         while (posRune.x == 0) {
-            Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + 2 + random.Next(innerRect.Height - 2));
+            Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + 1 + random.Next(innerRect.Height - 1));
             if (IsPosFree(pos, corridors, placedObjects)) {
                 posRune = pos;
             }
@@ -90,5 +90,7 @@ public class Meetingraum : InsideRoom {
                 placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(pos.x + 0.5f, pos.y), pillars[random.Next(pillars.Length)]));
             }
         }
+
+        Debug.Log(this.GetType() + " generated");
     }
 }

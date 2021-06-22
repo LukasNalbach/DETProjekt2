@@ -95,8 +95,11 @@ public class WorldGenerator : MonoBehaviour
         ventRoomsOutside[0].ventName = "Vent3";
         ventRoomsOutside[1].ventName = "Vent4";
 
+        Debug.Log("Generation started");
         root.generateOutside(this, corridors, rootInside.outerRect, rootOutside.outerRect);
+        Debug.Log("Outside generated");
         root.generateInside(this, corridors, rootInside.outerRect, rootOutside.outerRect);
+        Debug.Log("Inside generated");
 
         InsideRoom.generateRuinEdge(this, corridors, rootInside.outerRect, rootOutside.outerRect);
         OutsideRoom.GenerateForestOutside(this, corridors, rootInside.outerRect, rootOutside.outerRect);

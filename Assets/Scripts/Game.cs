@@ -49,7 +49,7 @@ public class Game : MonoBehaviour
 
     private float maxSabortageStartCooldown=15f;
 
-    private bool meetingNow=false;
+    public bool meetingNow=false;
     public bool escMenuOpenend = false;
     private void Awake()
     {
@@ -110,6 +110,11 @@ public class Game : MonoBehaviour
         List<Rectangle> placedObjectsRects = meetingraum.placedObjects.ConvertAll((GameObject obj) => WorldGenerator.GetRectangleFromTransform(obj.transform));
         Rectangle spawnRect = new Rectangle((int) ((Meetingraum) meetingraum).emergencyButton.transform.position.x - 2, (int) ((Meetingraum) meetingraum).emergencyButton.transform.position.y - 2, 5, 5);
 
+        UnityEngine.Color playerColor = Settings.getPlayerColor();
+
+        List<UnityEngine.Color> remainingColors = new List<UnityEngine.Color>();
+        remainingColors.AddRange(Settings.getPossibleColors());
+
         for (int i = 0; i < Settings.numberPlayers; i++) {
             while (positions.Count == i) {
                 Vector2 pos = new Vector2(spawnRect.X + random.Next(spawnRect.Width), spawnRect.Y + random.Next(spawnRect.Height));
@@ -127,12 +132,27 @@ public class Game : MonoBehaviour
                 newPlayer.AddComponent<Imposter>();
             }
             newPlayer.GetComponent<Player>().startPos = positions[positions.Count - 1];
-            UnityEngine.Color nextColor=Settings.getPossibleColors()[(Settings.getPlayerColorPointer()+i)%Settings.getPossibleColors().Length];
+            
+            int colorIndex = random.Next(remainingColors.Count);
+            UnityEngine.Color nextColor = remainingColors[colorIndex];
+            remainingColors.RemoveAt(colorIndex);
             newPlayer.GetComponent<Player>().create(nextColor);
+
             allPlayers.Add(newPlayer.GetComponent<Player>());
         }
 
-        int currentPlayerIndex = random.Next(Settings.numberPlayers);
+
+        int currentPlayerIndex = -1;
+        for (int i = 0; i < allPlayers.Count; i++) {
+            if (allPlayers[i].gameObject.GetComponent<Renderer>().material.color.Equals(playerColor)) {
+                currentPlayerIndex = i;
+                break;
+            }
+        }
+        if (currentPlayerIndex == -1) {
+            currentPlayerIndex = random.Next(allPlayers.Count);
+            allPlayers[currentPlayerIndex].gameObject.GetComponent<Renderer>().material.SetColor("_Color", playerColor);
+        }
         GameObject currentPlayer = allPlayers[currentPlayerIndex].gameObject;
         
         currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
@@ -436,28 +456,40 @@ public class Game : MonoBehaviour
     public IEnumerator meetingResult(int playerToKill)
     {
         GameObject currentPlayer = GetComponent<swapPlayer>().currentPlayer;
+        GameObject playerToKillObject;
+        Cainos.PixelArtTopDown_Basic.CameraFollow cameraFollow = GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>();
+
         if (playerToKill != -1) {
-            GameObject playerToKillObject = allPlayers[playerToKill].gameObject;
+            playerToKillObject = allPlayers[playerToKill].gameObject;
             Game.Instance.GUI.showMessage("Player " + playerToKill + " kicked out", 4);
-            checkWinningOverPlayers();
+
             RealGenRoom room;
             GetComponent<WorldGenerator>().rooms.TryGetValue(RoomType.Lavagrube, out room);
             Rectangle lavaRect = ((Lavagrube) room).lavaRect;
+
             playerToKillObject.transform.position = new Vector2(lavaRect.X + lavaRect.Width / 2, lavaRect.Y + lavaRect.Height / 2);
-            GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>().target = playerToKillObject.transform;
-            yield return new WaitForSeconds(4);
-            GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>().target = currentPlayer.transform;
+            cameraFollow.target = playerToKillObject.transform;
+
+            yield return new WaitForSeconds(3);
+
             allPlayers[playerToKill].killAfterMeeting();
+
+            yield return new WaitForSeconds(1);
+
+            if (checkWinningOverPlayers()) {
+                yield break;
+            } else if (playerToKillObject.Equals(currentPlayer)) {
+                GUI.showMessage("You can now spectate the remaining players", 4);
+                GetComponent<swapPlayer>().swap();
+            } else {
+                cameraFollow.target = currentPlayer.transform;
+                cameraFollow.transform.position = currentPlayer.transform.position + cameraFollow.offset;
+            }
         } else {
             Game.Instance.GUI.showMessage("Noone was kicked out", 4);
         }
         currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
         GUI.setStandardGui(true);
-        endMeeting();
-        yield return null;
-    }
-    public void endMeeting()
-    {
         meetingNow=false;
     }
     //return the only human player in the end
@@ -489,7 +521,7 @@ public class Game : MonoBehaviour
     checks wheter imposter wins because the number of imposters is equal to the number of crewMates
     checks wheter crew Mates wins because the number of imposters=0
     */
-    public void checkWinningOverPlayers()
+    public bool checkWinningOverPlayers()
     {
         int imposters=0;
         int crewMates=0;
@@ -510,11 +542,14 @@ public class Game : MonoBehaviour
         if(imposters>=crewMates)
         {
             impostersWin(false);
+            return true;
         }
         else if(imposters==0)
         {
             crewMatesWin(false);
+            return true;
         }
+        return false;
     }
     public bool impostersWin()
     {
@@ -547,7 +582,8 @@ public class Game : MonoBehaviour
         {
             line+=" with Sabotage";
         }
-        Game.Instance.GUI.showMessage(line, 10);
+        Game.Instance.GUI.showMessage(line, 4);
+        StartCoroutine(EndGameIn(4));
     }
     public void crewMatesWin(bool withTasks)
     {
@@ -562,7 +598,14 @@ public class Game : MonoBehaviour
             {
                 line+=" with Tasks";
             }
-            Game.Instance.GUI.showMessage(line, 10);
+            Game.Instance.GUI.showMessage(line, 4);
+            StartCoroutine(EndGameIn(4));
         }
+    }
+
+    public IEnumerator EndGameIn(int t) {
+        yield return new WaitForSeconds(t);
+        OpenMainMenu();
+        yield return null;
     }
 }

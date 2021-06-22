@@ -52,8 +52,14 @@ public class Voting : MonoBehaviour
             text.color=Game.Instance.allPlayers[i].color;
             if(!Game.Instance.allPlayers[i].isAlive())
             {
+                Destroy(GameObject.Find("Canvas/Players/Player" + i));
+                /*
                 text.fontStyle = FontStyles.Strikethrough | FontStyles.Bold;
                 deactivatePlayerButtons(i);
+                GameObject.Find("Canvas/Players/Player" + i + "/Votings").SetActive(false);
+                GameObject.Find("Canvas/Players/Player" + i + "/Votings/VotingsDefensive").SetActive(false);
+                GameObject.Find("Canvas/Players/Player" + i + "/Votings/VotingsAttacking").SetActive(false);
+                */
             }
         }
         votingActive = true;
@@ -75,18 +81,16 @@ public class Voting : MonoBehaviour
         }
         SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("SelectionGUI"));
         StartCoroutine(Game.Instance.meetingResult(result));
+        yield return new WaitForSeconds(5);
         Destroy(this);
         yield return null;
     }
 
     private void deactivatePlayerButtons(int playerNr)
     {
-         GameObject.Find("Canvas/Players/Player" + playerNr + "/Buttons").SetActive(false);
+        GameObject.Find("Canvas/Players/Player" + playerNr + "/Buttons").SetActive(false);
         GameObject.Find("Canvas/Players/Player" + playerNr + "/Buttons/buttonAccusePublic").SetActive(false);
         GameObject.Find("Canvas/Players/Player" + playerNr + "/Buttons/buttonDefendPublic").SetActive(false);
-        GameObject.Find("Canvas/Players/Player" + playerNr + "/Votings").SetActive(false);
-        GameObject.Find("Canvas/Players/Player" + playerNr + "/Votings/VotingsDefensive").SetActive(false);
-        GameObject.Find("Canvas/Players/Player" + playerNr + "/Votings/VotingsAttacking").SetActive(false);
     }
     private int results() {
         int[] accusedBy = new int[n];
@@ -100,7 +104,10 @@ public class Voting : MonoBehaviour
         }
 
         for (int i=0; i<n; i++) {
-            GameObject.Find("Canvas/Players/Player" + i + "/Buttons/buttonAccuse/textAccuse").GetComponent<TextMeshProUGUI>().SetText("Accused by " + accusedBy[i]);
+            GameObject obj = GameObject.Find("Canvas/Players/Player" + i + "/Buttons/buttonAccuse/textAccuse");
+            if (obj != null) {
+                obj.GetComponent<TextMeshProUGUI>().SetText("Accused by " + accusedBy[i]);
+            }
 
             if (accusedBy[i] > 0) {
                 if (iMax == -1) {
@@ -125,7 +132,6 @@ public class Voting : MonoBehaviour
                 }
             }
             if (skipWantedBy < accusedBy[iMax]) {
-                GameObject.Find("Canvas/Players/Player" + iMax + "/textName").GetComponent<TextMeshProUGUI>().color = Color.red;
                 return iMax;
             }
         }

@@ -72,20 +72,15 @@ public abstract class OutsideRoom : RealGenRoom {
                 GameObject spawnedObject;
                 
                 Vector2 pos = new Vector2(x, y);
-                if (WorldGenerator.IsPosInRectangle(pos, innerRect)) { // in room
-                    //spawnedObject = wGen.CreateGrassGround(pos, 0.7, 0.05, 0.25, 0.0);
-                } else { // outside room
-
+                if (!WorldGenerator.IsPosInRectangle(pos, innerRect)) { // outside room
                     if (VirtualGenRoom.IsCloserToThan(pos, corridors, "XY", 0)) { // in corridor
                         spawnedObject = wGen.CreateGrassGround(pos, 0.25, 0.05, 0.7);
                     } else { // in wall
                         if (VirtualGenRoom.IsCloserToThan(pos, innerRect, "XY", 1) || VirtualGenRoom.IsCloserToThan(pos, corridors, "XY", 1)) {
                             wGen.CreateColliderTile(pos);
                         }
-
-                        if (!VirtualGenRoom.IsCloserToThan(pos, rectInside, "XY", 1)) {
-                            wGen.CreateForest(pos, true);
-                        }
+                        bool allowTrees = (pos.y < innerRect.Y - 3 || pos.y >= innerRect.Y + innerRect.Height) && !VirtualGenRoom.IsCloserToThan(pos, rectInside, "XY", 1);
+                        wGen.CreateForest(pos, allowTrees);
                     }
                 }
             }

@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEditor;
 public class Opferstaette : InsideRoom {
     public override void generateInside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
-        
+        Debug.Log("Starting to generate " + this.GetType() + ", Vents " + (ventName != "" ? "enabled" : "disabled") + "innerRect: " + innerRect.Width + "x" + innerRect.Height);
         // set altar position
         string placementMode = "";
         Rectangle safeRect = new Rectangle(innerRect.X + 2, innerRect.Y + 2, innerRect.Width - 4, innerRect.Height - 4);
@@ -39,38 +39,44 @@ public class Opferstaette : InsideRoom {
             }
         }
 
-        // create benches
-        if (placementMode == "LEFT") {
-            for (int x = (int) posAltar.x + 3; x < Math.Min(safeRect.X + safeRect.Width, safeRect.X + 10); x = x + 2) {
-                for (int y = safeRect.Y; y < safeRect.Y + safeRect.Height; y = y + 3) {
-                    placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(x + 0.5f, y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Stone Bench W.prefab"));
-                }
-            }
-        } else if (placementMode == "RIGHT") {
-            for (int x = (int) posAltar.x - 3; x >= Math.Max(safeRect.X, posAltar.x - 10); x = x - 2) {
-                for (int y = safeRect.Y; y < safeRect.Y + safeRect.Height; y = y + 3) {
-                    placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(x + 0.5f, y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Stone Bench E.prefab"));
-                }
-            }
-        } else {
-            for (int y = (int) posAltar.y + 3; y < Math.Min(safeRect.Y + safeRect.Height, safeRect.Y + 10); y = y + 2) {
-                for (int x = safeRect.X; x < safeRect.X + safeRect.Width; x = x + 3) {
-                    placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(x + 0.5f, y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Stone Bench S.prefab"));
-                }
-            }
-        }
-
         if (ventName != "") {
             Vector2 posVent = new Vector2(0, 0);
             while (posVent.x == 0) {
-                Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + 2 + random.Next(innerRect.Height - 2));
-                if (IsPosFree(pos, corridors, placedObjects) && !VirtualGenRoom.IsCloserToThan(pos, posAltar, "XY", 3)) {
+                Vector2 pos = new Vector2((int) innerRect.X + random.Next(innerRect.Width), (int) innerRect.Y + 1 + random.Next(innerRect.Height - 1));
+                if (IsPosFree(pos, corridors, placedObjects) && !VirtualGenRoom.IsCloserToThan(pos, posAltar, "XY", 2)) {
                     posVent = pos;
                 }
             }
             GameObject vent = wGen.CreateAssetFromPrefab(posVent + new Vector2(0.5f, 0), "Assets/Prefabs/Vent.prefab");
             placedObjects.Add(vent);
             vent.name = ventName;
+        }
+
+        // create benches
+        if (placementMode == "LEFT") {
+            for (int x = (int) posAltar.x + 3; x < Math.Min(safeRect.X + safeRect.Width, safeRect.X + 10); x = x + 2) {
+                for (int y = safeRect.Y; y < safeRect.Y + safeRect.Height; y = y + 3) {
+                    if (IsPosFree(new Vector2(x, y), corridors, placedObjects)) {
+                        placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(x + 0.5f, y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Stone Bench W.prefab"));
+                    }
+                }
+            }
+        } else if (placementMode == "RIGHT") {
+            for (int x = (int) posAltar.x - 3; x >= Math.Max(safeRect.X, posAltar.x - 10); x = x - 2) {
+                for (int y = safeRect.Y; y < safeRect.Y + safeRect.Height; y = y + 3) {
+                    if (IsPosFree(new Vector2(x, y), corridors, placedObjects)) {
+                        placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(x + 0.5f, y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Stone Bench E.prefab"));
+                    }
+                }
+            }
+        } else {
+            for (int y = (int) posAltar.y + 3; y < Math.Min(safeRect.Y + safeRect.Height, safeRect.Y + 10); y = y + 2) {
+                for (int x = safeRect.X; x < safeRect.X + safeRect.Width; x = x + 3) {
+                    if (IsPosFree(new Vector2(x, y), corridors, placedObjects)) {
+                        placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(x + 0.5f, y), "Assets/Cainos/Pixel Art Top Down - Basic/Prefab/Props/PF Props Stone Bench S.prefab"));
+                    }
+                }
+            }
         }
 
         // create objects at the wall
@@ -118,5 +124,7 @@ public class Opferstaette : InsideRoom {
                 placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(pos.x + 0.5f, pos.y), pillars[random.Next(pillars.Length)]));
             }
         }
+
+        Debug.Log(this.GetType() + " generated");
     }
 }

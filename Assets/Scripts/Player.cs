@@ -50,7 +50,7 @@ public abstract class Player : MonoBehaviour
         {
             foreach (var player in Game.Instance.allPlayers)
             {
-                if(player.visible()&&Vector3.Distance(gameObject.transform.position, player.transform.position)<=Game.Instance.Settings.viewDistance)
+                if(player.visible() && (Game.Instance.meetingNow || Vector3.Distance(gameObject.transform.position, player.transform.position)<=Game.Instance.Settings.viewDistance))
                 {
                     player.gameObject.GetComponent<Renderer>().enabled=true;
                 }
