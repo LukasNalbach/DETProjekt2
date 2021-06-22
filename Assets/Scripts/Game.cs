@@ -95,7 +95,6 @@ public class Game : MonoBehaviour
         setCrewMadesTask();
         createVentConnections();
         createSabortageOptions();
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName("World"));
     }
 
     private void createCrew()
@@ -404,7 +403,16 @@ public class Game : MonoBehaviour
     public void OpenEscMenu() {
         GetComponent<swapPlayer>().currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = false;
         escMenuOpenend = true;
-        SceneManager.LoadSceneAsync("EscGUI", LoadSceneMode.Additive);
+        AsyncOperation op = SceneManager.LoadSceneAsync("EscGUI", LoadSceneMode.Additive);
+        StartCoroutine(setEscMenuActive(op));
+    }
+
+    private IEnumerator setEscMenuActive(AsyncOperation op) {
+        while (!op.isDone) {
+            yield return new WaitForEndOfFrame();
+        }
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName("EscGUI"));
+        yield return null;
     }
     public void CloseEscMenu() {
         SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("EscGUI"));
@@ -413,22 +421,30 @@ public class Game : MonoBehaviour
         escMenuOpenend = false;
     }
     public void OpenMainMenu() {
-        
+        for (int i = 0; i < SceneManager.sceneCount; i++) {
+            SceneManager.UnloadSceneAsync(SceneManager.GetSceneAt(i));
+        }
+        SceneManager.LoadScene("StartGui", LoadSceneMode.Single);
     }
     public void QuitGame() {
-        Application.Quit();
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
+        #endif
     }
     public IEnumerator meetingResult(int playerToKill)
     {
         GameObject currentPlayer = GetComponent<swapPlayer>().currentPlayer;
         if (playerToKill != -1) {
+            GameObject playerToKillObject = allPlayers[playerToKill].gameObject;
             Game.Instance.GUI.showMessage("Player " + playerToKill + " kicked out", 4);
             checkWinningOverPlayers();
             RealGenRoom room;
             GetComponent<WorldGenerator>().rooms.TryGetValue(RoomType.Lavagrube, out room);
             Rectangle lavaRect = ((Lavagrube) room).lavaRect;
-            allPlayers[playerToKill].transform.position = new Vector2(lavaRect.X + lavaRect.Width / 2, lavaRect.Y + lavaRect.Height / 2);
-            GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>().target = allPlayers[playerToKill].transform;
+            playerToKillObject.transform.position = new Vector2(lavaRect.X + lavaRect.Width / 2, lavaRect.Y + lavaRect.Height / 2);
+            GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>().target = playerToKillObject.transform;
             yield return new WaitForSeconds(4);
             GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>().target = currentPlayer.transform;
             allPlayers[playerToKill].killAfterMeeting();

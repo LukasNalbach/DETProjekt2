@@ -60,7 +60,7 @@ public class WorldGenerator : MonoBehaviour
             room.setRandom(random);
         }
 
-        worldArea = new Rectangle(0, 0, 50 + random.Next(20), 50 + random.Next(20));
+        worldArea = new Rectangle(-50, -50, 50 + random.Next(20), 50 + random.Next(20));
         root.generate(worldArea);
 
         foreach (GenRoom room in root.getSubrooms()) {
