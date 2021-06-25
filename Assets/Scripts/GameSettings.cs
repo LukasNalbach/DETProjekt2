@@ -66,7 +66,7 @@ public class GameSettings : ScriptableObject
     
     private int playerRolePointer;
 
-    private string[] possibleRoles={"RNG", "IMP", "CM"};
+    private string[] possibleRoles={"?", "IMP", "CM"};
 
     public int getMinPlayers()
     {

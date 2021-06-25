@@ -431,14 +431,12 @@ public class Game : MonoBehaviour
         while (!op.isDone) {
             yield return new WaitForEndOfFrame();
         }
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName("EscGUI"));
         yield return null;
     }
     public void CloseEscMenu() {
         SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName("EscGUI"));
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName("World"));
-        GetComponent<swapPlayer>().currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
-        escMenuOpenend = false;
+        Game.Instance.GetComponent<swapPlayer>().currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
+        Game.Instance.escMenuOpenend = false;
     }
     public void OpenMainMenu() {
         for (int i = 0; i < SceneManager.sceneCount; i++) {
