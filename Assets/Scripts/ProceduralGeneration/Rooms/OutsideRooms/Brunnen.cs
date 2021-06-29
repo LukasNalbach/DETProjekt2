@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEditor;
 public class Brunnen : OutsideRoom {
     public override void generateInside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
-        Debug.Log("Starting to generate " + this.GetType() + ", Vents " + (ventName != "" ? "enabled" : "disabled") + "innerRect: " + innerRect.Width + "x" + innerRect.Height);
 
         // create ground
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {
@@ -78,7 +77,5 @@ public class Brunnen : OutsideRoom {
                 placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(pos.x + 0.5f, pos.y), pillars[random.Next(pillars.Length)]));
             }
         }
-
-        Debug.Log(this.GetType() + " generated");
     }
 }

@@ -64,7 +64,8 @@ public class Imposter : Player
         }
         if(activePlayer()&&Input.GetKeyDown(KeyCode.Q))
         {
-            Game.Instance.startSabortage(Game.Instance.allSabortages[0]);
+            Game.Instance.startSabortageBournTrees();
+            //Game.Instance.startSabortage(Game.Instance.allSabortages[0]);
         }
         base.Update();
     }

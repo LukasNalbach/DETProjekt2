@@ -45,6 +45,7 @@ public class Voting : MonoBehaviour
         for (int i=n; i<10; i++) {
             GameObject.Destroy(GameObject.Find("Canvas/Players/Player" + i));
         }
+        GameObject.Find("Canvas/Players/Player" + p + "/textName").GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Underline | FontStyles.Bold;
         deactivatePlayerButtons(p);//deaktiviert alle Buttons zum aktiven Spieler
         for(int i=0;i<Game.Instance.allPlayers.Count;i++)
         {
@@ -52,14 +53,13 @@ public class Voting : MonoBehaviour
             text.color=Game.Instance.allPlayers[i].color;
             if(!Game.Instance.allPlayers[i].isAlive())
             {
-                Destroy(GameObject.Find("Canvas/Players/Player" + i));
-                /*
+                //Destroy(GameObject.Find("Canvas/Players/Player" + i));
+                
                 text.fontStyle = FontStyles.Strikethrough | FontStyles.Bold;
                 deactivatePlayerButtons(i);
                 GameObject.Find("Canvas/Players/Player" + i + "/Votings").SetActive(false);
                 GameObject.Find("Canvas/Players/Player" + i + "/Votings/VotingsDefensive").SetActive(false);
                 GameObject.Find("Canvas/Players/Player" + i + "/Votings/VotingsAttacking").SetActive(false);
-                */
             }
         }
         votingActive = true;

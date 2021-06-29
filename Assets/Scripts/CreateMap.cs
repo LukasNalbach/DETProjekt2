@@ -9,11 +9,12 @@ public class CreateMap : MonoBehaviour
     public GameObject playerPrefab;
     public GameObject taskPrefab;
     public GameObject sabortagePrefab;
+    public int height, width;
 
     // Start is called before the first frame update
     void Start()
     {
-       
+       //width = GameObject.Find("Camera")
     }
 
     // Update is called once per frame

@@ -7,7 +7,7 @@ using UnityEditor;
 
 public class VirtualGenRoom : GenRoom {
     public List<Rectangle> corridors = new List<Rectangle>();
-    protected Divider divider;
+    public Divider divider;
 
     public override List<Rectangle> getRects() {
         List<Rectangle> rects = new List<Rectangle>();
@@ -52,15 +52,15 @@ public class VirtualGenRoom : GenRoom {
         return "V (" + leftSubroom.GetType() + ") (" + rightSubroom.GetType() + ")";
     }
 
-    public void generate(Rectangle newOuterRect) {
+    public void generate(WorldGenerator wGen, Rectangle newOuterRect) {
         if (newOuterRect.Width > newOuterRect.Height) {
-            generate(newOuterRect, DividerType.Vertical);
+            generate(wGen, newOuterRect, DividerType.Vertical);
         } else {
-            generate(newOuterRect, DividerType.Horizontal);
+            generate(wGen, newOuterRect, DividerType.Horizontal);
         }
     }
 
-    public void generate(Rectangle newOuterRect, DividerType dividerType) {
+    public void generate(WorldGenerator wGen, Rectangle newOuterRect, DividerType dividerType) {
         outerRect = newOuterRect;
         int dividerPos;
 
@@ -88,14 +88,14 @@ public class VirtualGenRoom : GenRoom {
         divider = new Divider(dividerType, dividerPos);
 
         if (leftSubroom is VirtualGenRoom) {
-            ((VirtualGenRoom) leftSubroom).generate(leftOuterRect, nextDividersType);
+            ((VirtualGenRoom) leftSubroom).generate(wGen, leftOuterRect, nextDividersType);
         } else {
-            ((RealGenRoom) leftSubroom).generate(leftOuterRect);
+            ((RealGenRoom) leftSubroom).generate(wGen, leftOuterRect);
         }
         if (rightSubroom is VirtualGenRoom) {
-            ((VirtualGenRoom) rightSubroom).generate(rightOuterRect, nextDividersType);
+            ((VirtualGenRoom) rightSubroom).generate(wGen, rightOuterRect, nextDividersType);
         } else {
-            ((RealGenRoom) rightSubroom).generate(rightOuterRect);
+            ((RealGenRoom) rightSubroom).generate(wGen, rightOuterRect);
         }
 
         List<Rectangle> leftRectsOrig = leftSubroom.getRects();

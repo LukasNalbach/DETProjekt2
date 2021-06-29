@@ -37,6 +37,7 @@ public class Game : MonoBehaviour
 
     //never more than one
     public Sabortage activeSabortage;
+    public List<GameObject> sabotageFires = new List<GameObject>();
 
     //the prefabs of all weapons
 
@@ -377,9 +378,37 @@ public class Game : MonoBehaviour
         taskDone-=lostCrewMate.taskDone;
         GUI.updateTaskProgress(getTaskProgress());
     }
-    public static void startSabortageBournTrees()
+    public void startSabortageBournTrees()
     {
-        Game.Instance.startSabortage(Game.Instance.allSabortages[0]);
+        Game.Instance.startSabortage(allSabortages[0]);
+        RealGenRoom room;
+        GetComponent<WorldGenerator>().rooms.TryGetValue(RoomType.Wald, out room);
+        Wald roomForest = (Wald) room;
+
+        Rectangle rectForest = roomForest.innerRect;
+
+        GameObject prefabFire = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/FireBig.prefab", typeof(GameObject)) as GameObject;
+
+        List<Rectangle> fireRects = new List<Rectangle>();
+
+        int n = rectForest.Width * rectForest.Height / 10;
+        for (int i = 0; i < n; i++) {
+            int j = 0;
+            while (j < n) {
+                Vector2 pos = new Vector2(rectForest.X + 1 + random.Next(rectForest.Width - 2), rectForest.Y + 1 + random.Next(rectForest.Height - 2));
+                if (!VirtualGenRoom.IsCloserToThan(pos, fireRects, "XY", 1)) {
+
+                    GameObject fire = Instantiate(prefabFire, pos, new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
+                    sabotageFires.Add(fire);
+                    float size = 0.6f +  2.4f * (float) random.NextDouble();
+                    fire.GetComponent<ParticleSystem>().startSize = size;
+                    fireRects.Add(new Rectangle((int) pos.x, (int) pos.y, (int) size, (int) size));
+
+                    break;
+                }
+                j++;
+            }
+        }
     }
     public void startSabortage(Sabortage sabortage)
     {
@@ -388,6 +417,7 @@ public class Game : MonoBehaviour
             activeSabortage=sabortage;
             sabortage.activate();
         }
+        GUI.showMessage("The Sabotage was started", 4);
     }
     public bool sabortagePossible()
     {
@@ -395,8 +425,15 @@ public class Game : MonoBehaviour
     }
     public void stopSabortage()
     {
+        if (sabotageFires.Count != 0) {
+            foreach (GameObject fire in sabotageFires) {
+                Destroy(fire);
+            }
+        }
+        sabotageFires = new List<GameObject>();
         activeSabortage=null;
         sabortageStartCooldown=maxSabortageStartCooldown;
+        GUI.showMessage("The Sabotage was stopped", 4);
     }
     public List<SabortageTask> allActiveSabortageTasks()
     {
@@ -469,7 +506,7 @@ public class Game : MonoBehaviour
 
         if (playerToKill != -1) {
             playerToKillObject = allPlayers[playerToKill].gameObject;
-            Game.Instance.GUI.showMessage("Player " + playerToKill + " kicked out", 4);
+            Game.Instance.GUI.showMessage((allPlayers[playerToKill].isImposter() ? "Imposter " : "Crewmate ") + "Player " + playerToKill + " kicked out", 4);
 
             RealGenRoom room;
             GetComponent<WorldGenerator>().rooms.TryGetValue(RoomType.Lavagrube, out room);

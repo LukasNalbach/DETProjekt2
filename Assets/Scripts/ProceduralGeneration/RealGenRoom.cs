@@ -21,7 +21,7 @@ public abstract class RealGenRoom : GenRoom {
         return "R";
     }
 
-    public void generate(Rectangle newOuterRect) {
+    public void generate(WorldGenerator wGen, Rectangle newOuterRect) {
         outerRect = newOuterRect;
         Rectangle innerOuterRect = new Rectangle(outerRect.X + 1, outerRect.Y + 1, outerRect.Width - 2, outerRect.Height - 2);
 
