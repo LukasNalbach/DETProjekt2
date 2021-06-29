@@ -72,31 +72,17 @@ public class WorldGenerator : MonoBehaviour
             }
         }
 
-        foreach (GenRoom room in root.getSubrooms()) {
-            if (room is VirtualGenRoom) {
-                foreach (Rectangle corridor in ((VirtualGenRoom) room).corridors) {
-                    foreach (RealGenRoom subRoom1 in room.getSubrooms().Where((room) => room is RealGenRoom)) {
-                        foreach (RealGenRoom subRoom2 in room.getSubrooms().Where((room) => room is RealGenRoom)) {
-                            if (
-                                !subRoom1.Equals(subRoom2) &&
-                                VirtualGenRoom.IsCloserToThan(subRoom1.innerRect, corridor, "XY", 1) &&
-                                VirtualGenRoom.IsCloserToThan(corridor, subRoom2.innerRect, "XY", 1)
-                            ) {
-                                if (((VirtualGenRoom) room).divider.type == GenRoom.DividerType.Horizontal) {
-                                    checkpoints.Add(new Vector2(corridor.X + 1, corridor.Y));
-                                    checkpoints.Add(new Vector2(corridor.X + 1, corridor.Y + corridor.Height));
-                                } else {
-                                    checkpoints.Add(new Vector2(corridor.X, corridor.Y + 1));
-                                    checkpoints.Add(new Vector2(corridor.X + corridor.Width, corridor.Y + 1));
-                                }
-                            }
-                        }
-                    }
-                }
+        foreach (Rectangle corridor in corridors) {
+            if (corridor.Width == 2) {
+                checkpoints.Add(new Vector2(corridor.X + 1, corridor.Y));
+                checkpoints.Add(new Vector2(corridor.X + 1, corridor.Y + corridor.Height));
+            } else {
+                checkpoints.Add(new Vector2(corridor.X, corridor.Y + 1));
+                checkpoints.Add(new Vector2(corridor.X + corridor.Width, corridor.Y + 1));
             }
         }
 
-        Debug.Log(checkpoints.Count);      
+        Debug.Log(checkpoints.Count);
 
         List<RealGenRoom> ventRoomsInside = new List<RealGenRoom>();
         List<RealGenRoom> ventRoomsOutside = new List<RealGenRoom>();
