@@ -281,14 +281,14 @@ public class Game : MonoBehaviour
             list[n] = value;  
         }  
     }
-    public List<>allCheckpoints()
+    public List<Vector2>allCheckpoints()
     {
          WorldGenerator wGen = gameObject.GetComponent<WorldGenerator>();
          if(wGen==null)
          {
-             return new List<>();
+             return new List<Vector2>();
          }
-         return wb.
+         return wGen.checkpoints;
     }
     private void Update() {
         Game.Instance.GUI.setSabotageGui(activeSabortage != null);

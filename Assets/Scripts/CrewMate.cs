@@ -7,7 +7,7 @@ public class CrewMate : Player
     public new string name="Player";
     public bool ki=false;
 
-    public LinkedList<Task>taskToDo=new LinkedList<Task>();
+    public List<Task>taskToDo=new List<Task>();
 
     public int taskDone;
 
@@ -86,7 +86,7 @@ public class CrewMate : Player
     }
     public void addTask(Task task)
     {
-        taskToDo.AddLast(task);
+        taskToDo.Add(task);
     }
     public bool doingTask()
     {

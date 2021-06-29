@@ -17,28 +17,14 @@ public class CrewMateAgent : Agent
      public CrewMate crewMateScript;
     void Start () {
     }
-    public Transform Target=null;
     /*public override void Initialize() { 
          Debug.Log("Initialize begins");
     }*/
     public override void OnEpisodeBegin()
     {
-       // If the Agent fell, zero its momentum
-        /*foreach(Task task in crewMateScript.taskToDo)
-        {
-            targets.Add(task.transform);
-        }
-        Transform lastTarget=Target;
-        // Move the target to a new spot
-        Game.Shuffle<Transform>(targets,random);
-        Target=targets[0];
-        if(Target==lastTarget)
-        {
-            Target=targets[1];
-        }*/
         rBody = GetComponent<Rigidbody2D>();
         crewMateScript=GetComponent<CrewMate>();
-        lastCheckpoint=this.transform;
+        lastCheckpoint=new Vector2(0,0);
         lastDistance=distanceToNextTask();
         //Debug.Log("Next Target at "+Target.position);
     }
@@ -46,8 +32,8 @@ public class CrewMateAgent : Agent
     public override void CollectObservations(VectorSensor sensor)
     {
         // Agent positions(2)
-        sensor.AddObservation(this.transform.localPosition[0],this.transform.localPosition[1]);
-
+        sensor.AddObservation(this.transform.localPosition[0]);
+        sensor.AddObservation(this.transform.localPosition[1]);
         // Agent velocity(2)
         sensor.AddObservation(rBody.velocity.x);
         sensor.AddObservation(rBody.velocity.y);
@@ -57,12 +43,13 @@ public class CrewMateAgent : Agent
         {
             if(i<crewMateScript.taskToDo.Count)
             {
-                sensor.AddObservation(crewMateScript.taskToDo[i].transform.localPosition[0],
-                crewMateScript.taskToDo[i].transform.localPosition[1]);
+                sensor.AddObservation(crewMateScript.taskToDo[i].transform.localPosition[0]);
+                sensor.AddObservation(crewMateScript.taskToDo[i].transform.localPosition[1]);
             }
             else
             {
-                sensor.AddObservation(new Vector2(-999999,-999999));
+                sensor.AddObservation(-999999);
+                sensor.AddObservation(-999999);
             }
         }
         //checkPoints(22*2)
@@ -70,18 +57,21 @@ public class CrewMateAgent : Agent
         {
             if(i<Game.Instance.allCheckpoints().Count)
             {
-                sensor.AddObservation(Game.Instance.allCheckpoints[i]);
+                Vector2 checkpoint=Game.Instance.allCheckpoints()[i];
+                sensor.AddObservation(checkpoint[0]);
+                sensor.AddObservation(checkpoint[1]);
             }
             else
             {
-                sensor.AddObservation(new Vector2(-999999,-999999));
+                sensor.AddObservation(-999999);
+                sensor.AddObservation(-999999);
             }
         }
     }
     public float forceMultiplier = 10;
     public int timeOffside=0;
     public float lastDistance;
-    public Transform lastCheckpoint;
+    public Vector2 lastCheckpoint;
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
         // Actions, size = 2
@@ -91,17 +81,17 @@ public class CrewMateAgent : Agent
         report=actionBuffers.ContinuousActions[3];
         // Rewards
         SetReward(-0.1f);//nichts tun wird bestraft
-       distanceToNextTask=distanceToNextTask();
+       float distanceNextTask=distanceToNextTask();
        // Reached target
-        if (distanceToNextTask < 1.5f)
+        if (distanceNextTask < 1.5f)
         {
             if(doingTask<crewMateScript.activation)
             {
                  SetReward(-0.1f);
             }
         }
-        SetReward(lastDistance-distanceToNextTask);
-        lastDistance=distanceToNextTask;
+        SetReward(lastDistance-distanceNextTask);
+        lastDistance=distanceNextTask;
         Vector2 ownPosition=new Vector2(this.transform.position[0],this.transform.position[1]);
         foreach(Vector2 checkpoint in Game.Instance.allCheckpoints())
         {
@@ -109,15 +99,8 @@ public class CrewMateAgent : Agent
             {
                 if(lastCheckpoint!=checkpoint)
                 {
-                    if(Vector3.Distance(Target.localPosition,lastCheckpoint.localPosition)<Vector3.Distance(Target.localPosition,checkpoint.localPosition))
-                    {
-                        SetReward(-2f);
-                    }
-                    else
-                    {
-                        SetReward(2f);
-                    }
-                    Debug.Log("Next Checkpoint at "+checkpoint.localPosition);
+                    //if(Vector3.Distance(Target.localPosition,lastCheckpoint.localPosition)<Vector3.Distance(Target.localPosition,checkpoint.localPosition))
+                    SetReward(5f);
                     lastCheckpoint=checkpoint;
                 }
             }
@@ -126,9 +109,10 @@ public class CrewMateAgent : Agent
     public float distanceToNextTask()
     {
          float distanceToBestTarget = Mathf.Infinity;
+          float newDistance=0f;
         foreach(Task task in crewMateScript.taskToDo)
         {
-            Vector3 newDistance=Vector3.Distance(this.transform.localPosition, task.transform.localPosition);
+           newDistance=Vector3.Distance(this.transform.localPosition, task.transform.localPosition);
             distanceToBestTarget=Mathf.Min(distanceToBestTarget,newDistance);
         }
         return distanceToBestTarget;
