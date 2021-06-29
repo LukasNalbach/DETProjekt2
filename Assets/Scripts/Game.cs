@@ -76,6 +76,7 @@ public class Game : MonoBehaviour
         allVents=new List<Vent>();
         killCooldown=0;
         sabortageStartCooldown=0;
+        WorldGenerator wGen = gameObject.AddComponent<WorldGenerator>();
     }
     public void SetTexture(GameObject obj, string name, float scale) {
         Texture2D tex = new Texture2D(500, 500);
@@ -88,8 +89,6 @@ public class Game : MonoBehaviour
 
     private void Start()
     {
-        WorldGenerator wGen = gameObject.AddComponent<WorldGenerator>();
-        
         createCrew();
         setRooms();
         setCrewMadesTask();
@@ -281,7 +280,15 @@ public class Game : MonoBehaviour
             list[n] = value;  
         }  
     }
-
+    public List<>allCheckpoints()
+    {
+         WorldGenerator wGen = gameObject.GetComponent<WorldGenerator>();
+         if(wGen==null)
+         {
+             return new List<>();
+         }
+         return wb.
+    }
     private void Update() {
         Game.Instance.GUI.setSabotageGui(activeSabortage != null);
         if (Input.GetKeyDown(KeyCode.Escape)) {
@@ -584,7 +591,7 @@ public class Game : MonoBehaviour
             line+=" with Sabotage";
         }
         Game.Instance.GUI.showMessage(line, 4);
-        foreach(Player player in allPlayers())
+        foreach(Player player in allPlayers)
             {
                 if(player.isImposter())
                 {
@@ -611,7 +618,7 @@ public class Game : MonoBehaviour
                 line+=" with Tasks";
             }
             Game.Instance.GUI.showMessage(line, 4);
-            foreach(Player player in allPlayers())
+            foreach(Player player in allPlayers)
             {
                 if(player.isImposter())
                 {
