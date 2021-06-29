@@ -7,7 +7,6 @@ using UnityEditor;
 public class Lavagrube : OutsideRoom {
     public Rectangle lavaRect;
     public override void generateInside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
-        Debug.Log("Starting to generate " + this.GetType() + ", Vents " + (ventName != "" ? "enabled" : "disabled") + "innerRect: " + innerRect.Width + "x" + innerRect.Height);
 
         lavaRect = new Rectangle(innerRect.X + innerRect.Width / 3, innerRect.Y + innerRect.Height / 3, Math.Min(Math.Max(innerRect.Width / 3, 3), 7), Math.Min(Math.Max(innerRect.Height / 3, 3), 7));
         Rectangle lavaCollisionRect = new Rectangle(lavaRect.X, lavaRect.Y - 4, lavaRect.Width, lavaRect.Height + 4);
@@ -77,7 +76,5 @@ public class Lavagrube : OutsideRoom {
                 placedObjects.Add(obj);
             }
         }
-
-        Debug.Log(this.GetType() + " generated");
     }
 }

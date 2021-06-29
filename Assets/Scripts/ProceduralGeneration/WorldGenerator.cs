@@ -11,6 +11,7 @@ public class WorldGenerator : MonoBehaviour
     private System.Random random = new System.Random();
     public Dictionary<RoomType,RealGenRoom> rooms = new Dictionary<RoomType,RealGenRoom>();
     public List<Rectangle> corridors = new List<Rectangle>();
+    public List<Vector2> checkpoints = new List<Vector2>();
     public Rectangle worldArea;
     public void Awake() {
 
@@ -61,7 +62,7 @@ public class WorldGenerator : MonoBehaviour
         }
 
         worldArea = new Rectangle(-50, -50, 50 + random.Next(20), 50 + random.Next(20));
-        root.generate(worldArea);
+        root.generate(this, worldArea);
 
         foreach (GenRoom room in root.getSubrooms()) {
             if (room is RealGenRoom) {
@@ -70,6 +71,32 @@ public class WorldGenerator : MonoBehaviour
                 corridors.AddRange(((VirtualGenRoom) room).corridors);
             }
         }
+
+        foreach (GenRoom room in root.getSubrooms()) {
+            if (room is VirtualGenRoom) {
+                foreach (Rectangle corridor in ((VirtualGenRoom) room).corridors) {
+                    foreach (RealGenRoom subRoom1 in room.getSubrooms().Where((room) => room is RealGenRoom)) {
+                        foreach (RealGenRoom subRoom2 in room.getSubrooms().Where((room) => room is RealGenRoom)) {
+                            if (
+                                !subRoom1.Equals(subRoom2) &&
+                                VirtualGenRoom.IsCloserToThan(subRoom1.innerRect, corridor, "XY", 1) &&
+                                VirtualGenRoom.IsCloserToThan(corridor, subRoom2.innerRect, "XY", 1)
+                            ) {
+                                if (((VirtualGenRoom) room).divider.type == GenRoom.DividerType.Horizontal) {
+                                    checkpoints.Add(new Vector2(corridor.X + 1, corridor.Y));
+                                    checkpoints.Add(new Vector2(corridor.X + 1, corridor.Y + corridor.Height));
+                                } else {
+                                    checkpoints.Add(new Vector2(corridor.X, corridor.Y + 1));
+                                    checkpoints.Add(new Vector2(corridor.X + corridor.Width, corridor.Y + 1));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Debug.Log(checkpoints.Count);      
 
         List<RealGenRoom> ventRoomsInside = new List<RealGenRoom>();
         List<RealGenRoom> ventRoomsOutside = new List<RealGenRoom>();
@@ -95,11 +122,8 @@ public class WorldGenerator : MonoBehaviour
         ventRoomsOutside[0].ventName = "Vent3";
         ventRoomsOutside[1].ventName = "Vent4";
 
-        Debug.Log("Generation started");
         root.generateOutside(this, corridors, rootInside.outerRect, rootOutside.outerRect);
-        Debug.Log("Outside generated");
         root.generateInside(this, corridors, rootInside.outerRect, rootOutside.outerRect);
-        Debug.Log("Inside generated");
 
         InsideRoom.generateRuinEdge(this, corridors, rootInside.outerRect, rootOutside.outerRect);
         OutsideRoom.GenerateForestOutside(this, corridors, rootInside.outerRect, rootOutside.outerRect);
@@ -112,6 +136,8 @@ public class WorldGenerator : MonoBehaviour
         RealGenRoom meetingraum;
         rooms.TryGetValue(RoomType.Meetingraum, out meetingraum);
         Destroy(((Meetingraum) meetingraum).emergencyButton.GetComponent<Rigidbody2D>());
+        
+        //SceneManager.LoadSceneAsync("MiniMap");
         
 
         /*
@@ -150,10 +176,11 @@ public class WorldGenerator : MonoBehaviour
         );
     }
 
-    public void GenerateRectangle(Rectangle rect) {
+    public GameObject GenerateRectangle(Rectangle rect) {
         GameObject rectPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/rectPrefab.prefab", typeof(GameObject)) as GameObject;
         GameObject drawnRect = Instantiate(rectPrefab, new Vector2(rect.X, rect.Y), new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
         drawnRect.transform.localScale = new Vector2(rect.Width, -rect.Height);
+        return drawnRect;
     }
 
     public GameObject CreateLavaTile(Vector2 pos) {

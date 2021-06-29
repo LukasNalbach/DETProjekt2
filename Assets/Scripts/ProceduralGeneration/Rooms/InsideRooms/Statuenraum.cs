@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEditor;
 public class Statuenraum : InsideRoom {
     public override void generateInside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
-        Debug.Log("Starting to generate " + this.GetType() + ", Vents " + (ventName != "" ? "enabled" : "disabled") + "innerRect: " + innerRect.Width + "x" + innerRect.Height);
         // set statue position
         string placementMode = "";
         Rectangle safeRect = new Rectangle(innerRect.X + 2, innerRect.Y + 2, innerRect.Width - 4, innerRect.Height - 4);
@@ -127,7 +126,5 @@ public class Statuenraum : InsideRoom {
                 placedObjects.Add(wGen.CreateAssetFromPrefab(new Vector2(pos.x + 0.5f, pos.y), pillars[random.Next(pillars.Length)]));
             }
         }
-
-        Debug.Log(this.GetType() + " generated");
     }
 }

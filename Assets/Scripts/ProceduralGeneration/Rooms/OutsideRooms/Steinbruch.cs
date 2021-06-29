@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEditor;
 public class Steinbruch : OutsideRoom {
     public override void generateInside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
-        Debug.Log("Starting to generate " + this.GetType() + ", Vents " + (ventName != "" ? "enabled" : "disabled") + "innerRect: " + innerRect.Width + "x" + innerRect.Height);
         // set stone area
         Rectangle stoneRect = new Rectangle(innerRect.X + 1, innerRect.Y + 1, innerRect.Width - 2, innerRect.Height - 2);
 
@@ -76,7 +75,5 @@ public class Steinbruch : OutsideRoom {
                 placedObjects.Add(obj);
             }
         }
-
-        Debug.Log(this.GetType() + " generated");
     }
 }

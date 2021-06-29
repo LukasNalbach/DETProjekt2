@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEditor;
 public class Wald : OutsideRoom {
     public override void generateInside(WorldGenerator wGen, List<Rectangle> corridors, Rectangle rectInside, Rectangle rectOutside) {
-        Debug.Log("Starting to generate " + this.GetType() + ", Vents " + (ventName != "" ? "enabled" : "disabled") + "innerRect: " + innerRect.Width + "x" + innerRect.Height);
         // create ground
         for (int x = innerRect.X; x < innerRect.X + innerRect.Width; x++) {
             for (int y = innerRect.Y; y < innerRect.Y + innerRect.Height; y++) {
@@ -83,7 +82,5 @@ public class Wald : OutsideRoom {
                 placedObjects.Add(obj);
             }
         }
-
-        Debug.Log(this.GetType() + " generated");
     }
 }
