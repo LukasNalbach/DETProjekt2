@@ -105,6 +105,7 @@ public class Game : MonoBehaviour
             return;
         }
         GameObject playerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Player.prefab", typeof(GameObject)) as GameObject;
+        GameObject playerPrefabKI=AssetDatabase.LoadAssetAtPath("Assets/KI/PlayerKI.prefab", typeof(GameObject)) as GameObject;
         List<Vector2> positions = new List<Vector2>();
         RealGenRoom meetingraum;
         GetComponent<WorldGenerator>().rooms.TryGetValue(RoomType.Meetingraum, out meetingraum);
@@ -126,10 +127,12 @@ public class Game : MonoBehaviour
                     positions.Add(pos);
                 }
             }
-            GameObject newPlayer = Instantiate(playerPrefab, positions[positions.Count - 1], new Quaternion());
+            GameObject newPlayer=null; 
             if (i >= Settings.numberImposters) {
-                newPlayer.AddComponent<CrewMate>();
+                newPlayer= Instantiate(playerPrefabKI, positions[positions.Count - 1], new Quaternion());
+                 newPlayer.AddComponent<CrewMate>();
             } else {
+                newPlayer= Instantiate(playerPrefab, positions[positions.Count - 1], new Quaternion());
                 newPlayer.AddComponent<Imposter>();
             }
             newPlayer.GetComponent<Player>().startPos = positions[positions.Count - 1];
@@ -254,7 +257,7 @@ public class Game : MonoBehaviour
     }
     private void addCrewMateTasks(CrewMate crewMate)
     {
-        Shuffle<Task>(allTasks);
+        Shuffle<Task>(allTasks,random);
         for(int i=0;i<Settings.tasks;i++)
         {
             if(i>=allTasks.Count)
@@ -268,7 +271,7 @@ public class Game : MonoBehaviour
             }
         }
     }
-    public void Shuffle<T>(List<T> list)  
+    public static void Shuffle<T>(List<T> list, System.Random random)  
     {  
         int n = list.Count;
         while (n > 1) {  
@@ -618,6 +621,17 @@ public class Game : MonoBehaviour
             line+=" with Sabotage";
         }
         Game.Instance.GUI.showMessage(line, 4);
+        foreach(Player player in allPlayers())
+            {
+                if(player.isImposter())
+                {
+                    player.agent.rewardWinGame();
+                }
+                else
+                {
+                    player.agent.rewardLooseGame();
+                }
+            }
         StartCoroutine(EndGameIn(4));
     }
     public void crewMatesWin(bool withTasks)
@@ -634,6 +648,17 @@ public class Game : MonoBehaviour
                 line+=" with Tasks";
             }
             Game.Instance.GUI.showMessage(line, 4);
+            foreach(Player player in allPlayers())
+            {
+                if(player.isImposter())
+                {
+                    player.agent.rewardLooseGame();
+                }
+                else
+                {
+                    player.agent.rewardWinGame();
+                }
+            }
             StartCoroutine(EndGameIn(4));
         }
     }
