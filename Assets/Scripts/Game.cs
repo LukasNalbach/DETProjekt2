@@ -621,7 +621,7 @@ public class Game : MonoBehaviour
             line+=" with Sabotage";
         }
         Game.Instance.GUI.showMessage(line, 4);
-        foreach(Player player in allPlayers())
+        foreach(Player player in allPlayers)
             {
                 if(player.isImposter())
                 {
@@ -648,7 +648,7 @@ public class Game : MonoBehaviour
                 line+=" with Tasks";
             }
             Game.Instance.GUI.showMessage(line, 4);
-            foreach(Player player in allPlayers())
+            foreach(Player player in allPlayers)
             {
                 if(player.isImposter())
                 {

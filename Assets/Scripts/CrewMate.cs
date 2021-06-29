@@ -116,7 +116,7 @@ public class CrewMate : Player
     }
     void doTask(Task task)
     {
-        agents.rewardStartTask();
+        agent.rewardStartTask();
         activeTask=task;
         taskCoroutine=coTask(activeTask);
         StartCoroutine(taskCoroutine);
@@ -131,7 +131,7 @@ public class CrewMate : Player
             if(task.sabortageTask)
             {
                 ((SabortageTask)task).finishSolving();
-                agents.rewardFinishSabortageTask();
+                agent.rewardFinishSabortageTask();
             }
             else
             {
@@ -139,7 +139,7 @@ public class CrewMate : Player
                 taskDone++;
                 Game.Instance.increaseTaskProgress();
                 taskToDo.Remove(task);
-                agents.rewardFinishTask();
+                agent.rewardFinishTask();
             }
         }
         activeTask=null;
