@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Settings
   m_EditorClassIdentifier: 
   size: 0
-  numberPlayers: 5
-  numberImposters: 1
+  numberPlayers: 1
+  numberImposters: 0
   playerSpeed: 3
   viewDistance: 5
-  killDistance: 3
-  cooldownTime: 45
-  tasks: 4
+  killDistance: 2
+  cooldownTime: 30
+  tasks: 8
   votingTime: 5

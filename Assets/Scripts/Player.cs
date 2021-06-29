@@ -16,6 +16,8 @@ public abstract class Player : MonoBehaviour
 
     public Room lastRoomBeforeMeeting;
     public UpdateRoom updateRoom;
+    public CrewMateAgent agent;
+    public float activation=0.8f;//when an imput form the agent is greater than activation, it is activated
 
     public void create(Color color)
     {
@@ -32,7 +34,7 @@ public abstract class Player : MonoBehaviour
     public void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.Space)&&activePlayer())
+        if (agent.report>=activation)
         {
             Player deadBody=nearDeadBody();
             if(deadBody!=null)

@@ -11,13 +11,19 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/StartGui.unity
     guid: c1a0c4ed603ec8d4bb395a9b9a7dd338
-  - enabled: 1
-    path: Assets/Scenes/World.unity
-    guid: 86e89bd9e4a9c5245a015cf17e3c0aae
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/Scenes/IngameGUI.unity
     guid: 26ebb09fedab917418e8990bf0968622
   - enabled: 1
     path: Assets/Scenes/SelectionGUI.unity
     guid: 7e6537f03f032e04a87b7abab7b8ffdc
+  - enabled: 1
+    path: Assets/Scenes/Training.unity
+    guid: 02ebb81e92c661a49a073670ef95183a
+  - enabled: 1
+    path: Assets/Scenes/World.unity
+    guid: 7248bac296b3a8c409be64464e1abee2
   m_configObjects: {}

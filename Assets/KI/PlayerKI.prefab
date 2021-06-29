@@ -16,6 +16,8 @@ GameObject:
   - component: {fileID: 7805625408114762907}
   - component: {fileID: 7805625408114762909}
   - component: {fileID: 7805625408114762910}
+  - component: {fileID: 3155296762096914809}
+  - component: {fileID: 8483211983210729753}
   m_Layer: 20
   m_Name: PlayerKI
   m_TagString: Player
@@ -183,18 +185,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 8
+    VectorObservationSize: 20
     NumStackedVectorObservations: 1
     m_ActionSpec:
-      m_NumContinuousActions: 2
+      m_NumContinuousActions: 4
       BranchSizes: 
-    VectorActionSize: 02000000
+    VectorActionSize: 04000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 3
-  m_BehaviorType: 1
+  m_BehaviorType: 0
   m_BehaviorName: CrewMate
   TeamId: 0
   m_UseChildSensors: 1
@@ -216,8 +218,42 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
+  checkPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  movement: {x: 0, y: 0}
   Target: {fileID: 0}
   forceMultiplier: 10
+  timeOffside: 0
+  lastDistance: 0
+  lastCheckpoint: {fileID: 0}
+--- !u!114 &3155296762096914809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2470675596994066608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64c68358354579a46b4b10ff70246962, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8483211983210729753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2470675596994066608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abd146093740c5d43b5909c7913f3109, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  active: 0
 --- !u!1 &2470675598688712044
 GameObject:
   m_ObjectHideFlags: 0

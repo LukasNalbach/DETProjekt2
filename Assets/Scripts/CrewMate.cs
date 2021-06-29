@@ -19,6 +19,7 @@ public class CrewMate : Player
     // Start is called before the first frame update
     void Start()
     {
+        agent=GetComponent<CrewMateAgent>();
         updateRoom=GetComponent<UpdateRoom>();
         imposter=false;
         taskDone=0;
@@ -28,7 +29,7 @@ public class CrewMate : Player
     // Update is called once per frame
     public new void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return)&&activePlayer())
+        if (agent.doingTask>=activation)
         {
             if(canDoTask())
             {
@@ -115,6 +116,7 @@ public class CrewMate : Player
     }
     void doTask(Task task)
     {
+        agents.rewardStartTask();
         activeTask=task;
         taskCoroutine=coTask(activeTask);
         StartCoroutine(taskCoroutine);
@@ -129,6 +131,7 @@ public class CrewMate : Player
             if(task.sabortageTask)
             {
                 ((SabortageTask)task).finishSolving();
+                agents.rewardFinishSabortageTask();
             }
             else
             {
@@ -136,6 +139,7 @@ public class CrewMate : Player
                 taskDone++;
                 Game.Instance.increaseTaskProgress();
                 taskToDo.Remove(task);
+                agents.rewardFinishTask();
             }
         }
         activeTask=null;
