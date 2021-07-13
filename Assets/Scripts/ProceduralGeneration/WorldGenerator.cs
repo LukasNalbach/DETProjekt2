@@ -13,6 +13,10 @@ public class WorldGenerator : MonoBehaviour
     public List<Rectangle> corridors = new List<Rectangle>();
     public List<Vector2> checkpoints = new List<Vector2>();
     public Rectangle worldArea;
+
+    private GameObject minimapPlayer;
+    private Dictionary<Task,GameObject> minimapTasks = new Dictionary<Task,GameObject>();
+    private Dictionary<SabortageTask,GameObject> minimapSabotageTasks = new Dictionary<SabortageTask,GameObject>();
     public void Awake() {
 
         List<RealGenRoom> roomsInside = new List<RealGenRoom>(6);
@@ -63,6 +67,7 @@ public class WorldGenerator : MonoBehaviour
 
         worldArea = new Rectangle(-50, -50, 50 + random.Next(20), 50 + random.Next(20));
         root.generate(this, worldArea);
+        //GameObject.Find("MinimapCamera").transform.position = ((Vector3) CenterPosition(worldArea)) + new Vector3Int(0, 0, -1000);
 
         foreach (GenRoom room in root.getSubrooms()) {
             if (room is RealGenRoom) {
@@ -123,17 +128,60 @@ public class WorldGenerator : MonoBehaviour
         rooms.TryGetValue(RoomType.Meetingraum, out meetingraum);
         Destroy(((Meetingraum) meetingraum).emergencyButton.GetComponent<Rigidbody2D>());
         
-        //SceneManager.LoadSceneAsync("MiniMap");
-        
+        GenerateMinimap();
+        StartCoroutine(updateMinimap());
+    }
 
-        /*
-        foreach (KeyValuePair<RoomType,Rectangle> room in rooms) {
-            GenerateRectangle(room.Value);
+    public void GenerateMinimap() {
+        foreach (RealGenRoom room in rooms.Values.Where((room) => room is RealGenRoom)) {
+            GenreateRectangleOnMinimap(room.innerRect);
         }
         foreach (Rectangle corridor in corridors) {
-            GenerateRectangle(corridor);
+            GenreateRectangleOnMinimap(corridor);
         }
-        */
+    }
+
+    public IEnumerator updateMinimap() {
+        while (true) {
+            // remove old tasks
+            foreach (KeyValuePair<Task,GameObject> minimapTask in minimapTasks.Where((t) => !t.Key.solvingVisible || !Game.Instance.allTasks.Contains(t.Key))) {
+                Destroy(minimapTask.Value);
+                minimapTasks.Remove(minimapTask.Key);
+            }
+            // create new Tasks
+            foreach (Task task in Game.Instance.allTasks.Where((t) => t.solvingVisible && !minimapTasks.ContainsKey(t))) {
+                GameObject minimapTask = GenreateTaskOnMinimap(task.gameObject.transform.position);
+                minimapTasks.Add(task, minimapTask);
+            }
+
+            // remove old sabotageTasks
+            foreach (KeyValuePair<SabortageTask,GameObject> minimapSabotageTask in minimapSabotageTasks.Where((t) => !t.Key.solvingVisible || !Game.Instance.allActiveSabortageTasks().Contains(t.Key))) {
+                Destroy(minimapSabotageTask.Value);
+                minimapTasks.Remove(minimapSabotageTask.Key);
+            }
+            // create new sabotageTasks
+            foreach (SabortageTask sabotageTask in Game.Instance.allActiveSabortageTasks().Where((t) => t.solvingVisible && !minimapSabotageTasks.ContainsKey(t))) {
+                GameObject minimapSabotageTask = GenreateTaskOnMinimap(sabotageTask.gameObject.transform.position);
+                minimapTasks.Add(sabotageTask, minimapSabotageTask);
+            }
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    public GameObject GenreateTaskOnMinimap(Vector2 pos) {
+        GameObject taskPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Task.prefab", typeof(GameObject)) as GameObject;
+        GameObject task = Instantiate(taskPrefab, pos, new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
+        task.layer = 6;
+        task.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
+        return task;
+    }
+
+    public GameObject GenreateSabotageTaskOnMinimap(Vector2 pos) {
+        GameObject sabotagePrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Task.prefab", typeof(GameObject)) as GameObject;
+        GameObject sabotage = Instantiate(sabotagePrefab, pos, new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
+        sabotage.layer = 6;
+        sabotage.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
+        return sabotage;
     }
 
     public static RoomType GetRoomTypeFromObject(RealGenRoom room) {
@@ -162,10 +210,13 @@ public class WorldGenerator : MonoBehaviour
         );
     }
 
-    public GameObject GenerateRectangle(Rectangle rect) {
+    public GameObject GenreateRectangleOnMinimap(Rectangle rect) {
         GameObject rectPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/rectPrefab.prefab", typeof(GameObject)) as GameObject;
         GameObject drawnRect = Instantiate(rectPrefab, new Vector2(rect.X, rect.Y), new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
         drawnRect.transform.localScale = new Vector2(rect.Width, -rect.Height);
+        drawnRect.layer = 6;
+        drawnRect.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
+        drawnRect.GetComponent<SpriteRenderer>().color = new UnityEngine.Color(1f/3f, 1f/3f, 1f/3f, 1f);
         return drawnRect;
     }
 

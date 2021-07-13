@@ -111,7 +111,7 @@ public class VirtualGenRoom : GenRoom {
         int maxCorridorWidth, x, y, w, h, iPos, pos;
         Rectangle corridor, tmpRectL, tmpRectR, rectLOrig, rectROrig, tmpRectSwap;
         List<int> positions = new List<int>();
-        bool found, swapped;
+        bool swapped;
 
         leftRects.AddRange(leftRectsOrig);
 
@@ -167,9 +167,8 @@ public class VirtualGenRoom : GenRoom {
                     for (int i = 1; i <= maxCorridorWidth - (w + 1); i++) {
                         positions.Add(i);
                     }
-                    found = false;
 
-                    while (!found && positions.Count > 0) {
+                    while (positions.Count > 0) {
                         iPos = random.Next(positions.Count);
                         pos = positions[iPos];
                         positions.RemoveAt(iPos);
@@ -188,7 +187,7 @@ public class VirtualGenRoom : GenRoom {
 
                         if (!IsCloserToThan(corridor, otherRects, "XY", 3) && !IsCloserToThan(corridor, corridors, "XY", 3)) {
                             corridors.Add(corridor);
-                            found = true;
+                            break;
                         }
                     }
                     positions.Clear();
