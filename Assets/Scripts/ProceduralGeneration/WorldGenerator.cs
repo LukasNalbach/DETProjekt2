@@ -17,6 +17,7 @@ public class WorldGenerator : MonoBehaviour
     private GameObject minimapPlayer;
     private Dictionary<Task,GameObject> minimapTasks = new Dictionary<Task,GameObject>();
     private Dictionary<SabortageTask,GameObject> minimapSabotageTasks = new Dictionary<SabortageTask,GameObject>();
+    public Grid<bool> mapGrid;
     public void Awake() {
 
         List<RealGenRoom> roomsInside = new List<RealGenRoom>(6);
@@ -65,7 +66,7 @@ public class WorldGenerator : MonoBehaviour
             room.setRandom(random);
         }
 
-        worldArea = new Rectangle(-50, -50, 50 + random.Next(20), 50 + random.Next(20));
+        worldArea = new Rectangle(0, 0, 50 + random.Next(20), 50 + random.Next(20));
         root.generate(this, worldArea);
         //GameObject.Find("MinimapCamera").transform.position = ((Vector3) CenterPosition(worldArea)) + new Vector3Int(0, 0, -1000);
 
@@ -87,23 +88,33 @@ public class WorldGenerator : MonoBehaviour
             }
         }
 
-        Dictionary<RoomType,Grid<bool>> grids = new Dictionary<RoomType,Grid<bool>>();
-        foreach (GenRoom r in root.getSubrooms()) {
-            if (r is RealGenRoom) {
-                RealGenRoom room = (RealGenRoom) r;
+        mapGrid = new Grid<bool>(worldArea.Width, worldArea.Height, 1, new Vector3(worldArea.X, worldArea.Y, 0));
 
-                Grid<bool> grid = new Grid<bool>(room.innerRect.Width, room.innerRect.Height, 1, new Vector3(room.innerRect.X, room.innerRect.Y, 0));
+        foreach (Rectangle corridor in corridors) {
+            // set all cells in corridor as walkable
+            for (int x = corridor.X; x < corridor.X + corridor.Width; x++) {
+                for (int y = corridor.Y; y < corridor.Y + corridor.Height; y++) {
+                    mapGrid.setValue(x, y, true);
+                }
+            }
+        }
 
-                foreach (GameObject obj in room.placedObjects) {
-                    Rectangle transformRect = GetRectangleFromTransform(obj.transform);
-                    for (int x = transformRect.X; x < transformRect.X + transformRect.Width; x++) {
-                        for (int y = transformRect.Y; y < transformRect.Y + transformRect.Height; y++) {
-                            grid.setValue(x, y, true);
-                        }
+        foreach (RealGenRoom room in rooms.Values) {
+            // set all cells in room as walkable
+            for (int x = room.innerRect.X; x < room.innerRect.X + room.innerRect.Width; x++) {
+                for (int y = room.innerRect.Y; y < room.innerRect.Y + room.innerRect.Height; y++) {
+                    mapGrid.setValue(x, y, true);
+                }
+            }
+
+            // set all cells under objects as not walkable
+            foreach (GameObject obj in room.placedObjects) {
+                Rectangle transformRect = GetRectangleFromTransform(obj.transform);
+                for (int x = transformRect.X; x < transformRect.X + transformRect.Width; x++) {
+                    for (int y = transformRect.Y; y < transformRect.Y + transformRect.Height; y++) {
+                        mapGrid.setValue(x, y, false);
                     }
                 }
-
-                grids.Add(GetRoomTypeFromObject((RealGenRoom) room), grid);
             }
         }
 
