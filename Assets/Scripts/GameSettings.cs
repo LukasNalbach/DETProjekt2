@@ -53,11 +53,11 @@ public class GameSettings : ScriptableObject
 
     [Tooltip("Amount of task that one crew member must solve")]
     public int tasks;
+    private int[] taskOptions={ 2 , 3, 4, 5, 6};
     
     [Tooltip("time of the voting phase in seconds")]
     public int votingTime;
     
-    private int[] taskOptions={ 2 , 3, 4, 5, 6};
 
     private int playerColorPointer;
 

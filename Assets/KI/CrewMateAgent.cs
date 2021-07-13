@@ -5,7 +5,7 @@ using Unity.MLAgents;
 using Unity.MLAgents.Sensors;
 using Unity.MLAgents.Actuators;
 
-public class CrewMateAgent : Agent
+public class CrewMateAgent  :Agent
 {
      Rigidbody2D rBody;
      public System.Random random = new System.Random();
@@ -15,20 +15,35 @@ public class CrewMateAgent : Agent
      public float doingTask=0;
      public float report=0;
      public CrewMate crewMateScript;
+     public float floatPositivInfinity=99999999;
+     public float floatNegativeInfinity=-99999999;
     void Start () {
     }
-    /*public override void Initialize() { 
-         Debug.Log("Initialize begins");
-    }*/
+    public override void Initialize() { 
+        
+    }
     public override void OnEpisodeBegin()
     {
-        rBody = GetComponent<Rigidbody2D>();
+        Debug.Log("On Episode Begin");
         crewMateScript=GetComponent<CrewMate>();
+        rBody = GetComponent<Rigidbody2D>();
+        time=0;
+
+        gameObject.transform.position=Game.Instance.startPoint;
         lastCheckpoint=new Vector2(0,0);
         lastDistance=distanceToNextTask();
+        Game.Shuffle<Task>(Game.Instance.allTasks,Game.Instance.random);
+        if(crewMateScript.taskToDo.Count==0)
+        {
+            for(int i=0;i<Game.Instance.Settings.tasks;i++)
+            {
+                crewMateScript.addTask(Game.Instance.allTasks[i]);
+            }
+        }
+        
         //Debug.Log("Next Target at "+Target.position);
     }
-
+    public float time;
     public override void CollectObservations(VectorSensor sensor)
     {
         // Agent positions(2)
@@ -37,7 +52,6 @@ public class CrewMateAgent : Agent
         // Agent velocity(2)
         sensor.AddObservation(rBody.velocity.x);
         sensor.AddObservation(rBody.velocity.y);
-
         //Tasks(6*2)
         for(int i=0;i<maxTasks;i++)
         {
@@ -48,11 +62,26 @@ public class CrewMateAgent : Agent
             }
             else
             {
-                sensor.AddObservation(-999999);
-                sensor.AddObservation(-999999);
+                sensor.AddObservation(floatNegativeInfinity);
+                sensor.AddObservation(floatNegativeInfinity);
             }
         }
-        //checkPoints(22*2)
+        //sabortageTasks(2*2) total:20
+        List<SabortageTask>allActiveSabortageTasks=Game.Instance.allActiveSabortageTasks();
+        for(int i=0;i<2;i++)
+        {
+            if(i<allActiveSabortageTasks.Count)
+            {
+                sensor.AddObservation(allActiveSabortageTasks[i].transform.localPosition[0]);
+                sensor.AddObservation(allActiveSabortageTasks[i].transform.localPosition[1]);
+            }
+            else
+            {
+                sensor.AddObservation(floatNegativeInfinity);
+                sensor.AddObservation(floatNegativeInfinity);
+            }
+        }
+        //checkPoints(22*2)total:64
         for(int i=0;i<maxCheckpoints;i++)
         {
             if(i<Game.Instance.allCheckpoints().Count)
@@ -63,8 +92,46 @@ public class CrewMateAgent : Agent
             }
             else
             {
-                sensor.AddObservation(-999999);
-                sensor.AddObservation(-999999);
+                sensor.AddObservation(floatNegativeInfinity);
+                sensor.AddObservation(floatNegativeInfinity);
+            }
+        }
+        //Vent positions(4*2)total:72
+        for(int i=0;i<4;i++)
+        {
+            sensor.AddObservation(Game.Instance.allVents[i].transform.localPosition[0]);
+            sensor.AddObservation(Game.Instance.allVents[i].transform.localPosition[1]);
+        }
+        //Other Players: position(when know), allive(when know), bisheriger verdacht(9*4)total:108
+        for(int i=0;i<10;i++)
+        {
+            if(i!=crewMateScript.number)//die eigene Position ist ja schon wo anders
+            {
+                if(i>=Game.Instance.allPlayers.Count)
+                {
+                    sensor.AddObservation(floatNegativeInfinity);
+                    sensor.AddObservation(floatNegativeInfinity);
+                    sensor.AddObservation(-1f);
+                    sensor.AddObservation(-1f);
+                }
+                else
+                {
+                    Player player=Game.Instance.allPlayers[i];
+                    if(crewMateScript.playerInViewDistance.Contains(player))
+                    {
+                        sensor.AddObservation(player.transform.localPosition[0]);
+                        sensor.AddObservation(player.transform.localPosition[1]);
+                        sensor.AddObservation(player.isAlive()?1f:0f);
+                        sensor.AddObservation(player.verdacht(i));
+                    }
+                    else
+                    {
+                        sensor.AddObservation(floatNegativeInfinity);
+                        sensor.AddObservation(floatNegativeInfinity);
+                        sensor.AddObservation(player.deadAndInvisible?0f:1f);
+                        sensor.AddObservation(player.verdacht(i));
+                    }
+                }
             }
         }
     }
@@ -74,13 +141,22 @@ public class CrewMateAgent : Agent
     public Vector2 lastCheckpoint;
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
-        // Actions, size = 2
+        // Actions, size = 4
         movement.x = actionBuffers.ContinuousActions[0];
         movement.y = actionBuffers.ContinuousActions[1];
         doingTask=actionBuffers.ContinuousActions[2];
         report=actionBuffers.ContinuousActions[3];
+        if(doingTask<=0.5f)
+        {
+            SetReward(-1);
+        }
+        if(movement.x==0||movement.y==0)
+        {
+            SetReward(1);
+        }
+        //Debug.Log(movement.x+","+movement.y+","+doingTask+", "+report);
         // Rewards
-        SetReward(-0.1f);//nichts tun wird bestraft
+        //SetReward(-0.1f);//nichts tun wird bestraft
        float distanceNextTask=distanceToNextTask();
        // Reached target
         if (distanceNextTask < 1.5f)
@@ -90,7 +166,22 @@ public class CrewMateAgent : Agent
                  SetReward(-0.1f);
             }
         }
-        SetReward(lastDistance-distanceNextTask);
+        if(distanceNextTask<Mathf.Infinity&&lastDistance<Mathf.Infinity)
+        {
+            Debug.Log("Output:"+movement.x+","+movement.y+","+doingTask+","+report);
+            //SetReward(lastDistance-distanceNextTask);
+        }
+        
+        //Debug.Log("Last Distance: "+lastDistance+", Current Distance: "+distanceNextTask);
+        if(! crewMateScript.immobile()&&Mathf.Abs(lastDistance-distanceNextTask)<=0.001f)
+        {
+             //SetReward(-1.0f);
+             time-=100f;
+        }
+        else
+        {
+            //SetReward(0.1f);
+        }
         lastDistance=distanceNextTask;
         Vector2 ownPosition=new Vector2(this.transform.position[0],this.transform.position[1]);
         foreach(Vector2 checkpoint in Game.Instance.allCheckpoints())
@@ -100,10 +191,16 @@ public class CrewMateAgent : Agent
                 if(lastCheckpoint!=checkpoint)
                 {
                     //if(Vector3.Distance(Target.localPosition,lastCheckpoint.localPosition)<Vector3.Distance(Target.localPosition,checkpoint.localPosition))
-                    SetReward(5f);
+                    Debug.Log("Reach Checkpoint "+checkpoint);
+                    SetReward(0.5f);
                     lastCheckpoint=checkpoint;
                 }
             }
+        }
+        if(time<=-1200f)
+        {
+            //SetReward(-1f);
+            //EndEpisode();
         }
     }
     public float distanceToNextTask()
@@ -127,25 +224,32 @@ public class CrewMateAgent : Agent
     }
     public void rewardFinishSabortageTask()
     {
-        SetReward(200.0f);
+        SetReward(1.0f);
     }
     public void rewardFinishTask()
     {
-        SetReward(100.0f);
+        Debug.Log("Crew Mate Finish Task");
+        SetReward(1.0f);
+            EndEpisode();
     }
     public void rewardStartTask()
     {
-        SetReward(10.0f);
+        Debug.Log("Crew Mate Starts Task");
+        SetReward(1.0f);
     }
     
     public void rewardWinGame()
     {
-        SetReward(1000.0f);
+        SetReward(1.0f);
+            EndEpisode();
         //OnEpisodeBegin();
     }
     public void rewardLooseGame()
     {
-        SetReward(-1000.0f);
+        SetReward(-1.0f);
+            EndEpisode();
          //OnEpisodeBegin();
     }
-}
+    
+    
+}   

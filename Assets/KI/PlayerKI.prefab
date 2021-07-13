@@ -18,6 +18,8 @@ GameObject:
   - component: {fileID: 7805625408114762910}
   - component: {fileID: 3155296762096914809}
   - component: {fileID: 8483211983210729753}
+  - component: {fileID: 7775173102415314736}
+  - component: {fileID: 3397656052852176832}
   m_Layer: 20
   m_Name: PlayerKI
   m_TagString: Player
@@ -185,7 +187,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 20
+    VectorObservationSize: 108
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 4
@@ -218,17 +220,18 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 0
-  checkPoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   movement: {x: 0, y: 0}
-  Target: {fileID: 0}
+  doingTask: 0
+  report: 0
+  crewMateScript: {fileID: 0}
+  floatPositivInfinity: 100000000
+  floatNegativeInfinity: -100000000
+  verdacht: []
+  time: 0
   forceMultiplier: 10
   timeOffside: 0
   lastDistance: 0
-  lastCheckpoint: {fileID: 0}
+  lastCheckpoint: {x: 0, y: 0}
 --- !u!114 &3155296762096914809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -254,6 +257,46 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   active: 0
+--- !u!114 &7775173102415314736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2470675596994066608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2902496c0120472b90269f94a0aec7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Record: 1
+  NumStepsToRecord: 0
+  DemonstrationName: CrewMate_Tasks
+  DemonstrationDirectory: C:\Informatik\DET\P2\MLAgents\ml-agents\demos\Crew_Mate
+--- !u!114 &3397656052852176832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2470675596994066608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f67c7e722ba14acd9153bb4488bff6e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SensorName: RayPerceptionSensor
+  m_DetectableTags: []
+  m_RaysPerDirection: 16
+  m_MaxRayDegrees: 180
+  m_SphereCastRadius: 0.5
+  m_RayLength: 5
+  m_RayLayerMask:
+    serializedVersion: 2
+    m_Bits: 4290772971
+  m_ObservationStacks: 1
+  rayHitColor: {r: 1, g: 0, b: 0, a: 1}
+  rayMissColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &2470675598688712044
 GameObject:
   m_ObjectHideFlags: 0

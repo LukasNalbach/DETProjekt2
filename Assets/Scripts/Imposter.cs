@@ -162,4 +162,32 @@ public class Imposter : Player
     {
         return (currentUsedVent==null)&&!deadAndInvisible;
     }
+    public override void accusePublic()
+    {
+        if(!activePlayer())
+        {
+            //accursation.accurrsePublic();
+        }
+    }
+    public override void accuse()
+    {
+        if(!activePlayer())
+        {
+            //accursation.accurrse();
+        }
+    }
+    public override void noticePublicAccuse(int p1,int p2)
+    {
+
+    }
+    public override void noticePublicDefend(int p1,int p2)
+    {
+        
+    }
+
+    
+    public override float verdacht(int playerNumber)
+    {
+        return 0f;
+    }
 }

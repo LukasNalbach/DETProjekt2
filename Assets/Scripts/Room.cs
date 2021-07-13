@@ -45,4 +45,15 @@ public class Room : MonoBehaviour
     public Task getTask(int i) {
         return tasks[i];
     }
+    public void addTask(Task task)
+    {
+        Task[] newTasks=new Task[tasks.Length+1];
+        int i=0;
+        foreach(Task t in tasks)
+        {
+            newTasks[i++]=t;
+        }
+        newTasks[tasks.Length]=task;
+        tasks=newTasks;
+    }
 }

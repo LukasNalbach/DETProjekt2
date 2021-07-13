@@ -9,12 +9,23 @@ public class UpdateRoom : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        currentRoom = Room.getRoom(0);
+        if(Game.Instance.fixMap())
+        {
+            currentRoom=Room.getRoom(2);
+        }
+        else
+        {
+            currentRoom = Room.getRoom(0);
+        }
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        if(Game.Instance.fixMap())
+        {
+            return;
+        }
         KeyValuePair<int,string> place = Game.Instance.GetComponent<WorldGenerator>().GetPlaceFromPos(gameObject.transform.position);
         if (place.Key != - 1) {
             if (gameObject.Equals(Game.Instance.GetComponent<swapPlayer>().currentPlayer)) {
