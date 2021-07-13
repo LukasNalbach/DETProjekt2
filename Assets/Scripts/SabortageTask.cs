@@ -30,10 +30,10 @@ public class SabortageTask : Task
             setColor();
         }
     }
-    public void finishSolving()
+    public void finishSolving(Player player)
     {
         solved=true;
         mySabortage.maybeDeactivated();
-        endSolving();
+        endSolving(player);
     }
 }

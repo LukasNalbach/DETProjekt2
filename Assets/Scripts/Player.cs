@@ -6,6 +6,7 @@ public abstract class Player : MonoBehaviour
 {
     public Vector2 startPos;
     public new string name;
+    public int number;
     protected bool imposter;
 
     public bool alive = true;
@@ -16,11 +17,12 @@ public abstract class Player : MonoBehaviour
 
     public Room lastRoomBeforeMeeting;
     public UpdateRoom updateRoom;
-    public CrewMateAgent agent;
+    public CrewMatePseudoAgent agent;
     public float activation=0.8f;//when an imput form the agent is greater than activation, it is activated
-
-    public void create(Color color)
+    public List<Player>playerInViewDistance=new List<Player>();
+    public void create(Color color, int number)
     {
+        this.number=number;
         this.color=color;
         gameObject.GetComponent<Renderer>().material.SetColor("_Color",color);
     }
@@ -34,7 +36,7 @@ public abstract class Player : MonoBehaviour
     public void Update()
     {
 
-        if (agent.report>=activation)
+        if (agent!=null&&agent.report>=activation)
         {
             Player deadBody=nearDeadBody();
             if(deadBody!=null)
@@ -48,19 +50,28 @@ public abstract class Player : MonoBehaviour
 
     public void FixedUpdate()
     {
-        if(activePlayer())
-        {
-            foreach (var player in Game.Instance.allPlayers)
+        playerInViewDistance.Clear();
+        foreach (var player in Game.Instance.allPlayers)
             {
                 if(player.visible() && (Game.Instance.meetingNow || Vector3.Distance(gameObject.transform.position, player.transform.position)<=Game.Instance.Settings.viewDistance))
                 {
-                    player.gameObject.GetComponent<Renderer>().enabled=true;
+                    if(activePlayer())
+                    {
+                        player.gameObject.GetComponent<Renderer>().enabled=true;
+                    }
+                    playerInViewDistance.Add(player);
                 }
                 else
                 {
-                    player.gameObject.GetComponent<Renderer>().enabled=false;
+                    if(activePlayer())
+                    {
+                        player.gameObject.GetComponent<Renderer>().enabled=false;
+                    }
                 }
             }
+        if(activePlayer())
+        {
+            
             foreach (var task in Game.Instance.allTasks)
             {
                 if(Vector3.Distance(gameObject.transform.position, task.transform.position)<=Game.Instance.Settings.viewDistance)
@@ -155,4 +166,14 @@ public abstract class Player : MonoBehaviour
     public abstract bool immobile();
 
     public abstract bool visible();
+
+    public abstract void accusePublic();
+
+    public abstract void accuse();
+
+    public abstract void noticePublicAccuse(int p1,int p2);
+
+    public abstract void noticePublicDefend(int p1,int p2);
+
+    public abstract float verdacht(int playerNumber);
 }

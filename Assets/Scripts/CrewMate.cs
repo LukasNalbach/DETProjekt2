@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class CrewMate : Player
 {
-    public new string name="Player";
     public bool ki=false;
 
-    public LinkedList<Task>taskToDo=new LinkedList<Task>();
+    public List<Task>taskToDo=new List<Task>();
 
     public int taskDone;
+    private AccursationCrew accursation; 
 
+    private Observation observation;
     //Task the crew mate is currently solving(or null).When a crewMate is doing task, he cannot move
     private Task activeTask;
 
@@ -19,11 +20,13 @@ public class CrewMate : Player
     // Start is called before the first frame update
     void Start()
     {
-        agent=GetComponent<CrewMateAgent>();
+        agent=this.gameObject.AddComponent<CrewMatePseudoAgent>();
         updateRoom=GetComponent<UpdateRoom>();
         imposter=false;
         taskDone=0;
         activeTask=null;
+        accursation=new AccursationCrew(this);
+        observation=new Observation(this);
     }
 
     // Update is called once per frame
@@ -66,6 +69,8 @@ public class CrewMate : Player
     }
     public new void FixedUpdate()
     {
+        
+        agent.time-=Time.deltaTime;
         if(activePlayer())
         {
             float distance;
@@ -86,7 +91,7 @@ public class CrewMate : Player
     }
     public void addTask(Task task)
     {
-        taskToDo.AddLast(task);
+        taskToDo.Add(task);
     }
     public bool doingTask()
     {
@@ -130,12 +135,12 @@ public class CrewMate : Player
         {
             if(task.sabortageTask)
             {
-                ((SabortageTask)task).finishSolving();
+                ((SabortageTask)task).finishSolving(this);
                 agent.rewardFinishSabortageTask();
             }
             else
             {
-                task.endSolving();
+                task.endSolving(this);
                 taskDone++;
                 Game.Instance.increaseTaskProgress();
                 taskToDo.Remove(task);
@@ -149,7 +154,7 @@ public class CrewMate : Player
     {
         if(doingTask())
         {
-            activeTask.endSolving();
+            activeTask.endSolving(this);
             activeTask=null;
             StopCoroutine(taskCoroutine);
         }
@@ -193,5 +198,41 @@ public class CrewMate : Player
     public override bool visible()
     {
         return !deadAndInvisible;
+    }
+    public override void accusePublic()
+    {
+        if(!activePlayer()&&isAlive())
+        {
+            accursation.accusePublic();
+        }
+    }
+    public override void accuse()
+    {
+        if(!activePlayer()&&isAlive())
+        {
+            accursation.accuse();
+        }
+    }
+    public override void noticePublicAccuse(int p1,int p2)
+    {
+        if(!activePlayer()&&isAlive())
+        {
+            accursation.noticePublicAccuse(p1,p2);
+        }
+    }
+    public override void noticePublicDefend(int p1,int p2)
+    {
+        if(!activePlayer()&&isAlive())
+        {
+            accursation.noticePublicDefend(p1,p2);
+        }
+    }
+    public override float verdacht(int playerNumber)
+    {
+        if(activePlayer())
+        {
+            return AccursationCrew.standardVerdacht;
+        }
+        return accursation.verdacht[playerNumber];
     }
 }

@@ -11,12 +11,13 @@ public class Game : MonoBehaviour
     /// <summary>
     /// The singleton instance.
     /// </summary>
-    public static Game Instance { get; private set; }
+    public static Game Instance { get; protected set; }
     /// <summary>
     /// The game settings.
     /// </summary>
-    public GameSettings Settings { get; private set; }
+    public GameSettings Settings { get; protected set; }
 
+    public bool training=false;
     public GUI GUI;
 
     public Vector3 startPoint=new Vector3(0,0,0);
@@ -43,12 +44,12 @@ public class Game : MonoBehaviour
 
     public System.Random random = new System.Random();
 
-    private float killCooldown{get; set;}
+    protected float killCooldown{get; set;}
 
     //so the imposter cannot spam sabortage
-    private float sabortageStartCooldown{get;set;}
+    protected float sabortageStartCooldown{get;set;}
 
-    private float maxSabortageStartCooldown=15f;
+    protected float maxSabortageStartCooldown=15f;
 
     public bool meetingNow=false;
     public bool escMenuOpenend = false;
@@ -77,6 +78,7 @@ public class Game : MonoBehaviour
         allVents=new List<Vent>();
         killCooldown=0;
         sabortageStartCooldown=0;
+        WorldGenerator wGen = gameObject.AddComponent<WorldGenerator>();
     }
     public void SetTexture(GameObject obj, string name, float scale) {
         Texture2D tex = new Texture2D(500, 500);
@@ -89,8 +91,6 @@ public class Game : MonoBehaviour
 
     private void Start()
     {
-        WorldGenerator wGen = gameObject.AddComponent<WorldGenerator>();
-        
         createCrew();
         setRooms();
         setCrewMadesTask();
@@ -127,9 +127,10 @@ public class Game : MonoBehaviour
                     positions.Add(pos);
                 }
             }
+            startPoint=positions[0];
             GameObject newPlayer=null; 
             if (i >= Settings.numberImposters) {
-                newPlayer= Instantiate(playerPrefabKI, positions[positions.Count - 1], new Quaternion());
+                newPlayer= Instantiate(playerPrefab, positions[positions.Count - 1], new Quaternion());
                  newPlayer.AddComponent<CrewMate>();
             } else {
                 newPlayer= Instantiate(playerPrefab, positions[positions.Count - 1], new Quaternion());
@@ -140,7 +141,7 @@ public class Game : MonoBehaviour
             int colorIndex = random.Next(remainingColors.Count);
             UnityEngine.Color nextColor = remainingColors[colorIndex];
             remainingColors.RemoveAt(colorIndex);
-            newPlayer.GetComponent<Player>().create(nextColor);
+            newPlayer.GetComponent<Player>().create(nextColor,i);
 
             allPlayers.Add(newPlayer.GetComponent<Player>());
         }
@@ -184,16 +185,16 @@ public class Game : MonoBehaviour
         }
     }
 
-    private void addRoom(Room room)
+    protected void addRoom(Room room)
     {
         allRooms.Add(room);
     }
 
-    private void addTask(Task task)
+    protected void addTask(Task task)
     {
         allTasks.Add(task);
     }
-    private void setCrewMadesTask()
+    protected void setCrewMadesTask()
     {
         foreach(var player in allPlayers)
         {
@@ -204,7 +205,7 @@ public class Game : MonoBehaviour
             }
         }
     }
-    private void createVentConnections()
+    protected void createVentConnections()
     {
         int i=1;
         while (true) {
@@ -282,7 +283,15 @@ public class Game : MonoBehaviour
             list[n] = value;  
         }  
     }
-
+    public List<Vector2>allCheckpoints()
+    {
+         WorldGenerator wGen = gameObject.GetComponent<WorldGenerator>();
+         if(wGen==null)
+         {
+             return new List<Vector2>();
+         }
+         return wGen.checkpoints;
+    }
     private void Update() {
         Game.Instance.GUI.setSabotageGui(activeSabortage != null);
         if (Input.GetKeyDown(KeyCode.Escape)) {
@@ -337,7 +346,7 @@ public class Game : MonoBehaviour
         killCooldown = 1;
         GUI.updateKillCooldown(1 - killCooldown);
     }
-    public float getTaskProgress()
+    public virtual float getTaskProgress()
     {
         float progress=1.0f*taskDone/totalTasks;
         float visibleProgress=0f;
@@ -540,29 +549,83 @@ public class Game : MonoBehaviour
     {
         return gameObject.GetComponent<swapPlayer>();
     }
+    //just use from gui
      public static void accuse(int p2) {
-        Game.Instance.gameObject.GetComponent<Voting>().accuse(-1, p2);
+        accuse(Game.Instance.numberActivePlayer(), p2);
+    }
+     public static void accuse(int p1,int p2) {
+        Game.Instance.gameObject.GetComponent<Voting>().accuse(p1, p2);
     }
 
     public static void accusePublic(int p2) {
-        Game.Instance.gameObject.GetComponent<Voting>().accusePublic(-1, p2);
+       accusePublic(Game.Instance.numberActivePlayer(), p2);
     }
 
+    public static void accusePublic(int p1,int p2) {
+        Game.Instance.gameObject.GetComponent<Voting>().accusePublic(p1, p2);
+        foreach(Player player in Instance.allLivingPlayers())
+        {
+            player.noticePublicAccuse(p1,p2);
+        }
+    }
     public static void defendPublic(int p2) {
-        Game.Instance.gameObject.GetComponent<Voting>().defendPublic(-1, p2);
+        defendPublic(Game.Instance.numberActivePlayer(), p2);
     }
 
-    public static void skip() {
-        Game.Instance.gameObject.GetComponent<Voting>().skip(-1);
+    public static void defendPublic(int p1,int p2) {
+        Game.Instance.gameObject.GetComponent<Voting>().defendPublic(p1, p2);
+        foreach(Player player in Instance.allLivingPlayers())
+        {
+            player.noticePublicDefend(p1,p2);
+        }
     }
-    /*
-    checks wheter imposter wins because the number of imposters is equal to the number of crewMates
-    checks wheter crew Mates wins because the number of imposters=0
-    */
-    public bool checkWinningOverPlayers()
+    public static void skip() {
+        skip(Game.Instance.numberActivePlayer());
+    }
+    public static void skip(int p1) {
+        Game.Instance.gameObject.GetComponent<Voting>().skip(p1);
+    }
+    public int numberActivePlayer()
+    {
+        foreach(Player player in allPlayers)
+        {
+            if(player.activePlayer())
+            {
+                return player.number;
+            }
+        }
+        return -1;
+    }
+    public List<Player> allLivingPlayers()
+    {
+        List<Player>result=new List<Player>();
+        foreach(Player player in allPlayers)
+        {
+            if(player.isAlive())
+            {
+                result.Add(player);
+            }
+        }
+        return result;
+    }
+    public int livingCrewMates()
+    {
+        int crewMates=0;
+        foreach(Player player in allPlayers)
+        {
+            if(player.isAlive())
+            {
+                if(!player.isImposter())
+                {
+                    crewMates++;
+                }
+            }
+        }
+        return crewMates;
+    }
+    public int livingImposter()
     {
         int imposters=0;
-        int crewMates=0;
         foreach(Player player in allPlayers)
         {
             if(player.isAlive())
@@ -571,12 +634,18 @@ public class Game : MonoBehaviour
                 {
                     imposters++;
                 }
-                else
-                {
-                    crewMates++;
-                }
             }
         }
+        return imposters;
+    }
+    /*
+    checks wheter imposter wins because the number of imposters is equal to the number of crewMates
+    checks wheter crew Mates wins because the number of imposters=0
+    */
+    public bool checkWinningOverPlayers()
+    {
+        int imposters=livingImposter();
+        int crewMates=livingCrewMates();
         if(imposters>=crewMates)
         {
             impostersWin(false);
@@ -632,7 +701,14 @@ public class Game : MonoBehaviour
                     player.agent.rewardLooseGame();
                 }
             }
-        StartCoroutine(EndGameIn(4));
+             if(training)
+            {
+                restartAfterTraining();
+            }
+            else
+            {
+                StartCoroutine(EndGameIn(4));
+            }
     }
     public void crewMatesWin(bool withTasks)
     {
@@ -659,10 +735,25 @@ public class Game : MonoBehaviour
                     player.agent.rewardWinGame();
                 }
             }
-            StartCoroutine(EndGameIn(4));
+            if(training)
+            {
+                restartAfterTraining();
+            }
+            else
+            {
+                StartCoroutine(EndGameIn(4));
+            }
+           
         }
     }
-
+    public bool fixMap()
+    {
+        return GetComponent<WorldGenerator>()==null;
+    }
+    public void restartAfterTraining()
+    {
+        Debug.Log(fixMap());
+    }
     public IEnumerator EndGameIn(int t) {
         yield return new WaitForSeconds(t);
         OpenMainMenu();

@@ -64,8 +64,20 @@ public class Voting : MonoBehaviour
         }
         votingActive = true;
         yield return new WaitForSeconds(1);
+        foreach(Player player in Game.Instance.allLivingPlayers())
+        {
+            player.accusePublic();
+        }
+        int votingTimeStart=t;
         while (t > 0) {
             t--;
+            if(votingTimeStart-t==5)
+            {
+                foreach(Player player in Game.Instance.allLivingPlayers())
+                {
+                    player.accuse();
+                }
+            }
             GameObject.Find("Canvas/timeRemaining/textTimeRemaining").GetComponent<TextMeshProUGUI>().SetText(t.ToString());
             yield return new WaitForSeconds(1);
         }

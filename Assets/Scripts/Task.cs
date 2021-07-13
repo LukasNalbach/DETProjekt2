@@ -13,7 +13,7 @@ public class Task : MonoBehaviour
 
     public bool activePlayerHasToDoThisTaskAndNear=false;
 
-    public Player playerDoingThisTask=null;
+    public List<Player> playerDoingThisTask=new List<Player>();
     protected int taskNum {get; set;}
     public Room room {get; set;}
 
@@ -44,13 +44,13 @@ public class Task : MonoBehaviour
 
     public void startSolving(Player player)
     {
-        playerDoingThisTask=player;
+        playerDoingThisTask.Add(player);
         setColor();
     }
 
-    public void endSolving()
+    public void endSolving(Player player)
     {
-        playerDoingThisTask=null;
+        playerDoingThisTask.Remove(player);
         setDeactivated();
     }
     public void setActivated()
@@ -91,7 +91,7 @@ public class Task : MonoBehaviour
         {
             return Color.white;
         }
-        if(playerDoingThisTask==null)
+        if(playerDoingThisTask.Count==0)
         {
             if(activePlayerHasToDoThisTaskAndNear)
             {
@@ -102,7 +102,7 @@ public class Task : MonoBehaviour
                 return Color.white;
             }
         }
-        if(playerDoingThisTask.activePlayer())
+        if(playerDoingThisTask.Contains(Game.Instance.activePlayer()))
         {
             return Color.blue;
         }
