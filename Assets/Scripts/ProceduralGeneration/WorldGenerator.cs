@@ -68,7 +68,6 @@ public class WorldGenerator : MonoBehaviour
 
         worldArea = new Rectangle(0, 0, 50 + random.Next(20), 50 + random.Next(20));
         root.generate(this, worldArea);
-        //GameObject.Find("MinimapCamera").transform.position = ((Vector3) CenterPosition(worldArea)) + new Vector3Int(0, 0, -1000);
 
         foreach (GenRoom room in root.getSubrooms()) {
             if (room is RealGenRoom) {
@@ -156,12 +155,18 @@ public class WorldGenerator : MonoBehaviour
         RealGenRoom meetingraum;
         rooms.TryGetValue(RoomType.Meetingraum, out meetingraum);
         Destroy(((Meetingraum) meetingraum).emergencyButton.GetComponent<Rigidbody2D>());
-        
-        GenerateMinimap();
-        StartCoroutine(updateMinimap());
+
+        StartCoroutine(Minimap());
     }
 
     public void GenerateMinimap() {
+        GameObject.Find("MinimapCamera").transform.position = ((Vector3) CenterPosition(worldArea)) + new Vector3Int(0, 0, -1000);
+
+        GameObject minimapPlayerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/MinimapPlayer.prefab", typeof(GameObject)) as GameObject;
+        minimapPlayer = Instantiate(minimapPlayerPrefab, Game.Instance.GetComponent<swapPlayer>().currentPlayer.transform.position, new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
+        minimapPlayer.layer = 6;
+        minimapPlayer.GetComponent<SpriteRenderer>().sortingLayerName = "Layer 2";
+
         foreach (RealGenRoom room in rooms.Values.Where((room) => room is RealGenRoom)) {
             GenreateRectangleOnMinimap(room.innerRect);
         }
@@ -170,29 +175,56 @@ public class WorldGenerator : MonoBehaviour
         }
     }
 
-    public IEnumerator updateMinimap() {
+    public IEnumerator Minimap() {
+        while (Game.Instance.GetComponent<swapPlayer>().currentPlayer == null) {
+            yield return new WaitForEndOfFrame();
+        }
+
+        GenerateMinimap();
+
+        List<Task> tasksToDisplay;
+
         while (true) {
+            GameObject player = Game.Instance.GetComponent<swapPlayer>().currentPlayer;
+            if (player.GetComponent<Player>() is CrewMate) {
+                tasksToDisplay = ((CrewMate) player.GetComponent<Player>()).taskToDo;
+            } else {
+                tasksToDisplay = new List<Task>();
+            }
+            
             // remove old tasks
-            foreach (KeyValuePair<Task,GameObject> minimapTask in minimapTasks.Where((t) => !t.Key.solvingVisible || !Game.Instance.allTasks.Contains(t.Key))) {
+            List<Task> tasksToRemove = new List<Task>();
+            foreach (KeyValuePair<Task,GameObject> minimapTask in minimapTasks.Where((t) => !t.Key.solvingVisible || !tasksToDisplay.Contains(t.Key))) {
                 Destroy(minimapTask.Value);
-                minimapTasks.Remove(minimapTask.Key);
+                tasksToRemove.Add(minimapTask.Key);
+            }
+            foreach (Task task in tasksToRemove) {
+                minimapTasks.Remove(task);
             }
             // create new Tasks
-            foreach (Task task in Game.Instance.allTasks.Where((t) => t.solvingVisible && !minimapTasks.ContainsKey(t))) {
+            foreach (Task task in tasksToDisplay.Where((t) => t.solvingVisible && !minimapTasks.ContainsKey(t))) {
                 GameObject minimapTask = GenreateTaskOnMinimap(task.gameObject.transform.position);
                 minimapTasks.Add(task, minimapTask);
             }
 
             // remove old sabotageTasks
+            List<SabortageTask> sabotageTasksToRemove = new List<SabortageTask>();
             foreach (KeyValuePair<SabortageTask,GameObject> minimapSabotageTask in minimapSabotageTasks.Where((t) => !t.Key.solvingVisible || !Game.Instance.allActiveSabortageTasks().Contains(t.Key))) {
                 Destroy(minimapSabotageTask.Value);
-                minimapTasks.Remove(minimapSabotageTask.Key);
+                sabotageTasksToRemove.Add(minimapSabotageTask.Key);
+            }
+            foreach (SabortageTask sabotageTask in sabotageTasksToRemove) {
+                minimapSabotageTasks.Remove(sabotageTask);
             }
             // create new sabotageTasks
             foreach (SabortageTask sabotageTask in Game.Instance.allActiveSabortageTasks().Where((t) => t.solvingVisible && !minimapSabotageTasks.ContainsKey(t))) {
-                GameObject minimapSabotageTask = GenreateTaskOnMinimap(sabotageTask.gameObject.transform.position);
+                GameObject minimapSabotageTask = GenreateSabotageTaskOnMinimap(sabotageTask.gameObject.transform.position);
                 minimapTasks.Add(sabotageTask, minimapSabotageTask);
             }
+            if (!minimapPlayer.transform.position.Equals(player.transform.position)) {
+                minimapPlayer.transform.position = player.transform.position;
+            }
+
             yield return new WaitForEndOfFrame();
         }
     }
@@ -201,15 +233,15 @@ public class WorldGenerator : MonoBehaviour
         GameObject taskPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Task.prefab", typeof(GameObject)) as GameObject;
         GameObject task = Instantiate(taskPrefab, pos, new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
         task.layer = 6;
-        task.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
+        task.GetComponent<SpriteRenderer>().sortingLayerName = "Layer 1";
         return task;
     }
 
     public GameObject GenreateSabotageTaskOnMinimap(Vector2 pos) {
-        GameObject sabotagePrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Task.prefab", typeof(GameObject)) as GameObject;
+        GameObject sabotagePrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Sabotage.prefab", typeof(GameObject)) as GameObject;
         GameObject sabotage = Instantiate(sabotagePrefab, pos, new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
         sabotage.layer = 6;
-        sabotage.GetComponent<SpriteRenderer>().sortingLayerName = "Default";
+        sabotage.GetComponent<SpriteRenderer>().sortingLayerName = "Layer 1";
         return sabotage;
     }
 
