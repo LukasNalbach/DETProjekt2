@@ -113,7 +113,7 @@ public class PathfindingRoom
     private List<PathNode> GetNeighborList(PathNode currentNode)
     {
         List<PathNode> neighborList=new List<PathNode>();
-        if(currentNode.x-1>=0)
+        /*if(currentNode.x-1>=0)
         {
             neighborList.Add(GetNode(currentNode.x-1, currentNode.y));
             if(currentNode.y-1>=0)neighborList.Add(GetNode(currentNode.x-1, currentNode.y-1));
@@ -127,11 +127,53 @@ public class PathfindingRoom
         
         }
         if(currentNode.y-1>=0)neighborList.Add(GetNode(currentNode.x, currentNode.y-1));
-        if(currentNode.y+1>=0)neighborList.Add(GetNode(currentNode.x, currentNode.y+1));
+        if(currentNode.y+1>=0)neighborList.Add(GetNode(currentNode.x, currentNode.y+1));*/
+        for(int i=-1;i<2;i++)
+        {
+            for(int j=-1;j<2;j++)
+            {
+                PathNode possibleNeighbor=GetNeighbotNodeWhenPossible(currentNode.x, currentNode.y, currentNode.x+i, currentNode.y+j);
+                if(possibleNeighbor!=null)
+                {
+                    neighborList.Add(possibleNeighbor);
+                }
+            }
+        }
         return neighborList;
     }
     private PathNode GetNode(int x, int y)
     {
         return grid.getValue(x,y);
+    }
+    private PathNode GetNeighbotNodeWhenPossible(int startX, int startY, int x, int y)
+    {
+        if(startX==x&&startY==y)
+        {
+            return null;
+        }
+        if(x<0||y<0)
+        {
+            return null;
+        }
+        if(x>=grid.widht||y>=grid.height)
+        {
+            return null;
+        }
+        if(!GetNode(x,y).isWalkable)
+        {
+            return null;
+        }
+        if((Mathf.Abs(startX-x)+Mathf.Abs(startY-y))==2)//diagonal
+        {
+            if(!GetNode(x, startY).isWalkable)
+            {
+                return null;
+            }
+            if(!GetNode(startX, y).isWalkable)
+            {
+                return null;
+            }
+        }
+        return GetNode(x,y);
     }
 }

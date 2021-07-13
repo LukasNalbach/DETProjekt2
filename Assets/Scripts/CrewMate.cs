@@ -9,13 +9,15 @@ public class CrewMate : Player
     public List<Task>taskToDo=new List<Task>();
 
     public int taskDone;
-    private AccursationCrew accursation; 
+    public AccursationCrew accursation; 
 
-    private Observation observation;
+    public Observation observation;
     //Task the crew mate is currently solving(or null).When a crewMate is doing task, he cannot move
     private Task activeTask;
 
     private IEnumerator taskCoroutine;
+
+    public static float maxDistanceToSolveTask=2f;
 
     // Start is called before the first frame update
     void Start()
@@ -101,14 +103,14 @@ public class CrewMate : Player
     {
         foreach (var task in updateRoom.getCurrentRoom().getTasks())
         {
-            if(taskToDo.Contains(task)&&Vector3.Distance(gameObject.transform.position, task.transform.position)<=2f)
+            if(taskToDo.Contains(task)&&Vector3.Distance(gameObject.transform.position, task.transform.position)<=maxDistanceToSolveTask)
             {
                 return true;
             }
         }
         foreach (var sabTask in Game.Instance.allActiveSabortageTasks())
         {
-            if(Vector3.Distance(gameObject.transform.position, sabTask.transform.position)<=2f)
+            if(Vector3.Distance(gameObject.transform.position, sabTask.transform.position)<=maxDistanceToSolveTask)
             {
                 return true;
             }
