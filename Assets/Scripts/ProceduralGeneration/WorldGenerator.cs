@@ -87,7 +87,25 @@ public class WorldGenerator : MonoBehaviour
             }
         }
 
-        Debug.Log(checkpoints.Count);
+        Dictionary<RoomType,Grid<bool>> grids = new Dictionary<RoomType,Grid<bool>>();
+        foreach (GenRoom r in root.getSubrooms()) {
+            if (r is RealGenRoom) {
+                RealGenRoom room = (RealGenRoom) r;
+
+                Grid<bool> grid = new Grid<bool>(room.innerRect.Width, room.innerRect.Height, 1, new Vector3(room.innerRect.X, room.innerRect.Y, 0));
+
+                foreach (GameObject obj in room.placedObjects) {
+                    Rectangle transformRect = GetRectangleFromTransform(obj.transform);
+                    for (int x = transformRect.X; x < transformRect.X + transformRect.Width; x++) {
+                        for (int y = transformRect.Y; y < transformRect.Y + transformRect.Height; y++) {
+                            grid.setValue(x, y, true);
+                        }
+                    }
+                }
+
+                grids.Add(GetRoomTypeFromObject((RealGenRoom) room), grid);
+            }
+        }
 
         List<RealGenRoom> ventRoomsInside = new List<RealGenRoom>();
         List<RealGenRoom> ventRoomsOutside = new List<RealGenRoom>();
