@@ -19,7 +19,7 @@ public class Imposter : Player
     // Update is called once per frame
     public new void Update()
     {
-        if (activePlayer()&&Input.GetKeyDown(KeyCode.Return))
+        if (activePlayer()&&((ImposterPseudoAgent)agent).kill>=activation)
         {
             if(canKill())
             {
@@ -41,7 +41,7 @@ public class Imposter : Player
                 kill((CrewMate)playerToKill);
             }
         }
-        if(activePlayer()&&Input.GetKeyDown(KeyCode.V))
+        if(activePlayer()&&((ImposterPseudoAgent)agent).vent>=activation)
         {
             if(inVent())
             {
@@ -56,7 +56,7 @@ public class Imposter : Player
                 }
             }
         }
-        if(activePlayer()&&Input.GetKeyDown(KeyCode.Tab))
+        if(activePlayer()&&((ImposterPseudoAgent)agent).changeVent>=activation)
         {
             if(inVent())
             {
