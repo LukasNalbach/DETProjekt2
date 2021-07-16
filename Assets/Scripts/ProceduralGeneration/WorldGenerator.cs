@@ -128,7 +128,7 @@ public class WorldGenerator : MonoBehaviour
         rooms.TryGetValue(RoomType.Meetingraum, out meetingraum);
         Destroy(((Meetingraum) meetingraum).emergencyButton.GetComponent<Rigidbody2D>());
 
-        mapGrid = new Grid<bool>(worldArea.Width, worldArea.Height, 1, new Vector3(worldArea.X, worldArea.Y, 0));
+        mapGrid = new Grid<bool>(worldArea.Width, worldArea.Height, 1, new Vector3(worldArea.X + 0.5f, worldArea.Y + 0.5f, 0));
         foreach (Rectangle corridor in corridors) {
             // set all cells in corridor as walkable
             for (int x = corridor.X; x < corridor.X + corridor.Width; x++) {
