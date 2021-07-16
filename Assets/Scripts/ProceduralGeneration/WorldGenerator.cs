@@ -17,7 +17,9 @@ public class WorldGenerator : MonoBehaviour
     private GameObject minimapPlayer;
     private Dictionary<Task,GameObject> minimapTasks = new Dictionary<Task,GameObject>();
     private Dictionary<SabortageTask,GameObject> minimapSabotageTasks = new Dictionary<SabortageTask,GameObject>();
+    private List<GameObject> minimapRects = new List<GameObject>();
     public Grid<bool> mapGrid;
+    Coroutine mapCor;
     public void Awake() {
 
         List<RealGenRoom> roomsInside = new List<RealGenRoom>(6);
@@ -161,9 +163,15 @@ public class WorldGenerator : MonoBehaviour
                 mapGrid.setValue(x, y, false);
             }
         }
-        
+    }
 
-        StartCoroutine(Minimap());
+    public void OpenMap() {
+        mapCor = StartCoroutine(Minimap());
+    }
+
+    public void CloseMap() {
+        StopCoroutine(mapCor);
+        CloseMinimap();
     }
 
     public void GenerateMinimap() {
@@ -175,11 +183,28 @@ public class WorldGenerator : MonoBehaviour
         minimapPlayer.GetComponent<SpriteRenderer>().sortingLayerName = "Layer 2";
 
         foreach (RealGenRoom room in rooms.Values.Where((room) => room is RealGenRoom)) {
-            GenreateRectangleOnMinimap(room.innerRect);
+            minimapRects.Add(GenreateRectangleOnMinimap(room.innerRect));
         }
         foreach (Rectangle corridor in corridors) {
-            GenreateRectangleOnMinimap(corridor);
+            minimapRects.Add(GenreateRectangleOnMinimap(corridor));
         }
+    }
+
+    private void CloseMinimap() {
+        foreach (GameObject obj in minimapSabotageTasks.Select((st) => st.Value)) {
+            Destroy(obj);
+        }
+        minimapSabotageTasks.Clear();
+        foreach (GameObject obj in minimapTasks.Select((st) => st.Value)) {
+            Destroy(obj);
+        }
+        minimapTasks.Clear();
+        foreach (GameObject obj in minimapRects) {
+            Destroy(obj);
+        }
+        minimapRects.Clear();
+        Destroy(minimapPlayer);
+        minimapPlayer = null;
     }
 
     public IEnumerator Minimap() {

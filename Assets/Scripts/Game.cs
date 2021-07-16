@@ -52,7 +52,7 @@ public class Game : MonoBehaviour
     protected float maxSabortageStartCooldown=15f;
 
     public bool meetingNow=false;
-    public bool escMenuOpenend = false;
+    public bool escMenuOpenend, mapOpened = false;
     private void Awake()
     {
         // there can be only one...
@@ -352,12 +352,20 @@ public class Game : MonoBehaviour
     }
     private void Update() {
         Game.Instance.GUI.setSabotageGui(activeSabortage != null);
-        if (Input.GetKeyDown(KeyCode.Escape)) {
+        if (Input.GetKeyDown(KeyCode.Escape) && !meetingNow && !mapOpened) {
             if (escMenuOpenend) {
                 CloseEscMenu();
             } else {
                 OpenEscMenu();
             }
+        }
+        if (Input.GetKeyDown(KeyCode.M) && !meetingNow && !escMenuOpenend) {
+            if (mapOpened) {
+                GetComponent<WorldGenerator>().CloseMap();
+            } else {
+                GetComponent<WorldGenerator>().OpenMap();
+            }
+            mapOpened = !mapOpened;
         }
     }
     private void FixedUpdate() {
