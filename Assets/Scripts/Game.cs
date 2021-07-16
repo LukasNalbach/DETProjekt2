@@ -448,7 +448,7 @@ public class Game : MonoBehaviour
     }
     public void startSabortageBournTrees()
     {
-        Game.Instance.startSabortage(allSabortages[0]);
+        Game.Instance.startSabortage(allSabortages[random.Next(2)]);
         RealGenRoom room;
         GetComponent<WorldGenerator>().rooms.TryGetValue(RoomType.Wald, out room);
         Wald roomForest = (Wald) room;
