@@ -56,10 +56,10 @@ public class PathfindingRoom
             }
             openList.Remove(currentNode);
             closedList.Add(currentNode);
-            foreach (PathNode neighborNode in GetNeighborList(currentNode))
+            foreach (PathNode neighborNode in GetNeighborList(currentNode, endPoint))
             {
                 if(closedList.Contains(neighborNode))continue;
-                if(!neighborNode.isWalkable){
+                if(!neighborNode.isWalkable&&neighborNode!=endPoint){
                     closedList.Add(neighborNode);
                     continue;
                 }
@@ -111,7 +111,7 @@ public class PathfindingRoom
         result.RemoveAt(0);
         return result;
     }
-    private List<PathNode> GetNeighborList(PathNode currentNode)
+    private List<PathNode> GetNeighborList(PathNode currentNode, PathNode endNode)
     {
         List<PathNode> neighborList=new List<PathNode>();
         /*if(currentNode.x-1>=0)
@@ -133,7 +133,7 @@ public class PathfindingRoom
         {
             for(int j=-1;j<2;j++)
             {
-                PathNode possibleNeighbor=GetNeighbotNodeWhenPossible(currentNode.x, currentNode.y, currentNode.x+i, currentNode.y+j);
+                PathNode possibleNeighbor=GetNeighbotNodeWhenPossible(currentNode.x, currentNode.y, currentNode.x+i, currentNode.y+j, endNode);
                 if(possibleNeighbor!=null)
                 {
                     neighborList.Add(possibleNeighbor);
@@ -146,8 +146,12 @@ public class PathfindingRoom
     {
         return grid.getValue(x,y);
     }
-    private PathNode GetNeighbotNodeWhenPossible(int startX, int startY, int x, int y)
+    private PathNode GetNeighbotNodeWhenPossible(int startX, int startY, int x, int y, PathNode endNode)
     {
+        if(x==endNode.x&&y==endNode.y)
+        {
+            return GetNode(x,y);
+        }
         if(startX==x&&startY==y)
         {
             return null;
