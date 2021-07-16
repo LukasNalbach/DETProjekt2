@@ -87,36 +87,6 @@ public class WorldGenerator : MonoBehaviour
             }
         }
 
-        mapGrid = new Grid<bool>(worldArea.Width, worldArea.Height, 1, new Vector3(worldArea.X, worldArea.Y, 0));
-
-        foreach (Rectangle corridor in corridors) {
-            // set all cells in corridor as walkable
-            for (int x = corridor.X; x < corridor.X + corridor.Width; x++) {
-                for (int y = corridor.Y; y < corridor.Y + corridor.Height; y++) {
-                    mapGrid.setValue(x, y, true);
-                }
-            }
-        }
-
-        foreach (RealGenRoom room in rooms.Values) {
-            // set all cells in room as walkable
-            for (int x = room.innerRect.X; x < room.innerRect.X + room.innerRect.Width; x++) {
-                for (int y = room.innerRect.Y; y < room.innerRect.Y + room.innerRect.Height; y++) {
-                    mapGrid.setValue(x, y, true);
-                }
-            }
-
-            // set all cells under objects as not walkable
-            foreach (GameObject obj in room.placedObjects) {
-                Rectangle transformRect = GetRectangleFromTransform(obj.transform);
-                for (int x = transformRect.X; x < transformRect.X + transformRect.Width; x++) {
-                    for (int y = transformRect.Y; y < transformRect.Y + transformRect.Height; y++) {
-                        mapGrid.setValue(x, y, false);
-                    }
-                }
-            }
-        }
-
         List<RealGenRoom> ventRoomsInside = new List<RealGenRoom>();
         List<RealGenRoom> ventRoomsOutside = new List<RealGenRoom>();
         List<GenRoom> realRoomsInside = rootInside.getSubrooms().Where((room) => room is RealGenRoom).ToList<GenRoom>();
@@ -155,6 +125,43 @@ public class WorldGenerator : MonoBehaviour
         RealGenRoom meetingraum;
         rooms.TryGetValue(RoomType.Meetingraum, out meetingraum);
         Destroy(((Meetingraum) meetingraum).emergencyButton.GetComponent<Rigidbody2D>());
+
+        mapGrid = new Grid<bool>(worldArea.Width, worldArea.Height, 1, new Vector3(worldArea.X, worldArea.Y, 0));
+        foreach (Rectangle corridor in corridors) {
+            // set all cells in corridor as walkable
+            for (int x = corridor.X; x < corridor.X + corridor.Width; x++) {
+                for (int y = corridor.Y; y < corridor.Y + corridor.Height; y++) {
+                    mapGrid.setValue(x, y, true);
+                }
+            }
+        }
+        foreach (RealGenRoom room in rooms.Values) {
+            // set all cells in room as walkable
+            for (int x = room.innerRect.X; x < room.innerRect.X + room.innerRect.Width; x++) {
+                for (int y = room.innerRect.Y; y < room.innerRect.Y + room.innerRect.Height; y++) {
+                    mapGrid.setValue(x, y, true);
+                }
+            }
+
+            // set all cells under objects as not walkable
+            foreach (GameObject obj in room.placedObjects) {
+                Rectangle transformRect = GetRectangleFromTransform(obj.transform);
+                for (int x = transformRect.X; x < transformRect.X + transformRect.Width; x++) {
+                    for (int y = transformRect.Y; y < transformRect.Y + transformRect.Height; y++) {
+                        mapGrid.setValue(x, y, false);
+                    }
+                }
+            }
+        }
+        RealGenRoom lavaGrube;
+        rooms.TryGetValue(RoomType.Lavagrube, out lavaGrube);
+        Rectangle lavaRect = ((Lavagrube) lavaGrube).lavaRect;
+        for (int x = lavaRect.X; x < lavaRect.X + lavaRect.Width; x++) {
+            for (int y = lavaRect.Y; y < lavaRect.Y + lavaRect.Height; y++) {
+                mapGrid.setValue(x, y, false);
+            }
+        }
+        
 
         StartCoroutine(Minimap());
     }

@@ -147,7 +147,7 @@ public class Voting : MonoBehaviour
                 return iMax;
             }
         }
-        return iMax;
+        return -1;
     }
 
     public void accuse(int p1, int p2) {
