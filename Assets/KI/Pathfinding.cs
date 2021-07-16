@@ -31,7 +31,7 @@ public class Pathfinding
             else
             {
                 int sizeWay=pathToGoal.Count;
-                Debug.Log("Size from "+start+" to "+task.transform.position+" has size "+sizeWay);
+                //Debug.Log("Size from "+start+" to "+task.transform.position+" has size "+sizeWay);
                 if(sizeWay<shortestSize)
                 {
                     shortestSize=sizeWay;
@@ -43,6 +43,41 @@ public class Pathfinding
         {
             calculatedPoints.AddLast(Game.Instance.GetComponent<WorldGenerator>().mapGrid.getWorldPosition(pn.x,pn.y));
         }
+    }
+    public void calculateSabortageGoals()
+    {
+        if(Game.Instance.allActiveSabortageTasks().Count==0)
+        {
+            Debug.Log("No Sabortage Tasks availible");
+        }
+        Vector3 start=crewMateScript.transform.position;
+        Vector3 firstGoal=Game.Instance.allActiveSabortageTasks()[0].transform.position;
+        PathfindingRoom pathfindingRoom=new PathfindingRoom(Game.Instance.GetComponent<WorldGenerator>().mapGrid);
+        List<PathNode> pathToFirst=pathfindingRoom.FindPath(start, firstGoal);
+        if(pathToFirst==null)
+        {
+            Debug.Log("No Path to Sabortage Task found");
+            return;
+        }
+        foreach(PathNode pn in pathToFirst)
+        {
+            calculatedPoints.AddLast(Game.Instance.GetComponent<WorldGenerator>().mapGrid.getWorldPosition(pn.x,pn.y));
+        }
+        if(Game.Instance.allActiveSabortageTasks().Count==2)
+        {
+            Vector3 secoundGoal=Game.Instance.allActiveSabortageTasks()[1].transform.position;
+            List<PathNode> pathToSecound=pathfindingRoom.FindPath(start, secoundGoal);
+             if(pathToSecound==null)
+            {
+                Debug.Log("No Path to Sabortage Task found");
+                return;
+            }
+            foreach(PathNode pn in pathToSecound)
+            {
+                calculatedPoints.AddLast(Game.Instance.GetComponent<WorldGenerator>().mapGrid.getWorldPosition(pn.x,pn.y));
+            }
+        }
+        
     }
     /*public void calculateNextGoalForTasks()
     {
@@ -85,6 +120,11 @@ public class Pathfinding
     }
     public void reachNextPosition()
     {
+        //Debug.Log("Reach point "+calculatedPoints.First.Value);
         calculatedPoints.RemoveFirst();
+    }
+    public void clearCalculatedPoints()
+    {
+        calculatedPoints.Clear();
     }
 }

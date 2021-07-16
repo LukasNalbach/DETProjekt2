@@ -87,7 +87,7 @@ public class WorldGenerator : MonoBehaviour
             }
         }
 
-        mapGrid = new Grid<bool>(worldArea.Width, worldArea.Height, 1, new Vector3(worldArea.X, worldArea.Y, 0));
+        mapGrid = new Grid<bool>(worldArea.Width, worldArea.Height, 1, new Vector3(worldArea.X+0f, worldArea.Y+0f, 0));
 
         foreach (Rectangle corridor in corridors) {
             // set all cells in corridor as walkable

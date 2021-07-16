@@ -108,6 +108,7 @@ public class PathfindingRoom
             result.Add(currentNode);
         }
         result.Reverse();//dreht liste um
+        result.RemoveAt(0);
         return result;
     }
     private List<PathNode> GetNeighborList(PathNode currentNode)

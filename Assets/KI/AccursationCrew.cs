@@ -51,11 +51,11 @@ public class AccursationCrew
             {
                 if(verdacht[i]>= minSchwellePublicAccursation)
                 {
-                    Game.accusePublic(nr,i);
+                    accusePublic(nr,i);
                 }
                 if(verdacht[i]==0f&&i!=nr)
                 {
-                    Game.defendPublic(nr,i);
+                    defendPublic(nr,i);
                 }
             }
             
@@ -66,18 +66,39 @@ public class AccursationCrew
     {
         float greatestVerdacht=0f;
         int numberAcursedPlayer=-1;
+        int amountPlayersWithSameVerdacht=1;
         for(int i=0;i<verdacht.Length;i++)
         {
             if(i!=nr&&Game.Instance.allPlayers[i].isAlive())
             {
                 float tempVerdacht=verdacht[i]+temporerVerdachtDurchPublicAccursation[i];
                 Debug.Log("Verdacht CM "+nr+" fuer "+i+": "+tempVerdacht);
-                if(tempVerdacht>=greatestVerdacht)
+                if(Mathf.Abs(tempVerdacht-greatestVerdacht)<=0.05f)
+                {
+                    amountPlayersWithSameVerdacht++;
+                }
+                else if(tempVerdacht>greatestVerdacht)
                 {
                     greatestVerdacht=tempVerdacht;
                     numberAcursedPlayer=i;
+                    amountPlayersWithSameVerdacht=1;
                 }
             }
+        }
+        if(amountPlayersWithSameVerdacht>1)
+        {
+            List<int>numbersSameVerdacht=new List<int>();
+            for(int i=0;i<verdacht.Length;i++)
+            {
+                float tempVerdacht=verdacht[i]+temporerVerdachtDurchPublicAccursation[i];
+                if(Mathf.Abs(tempVerdacht-greatestVerdacht)<=0.05f)
+                {
+                    numbersSameVerdacht.Add(i);
+                }
+            }
+            int random=Game.Instance.random.Next(numbersSameVerdacht.Count);
+            Debug.Log(random+" ,"+ numbersSameVerdacht.Count);
+            numberAcursedPlayer=numbersSameVerdacht[random];
         }
         Debug.Log("numberAcursedPlayer:"+numberAcursedPlayer+", greatestVerdacht: "+greatestVerdacht+", minSchwelleAccurcation"+minSchwelleAccurcation);
         if(numberAcursedPlayer==-1)
@@ -86,12 +107,11 @@ public class AccursationCrew
         }
         else if(greatestVerdacht>=minSchwelleAccurcation)
         {
-            Debug.Log("Accuse"+nr+","+numberAcursedPlayer);
-            Game.accuse(nr,numberAcursedPlayer);
+            accuse(nr,numberAcursedPlayer);
         }
         else if(2*Game.Instance.livingCrewMates()-Game.Instance.livingImposter()<=1)
         {
-            Game.accuse(nr,numberAcursedPlayer);
+            accuse(nr,numberAcursedPlayer);
         }
         else
         {
@@ -100,16 +120,50 @@ public class AccursationCrew
     }
     public void noticePublicAccuse(int initiator,int reciver)
     {
-        if(verdacht[initiator]<=minSchwelleAccurcation)
+        if(reciver==nr)
+        {
+            accusePublic(nr,initiator);
+        }
+        else if(verdacht[initiator]<=minSchwelleAccurcation)
         {
              temporerVerdachtDurchPublicAccursation[reciver]+=0.5f;
         }
     }
     public void noticePublicDefend(int initiator,int reciver)
     {
-        if(verdacht[initiator]<=minSchwelleAccurcation&&verdacht[reciver]<=minSchwelleAccurcation)
+        if(verdacht[initiator]<=minSchwelleAccurcation*1.5&&verdacht[reciver]<=minSchwelleAccurcation)
         {
             verdacht[reciver]/=2;
+        }
+    }
+    public void accuse(int initiator, int reciver)
+    {
+        if(crewMateScript.activePlayer()||!crewMateScript.isAlive())
+        {
+            return;
+        }
+        Game.accuse(initiator,reciver);
+    }
+    public void accusePublic(int initiator, int reciver)
+    {
+        if(crewMateScript.activePlayer()||!crewMateScript.isAlive())
+        {
+            return;
+        }
+        if(!Game.Instance.GetComponent<Voting>().hasAccusatedPublic(initiator, reciver))
+        {
+            Game.accusePublic(initiator, reciver);
+        }
+    }
+    public void defendPublic(int initiator, int reciver)
+    {
+        if(crewMateScript.activePlayer()||!crewMateScript.isAlive())
+        {
+            return;
+        }
+        if(!Game.Instance.GetComponent<Voting>().hasDefendsPublic(initiator, reciver))
+        {
+            Game.defendPublic(initiator, reciver);
         }
     }
 }

@@ -79,6 +79,7 @@ public class Game : MonoBehaviour
         killCooldown=0;
         sabortageStartCooldown=0;
         WorldGenerator wGen = gameObject.AddComponent<WorldGenerator>();
+
     }
     public void SetTexture(GameObject obj, string name, float scale) {
         Texture2D tex = new Texture2D(500, 500);
@@ -96,6 +97,30 @@ public class Game : MonoBehaviour
         setCrewMadesTask();
         createVentConnections();
         createSabortageOptions();
+        visualisiereGrid();
+        
+    }
+    private void visualisiereGrid()
+    {
+        WorldGenerator wGen = gameObject.GetComponent<WorldGenerator>();
+        GameObject redSquarePrefab=AssetDatabase.LoadAssetAtPath("Assets/Prefabs/RedSquare.prefab", typeof(GameObject)) as GameObject;
+        GameObject greenSquarePrefab=AssetDatabase.LoadAssetAtPath("Assets/Prefabs/GreenSquare.prefab", typeof(GameObject)) as GameObject;
+        for(int x=0; x<wGen.mapGrid.widht;x++)
+        {
+            for(int y=0;y<wGen.mapGrid.height;y++)
+            {
+                Vector3 positionWorld=wGen.mapGrid.getWorldPosition(x, y);
+                positionWorld.z=1;
+                if(!wGen.mapGrid.getValue(x,y))
+                {
+                    Instantiate(redSquarePrefab, positionWorld , new Quaternion());
+                }
+                else
+                {
+                    Instantiate(greenSquarePrefab, positionWorld, new Quaternion());
+                }
+            }
+        }
     }
 
     private void createCrew()
@@ -116,7 +141,7 @@ public class Game : MonoBehaviour
 
         List<UnityEngine.Color> remainingColors = new List<UnityEngine.Color>();
         remainingColors.AddRange(Settings.getPossibleColors());
-
+        int activePlayerImposer=0;//1 wenn achtive Player Imposter
         for (int i = 0; i < Settings.numberPlayers; i++) {
             while (positions.Count == i) {
                 Vector2 pos = new Vector2(spawnRect.X + random.Next(spawnRect.Width), spawnRect.Y + random.Next(spawnRect.Height));
@@ -128,25 +153,56 @@ public class Game : MonoBehaviour
                 }
             }
             startPoint=positions[0];
-            GameObject newPlayer=null; 
-            if (i >= Settings.numberImposters) {
+            GameObject newPlayer=null;
+            if(i==0)
+            {
+                string role=Settings.getPlayerRole();
+                activePlayerImposer=role.Equals("IMP")?1:0;
+                if(role.Equals("?"))
+                {
+                    double randomDouble=random.NextDouble();
+                    //Debug.Log(randomDouble+" <="+1f*Settings.numberImposters/Settings.numberPlayers+"?");
+                    if(randomDouble<=(1f*Settings.numberImposters/Settings.numberPlayers))
+                    {
+                        activePlayerImposer=1;
+                    }
+                }
+                if(activePlayerImposer==1)
+                {
+                    newPlayer= Instantiate(playerPrefab, positions[positions.Count - 1], new Quaternion());
+                    newPlayer.AddComponent<Imposter>();
+                }
+                else
+                {
+                    newPlayer= Instantiate(playerPrefab, positions[positions.Count - 1], new Quaternion());
+                    newPlayer.AddComponent<CrewMate>();
+                }
+            } 
+            else if (i >= Settings.numberImposters+1-activePlayerImposer) {
                 newPlayer= Instantiate(playerPrefab, positions[positions.Count - 1], new Quaternion());
                  newPlayer.AddComponent<CrewMate>();
-            } else {
+            }
+            else {
                 newPlayer= Instantiate(playerPrefab, positions[positions.Count - 1], new Quaternion());
                 newPlayer.AddComponent<Imposter>();
             }
             newPlayer.GetComponent<Player>().startPos = positions[positions.Count - 1];
-            
-            int colorIndex = random.Next(remainingColors.Count);
+            int colorIndex;
+            if(i==0)
+            {
+                colorIndex=Settings.getPlayerColorPointer();
+            }
+            else
+            {
+                colorIndex = random.Next(remainingColors.Count);
+            }
             UnityEngine.Color nextColor = remainingColors[colorIndex];
             remainingColors.RemoveAt(colorIndex);
             newPlayer.GetComponent<Player>().create(nextColor,i);
-
             allPlayers.Add(newPlayer.GetComponent<Player>());
         }
 
-
+        /*
         int currentPlayerIndex = -1;
         for (int i = 0; i < allPlayers.Count; i++) {
             if (allPlayers[i].gameObject.GetComponent<Renderer>().material.color.Equals(playerColor)) {
@@ -159,7 +215,9 @@ public class Game : MonoBehaviour
             allPlayers[currentPlayerIndex].gameObject.GetComponent<Renderer>().material.SetColor("_Color", playerColor);
         }
         GameObject currentPlayer = allPlayers[currentPlayerIndex].gameObject;
-        
+        */
+        int currentPlayerIndex = 0;
+        GameObject currentPlayer = allPlayers[0].gameObject;
         currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
         GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>().target = currentPlayer.transform;
         
@@ -418,6 +476,13 @@ public class Game : MonoBehaviour
         {
             activeSabortage=sabortage;
             sabortage.activate();
+            foreach(Player player in allPlayers)
+            {
+                if(player.isAlive()&&!player.isImposter())
+                {
+                    ((CrewMate)player).agent.startSabortage();
+                }
+            }
         }
         GUI.showMessage("The Sabotage was started", 4);
     }
@@ -435,6 +500,13 @@ public class Game : MonoBehaviour
         sabotageFires = new List<GameObject>();
         activeSabortage=null;
         sabortageStartCooldown=maxSabortageStartCooldown;
+        foreach(Player player in allPlayers)
+            {
+                if(player.isAlive()&&!player.isImposter())
+                {
+                    ((CrewMate)player).agent.stopSabortage();
+                }
+            }
         GUI.showMessage("The Sabotage was stopped", 4);
     }
     public List<SabortageTask> allActiveSabortageTasks()
@@ -454,6 +526,7 @@ public class Game : MonoBehaviour
     }
     public void startEmergencyMeeting(Player initiator)
     {
+        Debug.Log(initiator.number+" reports death");
         meetingNow=true;
         if(activeSabortage)
         {
@@ -554,6 +627,7 @@ public class Game : MonoBehaviour
         accuse(Game.Instance.numberActivePlayer(), p2);
     }
      public static void accuse(int p1,int p2) {
+         Debug.Log(p1+" accuses "+p2);
         Game.Instance.gameObject.GetComponent<Voting>().accuse(p1, p2);
     }
 
@@ -562,6 +636,7 @@ public class Game : MonoBehaviour
     }
 
     public static void accusePublic(int p1,int p2) {
+         Debug.Log(p1+" accuses "+p2+" public");
         Game.Instance.gameObject.GetComponent<Voting>().accusePublic(p1, p2);
         foreach(Player player in Instance.allLivingPlayers())
         {
@@ -573,6 +648,7 @@ public class Game : MonoBehaviour
     }
 
     public static void defendPublic(int p1,int p2) {
+         Debug.Log(p1+" defends "+p2+" public");
         Game.Instance.gameObject.GetComponent<Voting>().defendPublic(p1, p2);
         foreach(Player player in Instance.allLivingPlayers())
         {
@@ -742,8 +818,7 @@ public class Game : MonoBehaviour
             else
             {
                 StartCoroutine(EndGameIn(4));
-            }
-           
+            }      
         }
     }
     public bool fixMap()
