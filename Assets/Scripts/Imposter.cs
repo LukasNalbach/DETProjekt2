@@ -8,6 +8,7 @@ public class Imposter : Player
     private Vent currentUsedVent;
     void Start()
     {
+        agent=this.gameObject.AddComponent<ImposterPseudoAgent>();
         updateRoom=GetComponent<UpdateRoom>();
     }
 
@@ -126,6 +127,13 @@ public class Imposter : Player
         crewMate.getKilledByImposter();
         Game.Instance.resetKillCooldown();
         Game.Instance.checkWinningOverPlayers();
+        foreach(Player player in playerInViewDistance)
+        {
+            if(player.isAlive()&&!player.isImposter())
+            {
+                ((CrewMate)player).observation.maybeSeeKill(crewMate);
+            }
+        }
     }
     bool inVent()
     {
@@ -137,6 +145,13 @@ public class Imposter : Player
         currentUsedVent=vent;
         gameObject.GetComponent<Renderer>().enabled=false;
         gameObject.transform.position=currentUsedVent.gameObject.transform.position;
+        foreach(Player player in playerInViewDistance)
+        {
+            if(player.isAlive()&&!player.isImposter())
+            {
+                ((CrewMate)player).observation.seeVenting(this);
+            }
+        }
     }
 
     void changeVentPosition()
@@ -149,6 +164,13 @@ public class Imposter : Player
     {
         currentUsedVent=null;
         gameObject.GetComponent<Renderer>().enabled=true;
+        foreach(Player player in playerInViewDistance)
+        {
+            if(player.isAlive()&&!player.isImposter())
+            {
+                ((CrewMate)player).observation.seeVenting(this);
+            }
+        }
     }
     public override void goToMeeting()
     {

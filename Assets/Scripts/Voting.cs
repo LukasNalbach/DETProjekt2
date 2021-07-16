@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class Voting : MonoBehaviour
 {
     int t, n, p;
-    bool[][] accusesPublic, defendsPublic;
+    public bool[][] accusesPublic, defendsPublic;
     int[] accuses;
     bool[] wantsSkip;
     bool votingActive;
@@ -71,7 +71,7 @@ public class Voting : MonoBehaviour
         int votingTimeStart=t;
         while (t > 0) {
             t--;
-            if(votingTimeStart-t==5)
+            if(votingTimeStart-t==15)
             {
                 foreach(Player player in Game.Instance.allLivingPlayers())
                 {
@@ -156,18 +156,24 @@ public class Voting : MonoBehaviour
         if (p1 == -1) {
             p1 = p;
         }
+        if(p1==p)
+        {
+            if (wantsSkip[p1]) {
+                skip(p1);
+            } else if (accuses[p1] != -1) {
+                GameObject.Find("Canvas/Players/Player" + accuses[p1] + "/Buttons/buttonAccuse").GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
+            }
 
-        if (wantsSkip[p1]) {
-            skip(p1);
-        } else if (accuses[p1] != -1) {
-            GameObject.Find("Canvas/Players/Player" + accuses[p1] + "/Buttons/buttonAccuse").GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
+            if (accuses[p1] == p2) {
+                accuses[p1] = -1;
+            } else if (p1 == p) {
+                accuses[p1] = p2;
+                GameObject.Find("Canvas/Players/Player" + p2 + "/Buttons/buttonAccuse").GetComponent<Image>().color = (Color.red + Color.yellow) / 2;
+            }
         }
-
-        if (accuses[p1] == p2) {
-            accuses[p1] = -1;
-        } else if (p1 == p) {
-            accuses[p1] = p2;
-            GameObject.Find("Canvas/Players/Player" + p2 + "/Buttons/buttonAccuse").GetComponent<Image>().color = (Color.red + Color.yellow) / 2;
+        else
+        {
+            accuses[p1]=p2;
         }
     }
 
@@ -240,23 +246,37 @@ public class Voting : MonoBehaviour
             GameObject.Destroy(GameObject.Find("Canvas/Players/Player" + p2 + "/Votings/VotingsDefensive/" + p1));
         }
     }
-
+    public bool hasAccusatedPublic(int initiator, int reciver)
+    {
+        return accusesPublic[initiator][reciver];
+    }
+    public bool hasDefendsPublic(int initiator, int reciver)
+    {
+        return defendsPublic[initiator][reciver];
+    }
     public void skip(int p1) {
         if (!votingActive) return;
         if (p1 == -1) {
             p1 = p;
         }
+        if(p1==p)
+        {
+            if (accuses[p1] != -1) {
+                accuse(p1, accuses[p1]);
+            }
 
-        if (accuses[p1] != -1) {
-            accuse(p1, accuses[p1]);
+            wantsSkip[p1] = !wantsSkip[p1];
+
+            if (wantsSkip[p1]) {
+                GameObject.Find("Canvas/skip").GetComponent<Image>().color = new Color(0.75f, 0.75f, 0.75f);
+            } else {
+                GameObject.Find("Canvas/skip").GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
+            }
         }
-
-        wantsSkip[p1] = !wantsSkip[p1];
-
-        if (wantsSkip[p1]) {
-            GameObject.Find("Canvas/skip").GetComponent<Image>().color = new Color(0.75f, 0.75f, 0.75f);
-        } else {
-            GameObject.Find("Canvas/skip").GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
+        else
+        {
+            wantsSkip[p1]=true;
         }
+        
     }
 }

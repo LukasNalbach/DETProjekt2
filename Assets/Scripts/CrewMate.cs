@@ -9,13 +9,17 @@ public class CrewMate : Player
     public List<Task>taskToDo=new List<Task>();
 
     public int taskDone;
-    private AccursationCrew accursation; 
+    public AccursationCrew accursation; 
 
-    private Observation observation;
+    public Observation observation;
     //Task the crew mate is currently solving(or null).When a crewMate is doing task, he cannot move
     private Task activeTask;
 
     private IEnumerator taskCoroutine;
+
+    public static float maxDistanceToSolveTask=2f;
+
+    private bool immobileCauseVotingEtc=false;
 
     // Start is called before the first frame update
     void Start()
@@ -65,12 +69,18 @@ public class CrewMate : Player
                 doTask(taskToDoNow);
             }
         }
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            Grid<bool> worldGrid=Game.Instance.GetComponent<WorldGenerator>().mapGrid;
+            int[] gridPosition=worldGrid.getXY(transform.position);
+            Debug.Log("Position: "+transform.position+" , Grid Position "+worldGrid.getWorldPosition(gridPosition[0], gridPosition[1]));
+        }
         base.Update();
     }
     public new void FixedUpdate()
     {
         
-        agent.time-=Time.deltaTime;
+        agent.time+=Time.deltaTime;
         if(activePlayer())
         {
             float distance;
@@ -87,6 +97,7 @@ public class CrewMate : Player
                 }
             }
         }
+        observation.observeVisibleTasks();
         base.FixedUpdate();
     }
     public void addTask(Task task)
@@ -101,14 +112,14 @@ public class CrewMate : Player
     {
         foreach (var task in updateRoom.getCurrentRoom().getTasks())
         {
-            if(taskToDo.Contains(task)&&Vector3.Distance(gameObject.transform.position, task.transform.position)<=2f)
+            if(taskToDo.Contains(task)&&Vector3.Distance(gameObject.transform.position, task.transform.position)<=maxDistanceToSolveTask)
             {
                 return true;
             }
         }
         foreach (var sabTask in Game.Instance.allActiveSabortageTasks())
         {
-            if(Vector3.Distance(gameObject.transform.position, sabTask.transform.position)<=2f)
+            if(Vector3.Distance(gameObject.transform.position, sabTask.transform.position)<=maxDistanceToSolveTask)
             {
                 return true;
             }
@@ -149,6 +160,12 @@ public class CrewMate : Player
         }
         activeTask=null;
         
+    }
+    public IEnumerator coWaiting(float time)
+    {
+        immobileCauseVotingEtc=true;
+        yield return new WaitForSeconds(time);
+        immobileCauseVotingEtc=false;
     }
     public void stopAllTasks()
     {
@@ -193,7 +210,7 @@ public class CrewMate : Player
 
     public override bool immobile()
     {
-        return doingTask()||!isAlive();
+        return doingTask()||!isAlive()||immobileCauseVotingEtc||Game.Instance.meetingNow||Game.Instance.escMenuOpenend;
     }
     public override bool visible()
     {

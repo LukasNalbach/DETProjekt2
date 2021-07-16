@@ -17,7 +17,7 @@ public abstract class Player : MonoBehaviour
 
     public Room lastRoomBeforeMeeting;
     public UpdateRoom updateRoom;
-    public CrewMatePseudoAgent agent;
+    public PseudoAgent agent;
     public float activation=0.8f;//when an imput form the agent is greater than activation, it is activated
     public List<Player>playerInViewDistance=new List<Player>();
     public void create(Color color, int number)
@@ -36,10 +36,10 @@ public abstract class Player : MonoBehaviour
     public void Update()
     {
 
-        if (agent!=null&&agent.report>=activation)
+        if (agent!=null&&agent.report>=activation&&isAlive())
         {
             Player deadBody=nearDeadBody();
-            if(deadBody!=null)
+            if(deadBody!=null&&isAlive())
             {
                 deadBody.DestroyDeadBody();
                 Game.Instance.startEmergencyMeeting(this);

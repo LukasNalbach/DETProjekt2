@@ -12,13 +12,10 @@ namespace Cainos.PixelArtTopDown_Basic
 
         private Player playerScript;
 
-        private CrewMateAgent agent;
-
         private void Start()
         {
             animator = GetComponent<Animator>();
             playerScript=GetComponent<Player>();
-            agent=GetComponent<CrewMateAgent>();
         }
 
 
@@ -29,9 +26,9 @@ namespace Cainos.PixelArtTopDown_Basic
                 return;
             }
             Vector2 dir = Vector2.zero;
-            if(agent!=null)
+            if(playerScript.agent!=null)
             {
-                dir.x = agent.movement.x;
+                dir.x = playerScript.agent.movement.x;
                 if(dir.x<0)
                 {
                     animator.SetInteger("Direction", 3);
@@ -40,7 +37,7 @@ namespace Cainos.PixelArtTopDown_Basic
                 {
                     animator.SetInteger("Direction", 2);
                 }
-                dir.y = agent.movement.y;
+                dir.y = playerScript.agent.movement.y;
                 if(dir.y<0)
                 {
                     animator.SetInteger("Direction", 0);

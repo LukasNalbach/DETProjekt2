@@ -129,4 +129,8 @@ public class Task : MonoBehaviour
             } 
         }
     }
+    public bool isVisibleSolved()
+    {
+        return solvingVisible&&playerDoingThisTask.Count!=0;
+    }
 }
