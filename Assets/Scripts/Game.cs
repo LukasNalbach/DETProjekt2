@@ -572,7 +572,7 @@ public class Game : MonoBehaviour
         for (int i = 0; i < SceneManager.sceneCount; i++) {
             SceneManager.UnloadSceneAsync(SceneManager.GetSceneAt(i));
         }
-        SceneManager.LoadScene("StartGui", LoadSceneMode.Single);
+        SceneManager.LoadSceneAsync("StartGui", LoadSceneMode.Single);
     }
     public void QuitGame() {
         #if UNITY_EDITOR

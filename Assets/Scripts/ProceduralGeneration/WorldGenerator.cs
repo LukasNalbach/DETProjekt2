@@ -147,10 +147,11 @@ public class WorldGenerator : MonoBehaviour
 
             // set all cells under objects as not walkable
             foreach (GameObject obj in room.placedObjects) {
-                Rectangle transformRect = GetRectangleFromTransform(obj.transform);
-                for (int x = transformRect.X; x < transformRect.X + transformRect.Width; x++) {
-                    for (int y = transformRect.Y; y < transformRect.Y + transformRect.Height; y++) {
-                        mapGrid.setValue(x, y, false);
+                foreach (Rectangle collisionRect in GetCollisionRectanglesFromObject(obj)) {
+                    for (int x = collisionRect.X; x < collisionRect.X + collisionRect.Width; x++) {
+                        for (int y = collisionRect.Y; y < collisionRect.Y + collisionRect.Height; y++) {
+                            mapGrid.setValue(x, y, false);
+                        }
                     }
                 }
             }
@@ -423,6 +424,28 @@ public class WorldGenerator : MonoBehaviour
         }
 
         return obj;
+    }
+
+    public static List<Rectangle> GetCollisionRectanglesFromObject(GameObject obj) {
+        List<Rectangle> collRects = new List<Rectangle>();
+
+        foreach(Transform child in obj.transform) {
+            collRects.AddRange(GetCollisionRectanglesFromObject(child.gameObject));
+        }
+        collRects.Add(GetCollisionRectangleFromObject(obj));
+        return collRects.Where((r) => r.Width != 0 || r.Height != 0).ToList();
+    }
+
+    private static Rectangle GetCollisionRectangleFromObject(GameObject obj) {
+        if (obj.GetComponent<BoxCollider2D>() != null) {
+            BoxCollider2D coll = obj.GetComponent<BoxCollider2D>();
+            if (coll.size.x != 0 || coll.size.y != 0) {
+                Vector2 pos = obj.transform.position;
+                Vector2Int bottomLeft = new Vector2Int((int) Math.Round(pos.x + coll.offset.x - coll.size.x / 2), (int) Math.Round(pos.y + coll.offset.y - coll.size.y / 2));
+                return new Rectangle(bottomLeft.x, bottomLeft.y, (int) (Math.Ceiling(pos.x + coll.offset.x + coll.size.x / 2) - bottomLeft.x), (int) (Math.Ceiling(pos.y + coll.offset.y + coll.size.y / 2) - bottomLeft.y));
+            }
+        }
+        return new Rectangle(0, 0, 0, 0);
     }
 
     public static Rectangle GetRectangleFromTransform(Transform transform) {
