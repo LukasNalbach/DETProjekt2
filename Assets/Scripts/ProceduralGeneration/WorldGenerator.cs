@@ -183,7 +183,7 @@ public class WorldGenerator : MonoBehaviour
     }
 
     public IEnumerator Minimap() {
-        while (Game.Instance.GetComponent<swapPlayer>().currentPlayer == null) {
+        while (Game.Instance == null || Game.Instance.GetComponent<swapPlayer>().currentPlayer == null) {
             yield return new WaitForEndOfFrame();
         }
 
