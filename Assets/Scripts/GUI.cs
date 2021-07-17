@@ -10,6 +10,7 @@ public class GUI : MonoBehaviour
 {
     public bool imposterGuiEnabled = true;
     public bool sabotageGuiEnabled = true;
+    public bool selectSabotageGuiEnabled = true;
     public bool standardGuiEnabled = true;
 
     public float scaleFactor;
@@ -74,6 +75,15 @@ public class GUI : MonoBehaviour
         if (GameObject.Find("Canvas") != null && active != sabotageGuiEnabled) {
             setActiveRecursive(GameObject.Find("Canvas/panelSabotageCooldown"), active);
             sabotageGuiEnabled = active;
+        }
+    }
+
+    public void setSelectSabotageGui(bool active) {
+        if (GameObject.Find("Canvas") != null && active != selectSabotageGuiEnabled) {
+            setActiveRecursive(GameObject.Find("Canvas3/wald"), active);
+            setActiveRecursive(GameObject.Find("Canvas3/schatzkammer"), active);
+            setActiveRecursive(GameObject.Find("Canvas3/sabotagen"), active);
+            selectSabotageGuiEnabled = active;
         }
     }
 

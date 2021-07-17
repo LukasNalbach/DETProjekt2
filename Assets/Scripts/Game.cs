@@ -365,8 +365,10 @@ public class Game : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.M) && !meetingNow && !escMenuOpenend) {
             if (mapOpened) {
                 GetComponent<WorldGenerator>().CloseMap();
+                GetComponent<swapPlayer>().currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
             } else {
                 GetComponent<WorldGenerator>().OpenMap();
+                GetComponent<swapPlayer>().currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = false;
             }
             mapOpened = !mapOpened;
         }
@@ -452,11 +454,19 @@ public class Game : MonoBehaviour
 
     public void startSabortageChests()
     {
+        if (allSabortages.Count == 0) {
+            Game.Instance.startSabortageChests();
+            return;
+        }
         Game.Instance.startSabortage(allSabortages[1]);
     }
     public void startSabortageBournTrees()
     {
-        Game.Instance.startSabortage(allSabortages[0]);
+        if (allSabortages.Count == 0) {
+            Game.Instance.startSabortageBournTrees();
+            return;
+        }
+        startSabortage(allSabortages[0]);
         RealGenRoom room;
         GetComponent<WorldGenerator>().rooms.TryGetValue(RoomType.Wald, out room);
         Wald roomForest = (Wald) room;

@@ -19,7 +19,6 @@ public class WorldGenerator : MonoBehaviour
     private Dictionary<Task,GameObject> minimapTasks = new Dictionary<Task,GameObject>();
     private Dictionary<SabortageTask,GameObject> minimapSabotageTasks = new Dictionary<SabortageTask,GameObject>();
     private List<GameObject> minimapRects = new List<GameObject>();
-    private List<GameObject> minimapSabotageButtons = new List<GameObject>();
     public Grid<bool> mapGrid;
     Coroutine mapCor;
     public void Awake() {
@@ -179,7 +178,7 @@ public class WorldGenerator : MonoBehaviour
     }
 
     public void GenerateMinimap() {
-        GameObject.Find("MinimapCamera").transform.position = ((Vector3) CenterPosition(worldArea)) + new Vector3Int(0, 0, -1000);
+        GameObject.Find("MinimapCamera").transform.position = ((Vector3) CenterPosition(worldArea)) + new Vector3Int(0, 0, -800);
 
         GameObject minimapPlayerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/MinimapPlayer.prefab", typeof(GameObject)) as GameObject;
         minimapPlayer = Instantiate(minimapPlayerPrefab, Game.Instance.GetComponent<swapPlayer>().currentPlayer.transform.position, new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
@@ -207,11 +206,8 @@ public class WorldGenerator : MonoBehaviour
             Destroy(obj);
         }
         minimapRects.Clear();
-        foreach(GameObject obj in minimapSabotageButtons) {
-            Destroy(obj);
-        }
-        minimapSabotageButtons.Clear();
         Destroy(minimapPlayer);
+        Game.Instance.GUI.setSelectSabotageGui(false);
         minimapPlayer = null;
     }
 
@@ -267,17 +263,8 @@ public class WorldGenerator : MonoBehaviour
 
             
             if (player.GetComponent<Player>() is Imposter) {
-                if (!Game.Instance.sabortagePossible() && minimapSabotageButtons.Count == 0) {// create new sabotageButtons
-                    RealGenRoom schatzkammer, wald;
-                    rooms.TryGetValue(RoomType.Schatzkammer, out schatzkammer);
-                    rooms.TryGetValue(RoomType.Wald, out wald);
-                    minimapSabotageButtons.Add(Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/buttonSabotageChests.prefab", typeof(GameObject)) as GameObject, CenterPosition(schatzkammer.innerRect), new Quaternion(0.0f, 0.0f, 0.0f, 0.0f)));
-                    minimapSabotageButtons.Add(Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/buttonSabotageBurnTrees.prefab", typeof(GameObject)) as GameObject, CenterPosition(wald.innerRect), new Quaternion(0.0f, 0.0f, 0.0f, 0.0f)));
-                } else if (Game.Instance.sabortagePossible() && minimapSabotageButtons.Count != 0) {// remove sabotageButtons
-                    foreach(GameObject obj in minimapSabotageButtons) {
-                        Destroy(obj);
-                    }
-                    minimapSabotageButtons.Clear();
+                if (Game.Instance.sabortagePossible() != Game.Instance.GUI.selectSabotageGuiEnabled) {// toggle sabotage buttons
+                    Game.Instance.GUI.setSelectSabotageGui(!Game.Instance.GUI.selectSabotageGuiEnabled);
                 }
             }
 
