@@ -458,12 +458,18 @@ public class Game : MonoBehaviour
             Game.Instance.startSabortageChests();
             return;
         }
+        if (!mapOpened || !sabortagePossible()) {
+            return;
+        }
         Game.Instance.startSabortage(allSabortages[1]);
     }
     public void startSabortageBournTrees()
     {
         if (allSabortages.Count == 0) {
             Game.Instance.startSabortageBournTrees();
+            return;
+        }
+        if (!mapOpened || !sabortagePossible()) {
             return;
         }
         startSabortage(allSabortages[0]);

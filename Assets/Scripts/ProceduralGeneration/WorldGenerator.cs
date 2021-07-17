@@ -19,6 +19,7 @@ public class WorldGenerator : MonoBehaviour
     private Dictionary<Task,GameObject> minimapTasks = new Dictionary<Task,GameObject>();
     private Dictionary<SabortageTask,GameObject> minimapSabotageTasks = new Dictionary<SabortageTask,GameObject>();
     private List<GameObject> minimapRects = new List<GameObject>();
+    private GameObject minimapEmergencyButton;
     public Grid<bool> mapGrid;
     Coroutine mapCor;
     public void Awake() {
@@ -185,6 +186,11 @@ public class WorldGenerator : MonoBehaviour
         minimapPlayer.layer = 6;
         minimapPlayer.GetComponent<SpriteRenderer>().sortingLayerName = "Layer 2";
 
+        GameObject minimapEmergencyButtonPrefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/MinimapEmergencyButton.prefab", typeof(GameObject)) as GameObject;
+        minimapEmergencyButton = Instantiate(minimapEmergencyButtonPrefab, Game.Instance.GetComponent<WorldGenerator>().emergencyButton.transform.position + new Vector3(0.7f, 0, 0), new Quaternion(0.0f, 0.0f, 0.0f, 0.0f));
+        minimapEmergencyButton.layer = 6;
+        minimapEmergencyButton.GetComponent<SpriteRenderer>().sortingLayerName = "Layer 2";
+
         foreach (RealGenRoom room in rooms.Values.Where((room) => room is RealGenRoom)) {
             minimapRects.Add(GenreateRectangleOnMinimap(room.innerRect));
         }
@@ -206,6 +212,7 @@ public class WorldGenerator : MonoBehaviour
             Destroy(obj);
         }
         minimapRects.Clear();
+        Destroy(minimapEmergencyButton);
         Destroy(minimapPlayer);
         Game.Instance.GUI.setSelectSabotageGui(false);
         minimapPlayer = null;
