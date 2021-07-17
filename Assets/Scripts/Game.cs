@@ -633,12 +633,12 @@ public class Game : MonoBehaviour
             } else if (playerToKillObject.Equals(currentPlayer)) {
                 if (playerToKillObject.GetComponent<Player>() is Imposter) {
                     do {
-                        GetComponent<swapPlayer>().swap();
+                        GetComponent<swapPlayer>().next();
                     } while(GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>() is CrewMate);
                     GUI.showMessage("You can now play on as the Imposter Player " + GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>().number, 4);
                 } else {
                     do {
-                        GetComponent<swapPlayer>().swap();
+                        GetComponent<swapPlayer>().next();
                     } while(GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>() is Imposter);
                     GUI.showMessage("You can now play on as the CrewMate Player " + GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>().number, 4);
                 }

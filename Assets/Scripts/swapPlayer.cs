@@ -14,9 +14,16 @@ public class swapPlayer : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update() {}
+    void Update()
+    {
+        /*
+        if (Input.GetKeyDown(KeyCode.F1) && !Game.Instance.GetComponent<Voting>()) {
+            next();
+        }
+        */
+    }
 
-    private void next() {
+    public void next() {
         do {
             if (currentPlayerIndex+1 >= Game.Instance.allPlayers.Count) {
                 currentPlayerIndex = 0;
