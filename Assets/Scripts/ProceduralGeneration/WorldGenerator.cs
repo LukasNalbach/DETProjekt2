@@ -18,6 +18,7 @@ public class WorldGenerator : MonoBehaviour
     private Dictionary<Task,GameObject> minimapTasks = new Dictionary<Task,GameObject>();
     private Dictionary<SabortageTask,GameObject> minimapSabotageTasks = new Dictionary<SabortageTask,GameObject>();
     private List<GameObject> minimapRects = new List<GameObject>();
+    private List<GameObject> minimapSabotageButtons = new List<GameObject>();
     public Grid<bool> mapGrid;
     Coroutine mapCor;
     public void Awake() {
@@ -204,6 +205,10 @@ public class WorldGenerator : MonoBehaviour
             Destroy(obj);
         }
         minimapRects.Clear();
+        foreach(GameObject obj in minimapSabotageButtons) {
+            Destroy(obj);
+        }
+        minimapSabotageButtons.Clear();
         Destroy(minimapPlayer);
         minimapPlayer = null;
     }
@@ -256,6 +261,22 @@ public class WorldGenerator : MonoBehaviour
             }
             if (!minimapPlayer.transform.position.Equals(player.transform.position)) {
                 minimapPlayer.transform.position = player.transform.position;
+            }
+
+            
+            if (player.GetComponent<Player>() is Imposter) {
+                if (!Game.Instance.sabortagePossible() && minimapSabotageButtons.Count == 0) {// create new sabotageButtons
+                    RealGenRoom schatzkammer, wald;
+                    rooms.TryGetValue(RoomType.Schatzkammer, out schatzkammer);
+                    rooms.TryGetValue(RoomType.Wald, out wald);
+                    minimapSabotageButtons.Add(Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/buttonSabotageChests.prefab", typeof(GameObject)) as GameObject, CenterPosition(schatzkammer.innerRect), new Quaternion(0.0f, 0.0f, 0.0f, 0.0f)));
+                    minimapSabotageButtons.Add(Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/buttonSabotageBurnTrees.prefab", typeof(GameObject)) as GameObject, CenterPosition(wald.innerRect), new Quaternion(0.0f, 0.0f, 0.0f, 0.0f)));
+                } else if (Game.Instance.sabortagePossible() && minimapSabotageButtons.Count != 0) {// remove sabotageButtons
+                    foreach(GameObject obj in minimapSabotageButtons) {
+                        Destroy(obj);
+                    }
+                    minimapSabotageButtons.Clear();
+                }
             }
 
             yield return new WaitForEndOfFrame();
