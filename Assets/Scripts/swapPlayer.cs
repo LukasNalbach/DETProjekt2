@@ -10,6 +10,7 @@ public class swapPlayer : MonoBehaviour
     void Start()
     {
         Game.Instance.GUI.setImposterGui(currentPlayer.GetComponent<Player>().isImposter());
+        Game.Instance.GUI.setSelectSabotageGui(false);
     }
 
     // Update is called once per frame
