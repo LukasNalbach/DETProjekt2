@@ -446,9 +446,14 @@ public class Game : MonoBehaviour
         taskDone-=lostCrewMate.taskDone;
         GUI.updateTaskProgress(getTaskProgress());
     }
+
+    public void startSabortageChests()
+    {
+        Game.Instance.startSabortage(allSabortages[1]);
+    }
     public void startSabortageBournTrees()
     {
-        Game.Instance.startSabortage(allSabortages[random.Next(2)]);
+        Game.Instance.startSabortage(allSabortages[0]);
         RealGenRoom room;
         GetComponent<WorldGenerator>().rooms.TryGetValue(RoomType.Wald, out room);
         Wald roomForest = (Wald) room;
@@ -569,9 +574,6 @@ public class Game : MonoBehaviour
         Game.Instance.escMenuOpenend = false;
     }
     public void OpenMainMenu() {
-        for (int i = 0; i < SceneManager.sceneCount; i++) {
-            SceneManager.UnloadSceneAsync(SceneManager.GetSceneAt(i));
-        }
         SceneManager.LoadSceneAsync("StartGui", LoadSceneMode.Single);
     }
     public void QuitGame() {
