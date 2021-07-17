@@ -17,8 +17,6 @@ public class CrewMate : Player
 
     private IEnumerator taskCoroutine;
 
-    public static float maxDistanceToSolveTask=2f;
-
     private bool immobileCauseVotingEtc=false;
 
     // Start is called before the first frame update

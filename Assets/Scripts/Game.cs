@@ -552,7 +552,12 @@ public class Game : MonoBehaviour
     }
     public void startEmergencyMeeting(Player initiator)
     {
-        //Debug.Log(initiator.number+" reports death");
+        
+        if(meetingNow)
+        {
+            return;
+        }
+        Debug.Log(initiator.number+" starts meeting");
         meetingNow=true;
         if(activeSabortage)
         {
