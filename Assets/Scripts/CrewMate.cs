@@ -79,8 +79,6 @@ public class CrewMate : Player
     }
     public new void FixedUpdate()
     {
-        
-        agent.time+=Time.deltaTime;
         if(activePlayer())
         {
             float distance;

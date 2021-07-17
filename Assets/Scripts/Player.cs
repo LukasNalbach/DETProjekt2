@@ -50,6 +50,7 @@ public abstract class Player : MonoBehaviour
 
     public void FixedUpdate()
     {
+        agent.time+=Time.deltaTime;
         playerInViewDistance.Clear();
         foreach (var player in Game.Instance.allPlayers)
             {

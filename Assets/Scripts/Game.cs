@@ -18,6 +18,7 @@ public class Game : MonoBehaviour
     public GameSettings Settings { get; protected set; }
 
     public bool training=false;
+    public bool gridVisible=false;
     public GUI GUI;
 
     public Vector3 startPoint=new Vector3(0,0,0);
@@ -44,7 +45,7 @@ public class Game : MonoBehaviour
 
     public System.Random random = new System.Random();
 
-    protected float killCooldown{get; set;}
+    public float killCooldown{get; set;}
 
     //so the imposter cannot spam sabortage
     protected float sabortageStartCooldown{get;set;}
@@ -97,8 +98,10 @@ public class Game : MonoBehaviour
         setCrewMadesTask();
         createVentConnections();
         createSabortageOptions();
-        visualisiereGrid();
-        
+        if(gridVisible)
+        {
+            visualisiereGrid();
+        }
     }
     private void visualisiereGrid()
     {
@@ -534,7 +537,7 @@ public class Game : MonoBehaviour
     }
     public void startEmergencyMeeting(Player initiator)
     {
-        Debug.Log(initiator.number+" reports death");
+        //Debug.Log(initiator.number+" reports death");
         meetingNow=true;
         if(activeSabortage)
         {
@@ -644,7 +647,7 @@ public class Game : MonoBehaviour
     }
 
     public static void accusePublic(int p1,int p2) {
-         Debug.Log(p1+" accuses "+p2+" public");
+         //Debug.Log(p1+" accuses "+p2+" public");
         Game.Instance.gameObject.GetComponent<Voting>().accusePublic(p1, p2);
         foreach(Player player in Instance.allLivingPlayers())
         {
@@ -656,7 +659,7 @@ public class Game : MonoBehaviour
     }
 
     public static void defendPublic(int p1,int p2) {
-         Debug.Log(p1+" defends "+p2+" public");
+         //Debug.Log(p1+" defends "+p2+" public");
         Game.Instance.gameObject.GetComponent<Voting>().defendPublic(p1, p2);
         foreach(Player player in Instance.allLivingPlayers())
         {
