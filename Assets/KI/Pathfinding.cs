@@ -4,23 +4,23 @@ using UnityEngine;
 
 public class Pathfinding
 {
-     private CrewMate crewMateScript;
+     private Player playerScript;
     public LinkedList<Vector3> calculatedPoints=new LinkedList<Vector3>();//points from the actuall Room grid calculated with A* or next checkpoint
     public LinkedList<PathPoint> nextPoints;//checkpoints and goal, way to this point is not jet calculated with A*
-    public Pathfinding(CrewMate crewMateScript)
+    public Pathfinding(Player playerScript)
     {
-        this.crewMateScript=crewMateScript;
+        this.playerScript=playerScript;
     }
-    public void calculateNextTaskGoal()
+    public void calculateNextTaskGoal(List<Task> goals)
     {
-        if(crewMateScript.taskToDo.Count==0)
+        if(goals.Count==0)
         {
             return;
         }
-        Vector3 start=crewMateScript.transform.position;
+        Vector3 start=playerScript.transform.position;
         int shortestSize=int.MaxValue;
         List<PathNode> bestPath=new List<PathNode>();
-        foreach(Task task in crewMateScript.taskToDo)
+        foreach(Task task in goals)
         {
             PathfindingRoom pathfindingRoom=new PathfindingRoom(Game.Instance.GetComponent<WorldGenerator>().mapGrid);
             List<PathNode> pathToGoal=pathfindingRoom.FindPath(start, task.transform.position);
@@ -50,7 +50,7 @@ public class Pathfinding
         {
             Debug.Log("No Sabortage Tasks availible");
         }
-        Vector3 start=crewMateScript.transform.position;
+        Vector3 start=playerScript.transform.position;
         Vector3 firstGoal=Game.Instance.allActiveSabortageTasks()[0].transform.position;
         PathfindingRoom pathfindingRoom=new PathfindingRoom(Game.Instance.GetComponent<WorldGenerator>().mapGrid);
         List<PathNode> pathToFirst=pathfindingRoom.FindPath(start, firstGoal);
@@ -78,6 +78,22 @@ public class Pathfinding
             }
         }
         
+    }
+    public void calculatePath(Vector3 goal)
+    {
+         Vector3 start=playerScript.transform.position;
+        Vector3 firstGoal=goal;
+        PathfindingRoom pathfindingRoom=new PathfindingRoom(Game.Instance.GetComponent<WorldGenerator>().mapGrid);
+        List<PathNode> pathToFirst=pathfindingRoom.FindPath(start, goal);
+        if(pathToFirst==null)
+        {
+            Debug.Log("No Path to Goal found");
+            return;
+        }
+        foreach(PathNode pn in pathToFirst)
+        {
+            calculatedPoints.AddLast(Game.Instance.GetComponent<WorldGenerator>().mapGrid.getWorldPosition(pn.x,pn.y));
+        }
     }
     /*public void calculateNextGoalForTasks()
     {

@@ -7,23 +7,23 @@ using UnityEngine.SceneManagement;
 public class CrewMatePseudoAgent : PseudoAgent
 {
    
-     public CrewMate crewMateScript;
-     private Pathfinding pathfinding;
+     public Player playerScript;
+     public Pathfinding pathfinding;
     public int mode=0;//0: normal movement, 1: just x movement, 2: just y movement
-    private GameObject greenSquarePrefab;
-    private GameObject redSquarePrefab;
-    private float timeStampLastReachedGoal=0f;
+    public GameObject greenSquarePrefab;
+    public GameObject redSquarePrefab;
+    public float timeStampLastReachedGoal=0f;
     public List<GameObject>grennSquaresCurrentPath=new List<GameObject>();
     void Awake()
     {
-        crewMateScript=GetComponent<CrewMate>();
-         pathfinding=new Pathfinding(crewMateScript);
+        playerScript=GetComponent<CrewMate>();
+         pathfinding=new Pathfinding(playerScript);
          greenSquarePrefab=AssetDatabase.LoadAssetAtPath("Assets/Prefabs/GreenSquare.prefab", typeof(GameObject)) as GameObject;
          redSquarePrefab=AssetDatabase.LoadAssetAtPath("Assets/Prefabs/RedSquare.prefab", typeof(GameObject)) as GameObject;
     }
     void FixedUpdate()
     {
-        if(crewMateScript.activePlayer())
+        if(playerScript.activePlayer())
         {
             movement=new Vector2(0,0);
             movement[0] = Input.GetAxis("Horizontal");
@@ -31,7 +31,7 @@ public class CrewMatePseudoAgent : PseudoAgent
             doingTask = Input.GetKey(KeyCode.Return)?1f:0;
             report = Input.GetKey(KeyCode.Space)?1f:0;
         }
-        else if(!crewMateScript.isAlive())
+        else if(!playerScript.isAlive())
         {
             movement=new Vector3(0,0,0);
             doingTask=0;
@@ -45,7 +45,7 @@ public class CrewMatePseudoAgent : PseudoAgent
     }
     public Vector3 calculateMovement()
     {
-        if(crewMateScript.immobile())
+        if(playerScript.immobile())
         {
             return new Vector3(0,0,0);
         }
@@ -70,8 +70,11 @@ public class CrewMatePseudoAgent : PseudoAgent
             if(pathfinding.hasNextPosition())
             {
                 //Debug.Log("Problem with node at position "+pathfinding.getNextPosition()+ ", Player positon: "+crewMateScript.transform.position);
-                GameObject redSquare=Instantiate(redSquarePrefab, pathfinding.getNextPosition(), new Quaternion());
-                redSquare.AddComponent<Destruction>();
+                if(Game.Instance.gridVisible)
+                {
+                    GameObject redSquare=Instantiate(redSquarePrefab, pathfinding.getNextPosition(), new Quaternion());
+                    redSquare.AddComponent<Destruction>();
+                }
                 mode=1;
                 timeStampLastReachedGoal=time;
                 return new Vector3(0,0,0);
@@ -86,11 +89,14 @@ public class CrewMatePseudoAgent : PseudoAgent
                 return new Vector3(0,0,0);
             }
         }
-        if(Vector3.Distance(crewMateScript.transform.position,nextStep)<=0.5f)
+        if(Vector3.Distance(playerScript.transform.position,nextStep)<=0.5f)
         {
             pathfinding.reachNextPosition();
-            Destroy(grennSquaresCurrentPath[0]);
-            grennSquaresCurrentPath.RemoveAt(0);
+            if(Game.Instance.gridVisible)
+            {
+                Destroy(grennSquaresCurrentPath[0]);
+                grennSquaresCurrentPath.RemoveAt(0);
+            }
             timeStampLastReachedGoal=time;
             if(pathfinding.hasNextPosition())
             {
@@ -101,13 +107,18 @@ public class CrewMatePseudoAgent : PseudoAgent
                 return new Vector3(0,0,0);
             }
         }
-        Vector3 movement=(nextStep-crewMateScript.transform.position);
+        Vector3 movement=(nextStep-playerScript.transform.position);
         //Debug.Log(movement);
         return movement;
     }
     public Vector3 calculate1DMovement()
     {
         //mode!=0
+        if(!pathfinding.hasNextPosition())
+        {
+            mode=0;
+            return new Vector3(0,0,0);
+        }
         if(time-timeStampLastReachedGoal>1f)
         {
             timeStampLastReachedGoal=time;
@@ -122,7 +133,7 @@ public class CrewMatePseudoAgent : PseudoAgent
             {
                 //Debug.Log("1 D Movement failed");
                 //crewMateScript.StartCoroutine(crewMateScript.coWaiting(5f));
-                crewMateScript.StartCoroutine(coBlackMarkingGrid(pathfinding.getNextPosition()));
+                playerScript.StartCoroutine(coBlackMarkingGrid(pathfinding.getNextPosition()));
                 mode=0;
                 clearCalculatedPoints();
                 return calculateNormalMovement();
@@ -131,19 +142,19 @@ public class CrewMatePseudoAgent : PseudoAgent
         Vector3 nextStep=pathfinding.getNextPosition();
         if(mode==1||mode==3)
         {
-            if(Vector3.Distance(crewMateScript.transform.position,nextStep)<=0.2f)
+            if(Vector3.Distance(playerScript.transform.position,nextStep)<=0.2f)
             {
-                Debug.Log("Goal reached just with X");
+                //Debug.Log("Goal reached just with X");
                 mode=0;
                 timeStampLastReachedGoal=time;
                 return new Vector3(0,0,0);
             }
-            else if(Mathf.Abs(nextStep.x-crewMateScript.transform.position.x)<=0.1f)
+            else if(Mathf.Abs(nextStep.x-playerScript.transform.position.x)<=0.1f)
             {
                 if(mode==3)
                 {
                     //Debug.Log("Mode 3 Failed, Calculat new Path");
-                    crewMateScript.StartCoroutine(coBlackMarkingGrid(pathfinding.getNextPosition()));
+                    playerScript.StartCoroutine(coBlackMarkingGrid(pathfinding.getNextPosition()));
                     mode=0;
                     clearCalculatedPoints();
                     return calculateNormalMovement();
@@ -159,21 +170,21 @@ public class CrewMatePseudoAgent : PseudoAgent
             }
             else
             {
-                Vector3 movement=new Vector3(nextStep.x-crewMateScript.transform.position.x,0,0);
+                Vector3 movement=new Vector3(nextStep.x-playerScript.transform.position.x,0,0);
                 //Debug.Log("X movement: "+movement);
                 return movement;
             }
         }
         else //if(mode==2)
         {
-            if(Vector3.Distance(crewMateScript.transform.position,nextStep)<=0.2f)
+            if(Vector3.Distance(playerScript.transform.position,nextStep)<=0.2f)
             {
                 //Debug.Log("Goal reached with Y");
                 mode=0;
                 timeStampLastReachedGoal=time;
                 return new Vector3(0,0,0);
             }
-            else if(Mathf.Abs(nextStep.y-crewMateScript.transform.position.y)<=0.1f)
+            else if(Mathf.Abs(nextStep.y-playerScript.transform.position.y)<=0.1f)
             {
                 //Debug.Log("Y Goal reached");
                 mode=3;
@@ -182,13 +193,13 @@ public class CrewMatePseudoAgent : PseudoAgent
             }
             else
             {
-                Vector3 movement=new Vector3(0,nextStep.y-crewMateScript.transform.position.y,0);
+                Vector3 movement=new Vector3(0,nextStep.y-playerScript.transform.position.y,0);
                 //Debug.Log("Y movement: "+movement);
                 return movement;
             }
         }
     }
-    public void calculateNextTaskGoal()
+    public virtual void calculateNextTaskGoal()
     {
         if(Game.Instance.activeSabortage!=null)
         {
@@ -196,22 +207,28 @@ public class CrewMatePseudoAgent : PseudoAgent
         }
         else
         {
-            pathfinding.calculateNextTaskGoal();
+            pathfinding.calculateNextTaskGoal(((CrewMate)playerScript).taskToDo);
         }
         timeStampLastReachedGoal=time;
-        foreach(Vector3 pathNodePosition in pathfinding.calculatedPoints)
+        if(Game.Instance.gridVisible)
         {
-            GameObject greenSquare=Instantiate(greenSquarePrefab, pathNodePosition, new Quaternion());
-            grennSquaresCurrentPath.Add(greenSquare);
+            foreach(Vector3 pathNodePosition in pathfinding.calculatedPoints)
+            {
+                GameObject greenSquare=Instantiate(greenSquarePrefab, pathNodePosition, new Quaternion());
+                grennSquaresCurrentPath.Add(greenSquare);
+            }
         }
     }
     public void clearCalculatedPoints()
     {
-        foreach(GameObject greenSquare in grennSquaresCurrentPath)
+        if(Game.Instance.gridVisible)
         {
-            Destroy(greenSquare);
+            foreach(GameObject greenSquare in grennSquaresCurrentPath)
+            {
+                Destroy(greenSquare);
+            }
+            grennSquaresCurrentPath.Clear();
         }
-        grennSquaresCurrentPath.Clear();
         pathfinding.clearCalculatedPoints();
     }
     public IEnumerator coBlackMarkingGrid(Vector3 position)

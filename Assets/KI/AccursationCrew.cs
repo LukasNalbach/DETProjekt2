@@ -72,7 +72,7 @@ public class AccursationCrew
             if(i!=nr&&Game.Instance.allPlayers[i].isAlive())
             {
                 float tempVerdacht=verdacht[i]+temporerVerdachtDurchPublicAccursation[i];
-                Debug.Log("Verdacht CM "+nr+" fuer "+i+": "+tempVerdacht);
+                //Debug.Log("Verdacht CM "+nr+" fuer "+i+": "+tempVerdacht);
                 if(Mathf.Abs(tempVerdacht-greatestVerdacht)<=0.05f)
                 {
                     amountPlayersWithSameVerdacht++;
@@ -97,10 +97,10 @@ public class AccursationCrew
                 }
             }
             int random=Game.Instance.random.Next(numbersSameVerdacht.Count);
-            Debug.Log(random+" ,"+ numbersSameVerdacht.Count);
+            //Debug.Log(random+" ,"+ numbersSameVerdacht.Count);
             numberAcursedPlayer=numbersSameVerdacht[random];
         }
-        Debug.Log("numberAcursedPlayer:"+numberAcursedPlayer+", greatestVerdacht: "+greatestVerdacht+", minSchwelleAccurcation"+minSchwelleAccurcation);
+        //Debug.Log("numberAcursedPlayer:"+numberAcursedPlayer+", greatestVerdacht: "+greatestVerdacht+", minSchwelleAccurcation"+minSchwelleAccurcation);
         if(numberAcursedPlayer==-1)
         {
             Game.skip(nr);

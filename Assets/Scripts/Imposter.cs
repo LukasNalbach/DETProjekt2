@@ -135,7 +135,7 @@ public class Imposter : Player
             }
         }
     }
-    bool inVent()
+    public bool inVent()
     {
         return currentUsedVent!=null;
     }
@@ -178,7 +178,7 @@ public class Imposter : Player
     }
     public override bool immobile()
     {
-        return currentUsedVent!=null;
+        return currentUsedVent!=null||Game.Instance.meetingNow||Game.Instance.escMenuOpenend||!isAlive();
     }
     public override bool visible()
     {
