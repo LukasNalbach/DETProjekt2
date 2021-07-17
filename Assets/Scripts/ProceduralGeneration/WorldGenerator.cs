@@ -10,6 +10,7 @@ public class WorldGenerator : MonoBehaviour
 {
     private System.Random random = new System.Random();
     public Dictionary<RoomType,RealGenRoom> rooms = new Dictionary<RoomType,RealGenRoom>();
+    public GameObject emergencyButton;
     public List<Rectangle> corridors = new List<Rectangle>();
     public List<Vector2> checkpoints = new List<Vector2>();
     public Rectangle worldArea;
@@ -128,6 +129,7 @@ public class WorldGenerator : MonoBehaviour
         RealGenRoom meetingraum;
         rooms.TryGetValue(RoomType.Meetingraum, out meetingraum);
         Destroy(((Meetingraum) meetingraum).emergencyButton.GetComponent<Rigidbody2D>());
+        emergencyButton = ((Meetingraum) meetingraum).emergencyButton;
 
         mapGrid = new Grid<bool>(worldArea.Width, worldArea.Height, 1, new Vector3(worldArea.X + 0.5f, worldArea.Y + 0.5f, 0));
         foreach (Rectangle corridor in corridors) {
