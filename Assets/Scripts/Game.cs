@@ -645,7 +645,7 @@ public class Game : MonoBehaviour
         accuse(Game.Instance.numberActivePlayer(), p2);
     }
      public static void accuse(int p1,int p2) {
-         Debug.Log(p1+" accuses "+p2);
+         //Debug.Log(p1+" accuses "+p2);
         Game.Instance.gameObject.GetComponent<Voting>().accuse(p1, p2);
     }
 

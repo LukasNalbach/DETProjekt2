@@ -8,6 +8,7 @@ public abstract class PseudoAgent : MonoBehaviour
      public float doingTask=0;
      public float report=0;
     public float time=0f;
+    public bool wantsMeetingNow=false;
     public virtual void startSabortage()
     {
         

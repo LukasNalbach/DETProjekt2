@@ -149,7 +149,7 @@ public class Imposter : Player
         {
             if(player.isAlive()&&!player.isImposter())
             {
-                ((CrewMate)player).observation.seeVenting(this);
+                ((CrewMate)player).seeVenting(this);
             }
         }
     }

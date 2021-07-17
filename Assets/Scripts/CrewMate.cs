@@ -203,6 +203,11 @@ public class CrewMate : Player
     {
         return (float)(taskDone)/Game.Instance.Settings.tasks;
     }
+    public void seeVenting(Player venter)
+    {
+        observation.seeVenting(venter);
+        ((CrewMatePseudoAgent)agent).reactionAfterVent();
+    }
 
     public override bool immobile()
     {
@@ -218,6 +223,7 @@ public class CrewMate : Player
         {
             accursation.accusePublic();
         }
+        agent.wantsMeetingNow=false;
     }
     public override void accuse()
     {
