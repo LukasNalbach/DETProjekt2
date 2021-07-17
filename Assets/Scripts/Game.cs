@@ -631,8 +631,17 @@ public class Game : MonoBehaviour
             if (checkWinningOverPlayers()) {
                 yield break;
             } else if (playerToKillObject.Equals(currentPlayer)) {
-                GUI.showMessage("You can now spectate the remaining players", 4);
-                GetComponent<swapPlayer>().swap();
+                if (playerToKillObject.GetComponent<Player>() is Imposter) {
+                    do {
+                        GetComponent<swapPlayer>().swap();
+                    } while(GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>() is CrewMate);
+                    GUI.showMessage("You can now play on as the Imposter Player " + GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>().number, 4);
+                } else {
+                    do {
+                        GetComponent<swapPlayer>().swap();
+                    } while(GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>() is Imposter);
+                    GUI.showMessage("You can now play on as the CrewMate Player " + GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>().number, 4);
+                }
             } else {
                 cameraFollow.target = currentPlayer.transform;
                 cameraFollow.transform.position = currentPlayer.transform.position + cameraFollow.offset;
