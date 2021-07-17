@@ -365,10 +365,8 @@ public class Game : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.M) && !meetingNow && !escMenuOpenend) {
             if (mapOpened) {
                 GetComponent<WorldGenerator>().CloseMap();
-                GetComponent<swapPlayer>().currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
             } else {
                 GetComponent<WorldGenerator>().OpenMap();
-                GetComponent<swapPlayer>().currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = false;
             }
             mapOpened = !mapOpened;
         }
@@ -661,7 +659,7 @@ public class Game : MonoBehaviour
         accuse(Game.Instance.numberActivePlayer(), p2);
     }
      public static void accuse(int p1,int p2) {
-         Debug.Log(p1+" accuses "+p2);
+         //Debug.Log(p1+" accuses "+p2);
         Game.Instance.gameObject.GetComponent<Voting>().accuse(p1, p2);
     }
 

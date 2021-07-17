@@ -14,7 +14,6 @@ public class CrewMatePseudoAgent : PseudoAgent
     public GameObject redSquarePrefab;
     public float timeStampLastReachedGoal=0f;
     public List<GameObject>grennSquaresCurrentPath=new List<GameObject>();
-    private bool wantsMeetingNow=false;
     void Awake()
     {
         playerScript=GetComponent<CrewMate>();
@@ -209,7 +208,12 @@ public class CrewMatePseudoAgent : PseudoAgent
     }
     public virtual void calculateNextTaskGoal()
     {
-        if(Game.Instance.activeSabortage!=null)
+        if(wantsMeetingNow)
+        {
+            Debug.Log(playerScript.number+" calculates Root to emergencyButton");
+            pathfinding.calculatePath(Game.Instance.GetComponent<WorldGenerator>().emergencyButton.transform.position);
+        }
+        else if(Game.Instance.activeSabortage!=null)
         {
             pathfinding.calculateSabortageGoals();
         }
@@ -248,6 +252,11 @@ public class CrewMatePseudoAgent : PseudoAgent
         yield return new WaitForSeconds(5f);
         worldGrid.setValue(gridPosition[0], gridPosition[1],true);
     }
+    public void reactionAfterVent()
+    {
+        clearCalculatedPoints();
+        wantsMeetingNow=true;
+    }  
     public override void startSabortage()
     {
         clearCalculatedPoints();
@@ -259,6 +268,5 @@ public class CrewMatePseudoAgent : PseudoAgent
         clearCalculatedPoints();
         calculateNextTaskGoal();
         mode=0;
-    }
-    
+    } 
 }
