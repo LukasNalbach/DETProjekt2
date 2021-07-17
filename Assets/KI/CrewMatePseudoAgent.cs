@@ -14,6 +14,7 @@ public class CrewMatePseudoAgent : PseudoAgent
     public GameObject redSquarePrefab;
     public float timeStampLastReachedGoal=0f;
     public List<GameObject>grennSquaresCurrentPath=new List<GameObject>();
+    private bool wantsMeetingNow=false;
     void Awake()
     {
         playerScript=GetComponent<CrewMate>();
@@ -40,7 +41,14 @@ public class CrewMatePseudoAgent : PseudoAgent
         else{
             movement=calculateMovement();
             doingTask=1;
-            report=1;
+            if(wantsMeetingNow||playerScript.nearDeadBody())
+            {
+                report=1;
+            }
+            else
+            {
+                report=0;
+            }
         }
     }
     public Vector3 calculateMovement()

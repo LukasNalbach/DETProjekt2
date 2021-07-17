@@ -20,6 +20,8 @@ public abstract class Player : MonoBehaviour
     public PseudoAgent agent;
     public float activation=0.8f;//when an imput form the agent is greater than activation, it is activated
     public List<Player>playerInViewDistance=new List<Player>();
+
+    public static float maxDistanceToSolveTask=2f;
     public void create(Color color, int number)
     {
         this.number=number;
@@ -39,9 +41,12 @@ public abstract class Player : MonoBehaviour
         if (agent!=null&&agent.report>=activation&&isAlive())
         {
             Player deadBody=nearDeadBody();
-            if(deadBody!=null&&isAlive())
+            if((deadBody!=null||nearEmergencyButton())&&isAlive())
             {
-                deadBody.DestroyDeadBody();
+                if(deadBody!=null)
+                {
+                    deadBody.DestroyDeadBody();
+                }
                 Game.Instance.startEmergencyMeeting(this);
             }
         }
@@ -131,6 +136,15 @@ public abstract class Player : MonoBehaviour
             }
         }
         return null;
+    }
+
+    public bool nearEmergencyButton()
+    {
+        if(Vector3.Distance(Game.Instance.GetComponent<WorldGenerator>().emergencyButton.transform.position,transform.position)<=maxDistanceToSolveTask)
+        {
+            return true;
+        }
+        return false;
     }
 
     public bool activePlayer()
