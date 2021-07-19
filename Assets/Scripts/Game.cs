@@ -570,8 +570,8 @@ public class Game : MonoBehaviour
         }
         if (mapOpened) {
                 GetComponent<WorldGenerator>().CloseMap();
-            } 
-        mapOpened = !mapOpened;
+                mapOpened = !mapOpened;
+        } 
         Debug.Log(initiator.number+" starts meeting");
         meetingNow=true;
         if(activeSabortage)
