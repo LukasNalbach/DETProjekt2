@@ -196,5 +196,7 @@ public abstract class Player : MonoBehaviour
 
     public abstract void noticePublicDefend(int p1,int p2);
 
+    public abstract void feedbackMeeting(int playerToKill);
+    
     public abstract float verdacht(int playerNumber);
 }

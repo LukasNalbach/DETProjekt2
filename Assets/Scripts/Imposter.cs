@@ -203,6 +203,10 @@ public class Imposter : Player
     {
         accursation.noticePublicDefend(p1,p2);
     }
+    public override void feedbackMeeting(int playerToKill)
+    {
+        return;
+    }
     public override float verdacht(int playerNumber)
     {
         return 0f;

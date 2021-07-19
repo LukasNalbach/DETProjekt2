@@ -255,6 +255,10 @@ public class CrewMate : Player
             accursation.noticePublicDefend(p1,p2);
         }
     }
+    public override void feedbackMeeting(int playerToKill)
+    {
+        accursation.feedbackMeeting(playerToKill);
+    }
     public override float verdacht(int playerNumber)
     {
         if(activePlayer())

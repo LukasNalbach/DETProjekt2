@@ -623,6 +623,7 @@ public class Game : MonoBehaviour
         Cainos.PixelArtTopDown_Basic.CameraFollow cameraFollow = GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>();
 
         if (playerToKill != -1) {
+
             playerToKillObject = allPlayers[playerToKill].gameObject;
             Game.Instance.GUI.showMessage((allPlayers[playerToKill].isImposter() ? "Imposter " : "Crewmate ") + "Player " + playerToKill + " kicked out", 3);
 

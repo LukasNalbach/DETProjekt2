@@ -145,6 +145,10 @@ public class Voting : MonoBehaviour
                 }
             }
             if (skipWantedBy < accusedBy[iMax]) {
+                foreach(Player player in Game.Instance.allLivingPlayers())
+                {
+                    player.feedbackMeeting(iMax);
+                }
                 return iMax;
             }
         }

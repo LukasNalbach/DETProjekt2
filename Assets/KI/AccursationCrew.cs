@@ -107,7 +107,7 @@ public class AccursationCrew
         {
             accuse(nr,numberAcursedPlayer);
         }
-        else if(2*Game.Instance.livingCrewMates()-Game.Instance.livingImposter()<=1)
+        else if(Game.Instance.livingCrewMates()-2*Game.Instance.livingImposter()<=1)
         {
             accuse(nr,numberAcursedPlayer);
         }
@@ -162,6 +162,37 @@ public class AccursationCrew
         if(!Game.Instance.GetComponent<Voting>().hasDefendsPublic(initiator, reciver))
         {
             Game.defendPublic(initiator, reciver);
+        }
+    }
+    public void feedbackMeeting(int playerToKill)
+    {
+        if(Game.Instance.allPlayers[playerToKill].isImposter())
+        {
+            for(int i=0;i<verdacht.Length;i++)
+            {
+                if(Game.Instance.GetComponent<Voting>().hasDefendsPublic(i, playerToKill))
+                {
+                    verdacht[i]+=0.25f;
+                }
+                else if(Game.Instance.GetComponent<Voting>().hasAccusatedPublic(i, playerToKill))
+                {
+                    verdacht[i]-=0.125f;
+                }
+            }
+        }
+        else
+        {
+            for(int i=0;i<verdacht.Length;i++)
+            {
+                if(Game.Instance.GetComponent<Voting>().hasAccusatedPublic(i, playerToKill))
+                {
+                    verdacht[i]+=0.25f;
+                }
+                else if(Game.Instance.GetComponent<Voting>().hasDefendsPublic(i, playerToKill))
+                {
+                    verdacht[i]-=0.125f;
+                }
+            }
         }
     }
 }
