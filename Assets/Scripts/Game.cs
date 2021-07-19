@@ -521,7 +521,7 @@ public class Game : MonoBehaviour
                 }
             }
         }
-        GUI.showMessage("The Sabotage was started", 4);
+        GUI.showMessage("The Sabotage was started", 3);
     }
     public bool sabortagePossible()
     {
@@ -544,7 +544,7 @@ public class Game : MonoBehaviour
                     ((CrewMate)player).agent.stopSabortage();
                 }
             }
-        GUI.showMessage("The Sabotage was stopped", 4);
+        GUI.showMessage("The Sabotage was stopped", 3);
     }
     public List<SabortageTask> allActiveSabortageTasks()
     {
@@ -624,7 +624,7 @@ public class Game : MonoBehaviour
 
         if (playerToKill != -1) {
             playerToKillObject = allPlayers[playerToKill].gameObject;
-            Game.Instance.GUI.showMessage((allPlayers[playerToKill].isImposter() ? "Imposter " : "Crewmate ") + "Player " + playerToKill + " kicked out", 4);
+            Game.Instance.GUI.showMessage((allPlayers[playerToKill].isImposter() ? "Imposter " : "Crewmate ") + "Player " + playerToKill + " kicked out", 3);
 
             RealGenRoom room;
             GetComponent<WorldGenerator>().rooms.TryGetValue(RoomType.Lavagrube, out room);
@@ -661,13 +661,13 @@ public class Game : MonoBehaviour
                     do {
                         GetComponent<swapPlayer>().next();
                     } while(GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>() is CrewMate);
-                    GUI.showMessage("You can now play on as the Imposter Player " + GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>().number, 4);
+                    GUI.showMessage("You can now play on as the Imposter Player " + GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>().number, 3);
                 } 
         else {
                     do {
                         GetComponent<swapPlayer>().next();
                     } while(GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>() is Imposter);
-                    GUI.showMessage("You can now play on as the CrewMate Player " + GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>().number, 4);
+                    GUI.showMessage("You can now play on as the CrewMate Player " + GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>().number, 3);
                 }
              
         
@@ -825,7 +825,7 @@ public class Game : MonoBehaviour
         {
             line+=" with Sabotage";
         }
-        Game.Instance.GUI.showMessage(line, 4);
+        Game.Instance.GUI.showMessage(line, 3);
         foreach(Player player in allPlayers)
             {
                 if(player.isImposter())
@@ -859,7 +859,7 @@ public class Game : MonoBehaviour
             {
                 line+=" with Tasks";
             }
-            Game.Instance.GUI.showMessage(line, 4);
+            Game.Instance.GUI.showMessage(line, 3);
             foreach(Player player in allPlayers)
             {
                 if(player.isImposter())
@@ -877,7 +877,7 @@ public class Game : MonoBehaviour
             }
             else
             {
-                StartCoroutine(EndGameIn(4));
+                StartCoroutine(EndGameIn(3));
             }      
         }
     }

@@ -66,6 +66,7 @@ public abstract class Player : MonoBehaviour
                 {
                     if(activePlayer())
                     {
+                        player.gameObject.transform.GetChild(1).GetComponent<SpriteRenderer>().enabled = this is Imposter && player is Imposter;
                         player.gameObject.GetComponent<Renderer>().enabled=true;
                     }
                     playerInViewDistance.Add(player);
@@ -74,9 +75,11 @@ public abstract class Player : MonoBehaviour
                 {
                     if(activePlayer())
                     {
+                        player.gameObject.transform.GetChild(1).GetComponent<SpriteRenderer>().enabled = false;
                         player.gameObject.GetComponent<Renderer>().enabled=false;
                     }
                 }
+                
             }
         if(activePlayer())
         {
