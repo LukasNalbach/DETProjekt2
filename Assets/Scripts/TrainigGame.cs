@@ -62,7 +62,8 @@ public class TrainigGame : Game
             int colorIndex = random.Next(remainingColors.Count);
             UnityEngine.Color nextColor = remainingColors[colorIndex];
             remainingColors.RemoveAt(colorIndex);
-            newPlayer.GetComponent<Player>().create(nextColor,i);
+            newPlayer.GetComponent<Player>().create(nextColor);
+            newPlayer.GetComponent<Player>().giveNumber(i);
 
             allPlayers.Add(newPlayer.GetComponent<Player>());
          }

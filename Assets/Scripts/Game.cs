@@ -19,6 +19,7 @@ public class Game : MonoBehaviour
 
     public bool training=false;
     public bool gridVisible=false;
+    public bool finished=false;
     public GUI GUI;
 
     public Vector3 startPoint=new Vector3(0,0,0);
@@ -201,9 +202,16 @@ public class Game : MonoBehaviour
             }
             UnityEngine.Color nextColor = remainingColors[colorIndex];
             remainingColors.RemoveAt(colorIndex);
-            newPlayer.GetComponent<Player>().create(nextColor,i);
+            newPlayer.GetComponent<Player>().create(nextColor);
             allPlayers.Add(newPlayer.GetComponent<Player>());
         }
+        GameObject currentPlayer = allPlayers[0].gameObject;
+        Shuffle<Player>(allPlayers,random);
+        for(int i=0;i<allPlayers.Count;i++)
+        {
+            allPlayers[i].giveNumber(i);
+        }
+        int currentPlayerIndex = currentPlayer.GetComponent<Player>().number;
 
         /*
         int currentPlayerIndex = -1;
@@ -219,8 +227,7 @@ public class Game : MonoBehaviour
         }
         GameObject currentPlayer = allPlayers[currentPlayerIndex].gameObject;
         */
-        int currentPlayerIndex = 0;
-        GameObject currentPlayer = allPlayers[0].gameObject;
+        
         currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
         GameObject.Find("Main Camera").GetComponent<Cainos.PixelArtTopDown_Basic.CameraFollow>().target = currentPlayer.transform;
         
@@ -557,10 +564,14 @@ public class Game : MonoBehaviour
     public void startEmergencyMeeting(Player initiator)
     {
         
-        if(meetingNow)
+        if(meetingNow||finished)
         {
             return;
         }
+        if (mapOpened) {
+                GetComponent<WorldGenerator>().CloseMap();
+            } 
+        mapOpened = !mapOpened;
         Debug.Log(initiator.number+" starts meeting");
         meetingNow=true;
         if(activeSabortage)
@@ -631,27 +642,35 @@ public class Game : MonoBehaviour
             if (checkWinningOverPlayers()) {
                 yield break;
             } else if (playerToKillObject.Equals(currentPlayer)) {
-                if (playerToKillObject.GetComponent<Player>() is Imposter) {
-                    do {
-                        GetComponent<swapPlayer>().next();
-                    } while(GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>() is CrewMate);
-                    GUI.showMessage("You can now play on as the Imposter Player " + GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>().number, 4);
-                } else {
-                    do {
-                        GetComponent<swapPlayer>().next();
-                    } while(GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>() is Imposter);
-                    GUI.showMessage("You can now play on as the CrewMate Player " + GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>().number, 4);
-                }
-            } else {
+                activePlayerRespawnsInSameTeam();
+        } else {
                 cameraFollow.target = currentPlayer.transform;
                 cameraFollow.transform.position = currentPlayer.transform.position + cameraFollow.offset;
-            }
-        } else {
+        }}
+        else {
             Game.Instance.GUI.showMessage("Noone was kicked out", 4);
         }
         currentPlayer.GetComponent<Cainos.PixelArtTopDown_Basic.TopDownCharacterController>().active = true;
         GUI.setStandardGui(true);
         meetingNow=false;
+    }
+    public void activePlayerRespawnsInSameTeam()
+    {
+        GameObject playerToKillObject=activePlayer().gameObject;
+        if (playerToKillObject.GetComponent<Player>() is Imposter) {
+                    do {
+                        GetComponent<swapPlayer>().next();
+                    } while(GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>() is CrewMate);
+                    GUI.showMessage("You can now play on as the Imposter Player " + GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>().number, 4);
+                } 
+        else {
+                    do {
+                        GetComponent<swapPlayer>().next();
+                    } while(GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>() is Imposter);
+                    GUI.showMessage("You can now play on as the CrewMate Player " + GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>().number, 4);
+                }
+             
+        
     }
     //return the only human player in the end
     public Player activePlayer()
@@ -871,6 +890,7 @@ public class Game : MonoBehaviour
         Debug.Log(fixMap());
     }
     public IEnumerator EndGameIn(int t) {
+        finished=true;
         yield return new WaitForSeconds(t);
         OpenMainMenu();
         yield return null;

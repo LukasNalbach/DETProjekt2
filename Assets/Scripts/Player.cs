@@ -22,11 +22,14 @@ public abstract class Player : MonoBehaviour
     public List<Player>playerInViewDistance=new List<Player>();
 
     public static float maxDistanceToSolveTask=2f;
-    public void create(Color color, int number)
+    public void create(Color color)
     {
-        this.number=number;
         this.color=color;
         gameObject.GetComponent<Renderer>().material.SetColor("_Color",color);
+    }
+    public void giveNumber(int number)
+    {
+        this.number=number;
     }
     // Start is called before the first frame update
     void Start()

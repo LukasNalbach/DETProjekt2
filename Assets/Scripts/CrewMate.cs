@@ -178,6 +178,10 @@ public class CrewMate : Player
         stopAllTasks();
         addDeadBody();
         Game.Instance.removeCrewMateFromTaskProgress(this);
+        if(activePlayer()&&!Game.Instance.finished)
+        {
+           StartCoroutine(changePlayerAfterDeath(5));
+        }
         /*
         if(!ki)
         {
@@ -188,6 +192,11 @@ public class CrewMate : Player
             Game.Instance.removeCrewMateFromTaskProgress(this);
         }
         */
+    }
+    public IEnumerator changePlayerAfterDeath(int t) {
+        yield return new WaitForSeconds(t);
+        Game.Instance.activePlayerRespawnsInSameTeam();
+        yield return null;
     }
 
     void addDeadBody()

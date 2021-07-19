@@ -8,14 +8,14 @@ public class AccursationCrew
      public float[] temporerVerdachtDurchPublicAccursation;//wird geloescht, falls beschuldiger selbst imposter ist(und das in diesem Meeting herausgefunden wird)
      public float minSchwellePublicAccursation=0.5f;
      public float minSchwelleAccurcation;
-    public CrewMate crewMateScript;
+    public Player playerScript;
     public static float standardVerdacht=0f;//set in initialise
     public int nr;//=crewMate number
     
-    public AccursationCrew(CrewMate crewMateScript)
+    public AccursationCrew(Player playerScript)
     {
-        this.crewMateScript=crewMateScript;
-        nr=crewMateScript.number;
+        this.playerScript=playerScript;
+        nr=playerScript.number;
         initialisiereVerdacht();
     }
     private void initialisiereVerdacht()
@@ -43,7 +43,7 @@ public class AccursationCrew
         minSchwelleAccurcation=standardStartVerdacht*1.2f;
         temporerVerdachtDurchPublicAccursation=new float[Game.Instance.allPlayers.Count];
     }
-    public void accusePublic()
+    public virtual void accusePublic()
     {
         for(int i=0;i<verdacht.Length;i++)
         {
@@ -58,11 +58,9 @@ public class AccursationCrew
                     defendPublic(nr,i);
                 }
             }
-            
-
         }
     }
-    public void accuse()
+    public virtual void accuse()
     {
         float greatestVerdacht=0f;
         int numberAcursedPlayer=-1;
@@ -118,7 +116,7 @@ public class AccursationCrew
             Game.skip(nr);
         }
     }
-    public void noticePublicAccuse(int initiator,int reciver)
+    public virtual void noticePublicAccuse(int initiator,int reciver)
     {
         if(reciver==nr)
         {
@@ -129,7 +127,7 @@ public class AccursationCrew
              temporerVerdachtDurchPublicAccursation[reciver]+=0.5f;
         }
     }
-    public void noticePublicDefend(int initiator,int reciver)
+    public virtual void noticePublicDefend(int initiator,int reciver)
     {
         if(verdacht[initiator]<=minSchwelleAccurcation*1.5&&verdacht[reciver]<=minSchwelleAccurcation)
         {
@@ -138,7 +136,7 @@ public class AccursationCrew
     }
     public void accuse(int initiator, int reciver)
     {
-        if(crewMateScript.activePlayer()||!crewMateScript.isAlive())
+        if(playerScript.activePlayer()||!playerScript.isAlive())
         {
             return;
         }
@@ -146,7 +144,7 @@ public class AccursationCrew
     }
     public void accusePublic(int initiator, int reciver)
     {
-        if(crewMateScript.activePlayer()||!crewMateScript.isAlive())
+        if(playerScript.activePlayer()||!playerScript.isAlive())
         {
             return;
         }
@@ -157,7 +155,7 @@ public class AccursationCrew
     }
     public void defendPublic(int initiator, int reciver)
     {
-        if(crewMateScript.activePlayer()||!crewMateScript.isAlive())
+        if(playerScript.activePlayer()||!playerScript.isAlive())
         {
             return;
         }

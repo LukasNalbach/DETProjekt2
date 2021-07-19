@@ -23,6 +23,7 @@ namespace Cainos.PixelArtTopDown_Basic
         {
             if(playerScript.immobile())
             {
+                animator.SetBool("IsMoving",false);
                 return;
             }
             Vector2 dir = Vector2.zero;

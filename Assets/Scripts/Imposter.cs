@@ -6,10 +6,12 @@ public class Imposter : Player
 {
     // Start is called before the first frame update
     private Vent currentUsedVent;
+    private AccursationImposter accursation;
     void Start()
     {
         agent=this.gameObject.AddComponent<ImposterPseudoAgent>();
         updateRoom=GetComponent<UpdateRoom>();
+        accursation=new AccursationImposter(this);
     }
 
     void Awake() {
@@ -19,7 +21,7 @@ public class Imposter : Player
     // Update is called once per frame
     public new void Update()
     {
-        if (activePlayer()&&((ImposterPseudoAgent)agent).kill>=activation)
+        if (((ImposterPseudoAgent)agent).kill>=activation)
         {
             if(canKill())
             {
@@ -41,7 +43,7 @@ public class Imposter : Player
                 kill((CrewMate)playerToKill);
             }
         }
-        if(activePlayer()&&((ImposterPseudoAgent)agent).vent>=activation)
+        if(((ImposterPseudoAgent)agent).vent>=activation)
         {
             if(inVent())
             {
@@ -56,17 +58,12 @@ public class Imposter : Player
                 }
             }
         }
-        if(activePlayer()&&((ImposterPseudoAgent)agent).changeVent>=activation)
+        if(((ImposterPseudoAgent)agent).changeVent>=activation)
         {
             if(inVent())
             {
                 changeVentPosition();
             }
-        }
-        if(activePlayer()&&Input.GetKeyDown(KeyCode.Q))
-        {
-            Game.Instance.startSabortageBournTrees();
-            //Game.Instance.startSabortage(Game.Instance.allSabortages[0]);
         }
         base.Update();
     }
@@ -188,26 +185,24 @@ public class Imposter : Player
     {
         if(!activePlayer())
         {
-            //accursation.accurrsePublic();
+            accursation.accusePublic();
         }
     }
     public override void accuse()
     {
         if(!activePlayer())
         {
-            //accursation.accurrse();
+            accursation.accuse();
         }
     }
     public override void noticePublicAccuse(int p1,int p2)
     {
-
+        accursation.noticePublicAccuse(p1,p2);
     }
     public override void noticePublicDefend(int p1,int p2)
     {
-        
+        accursation.noticePublicDefend(p1,p2);
     }
-
-    
     public override float verdacht(int playerNumber)
     {
         return 0f;

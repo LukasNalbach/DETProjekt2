@@ -33,7 +33,12 @@ public class SabortageTask : Task
     public void finishSolving(Player player)
     {
         solved=true;
-        mySabortage.maybeDeactivated();
         endSolving(player);
+        while(playerDoingThisTask.Count>0)
+        {
+            ((CrewMate)playerDoingThisTask[0]).stopAllTasks();
+        }
+        mySabortage.maybeDeactivated();
+        
     }
 }

@@ -210,7 +210,6 @@ public class CrewMatePseudoAgent : PseudoAgent
     {
         if(wantsMeetingNow)
         {
-            Debug.Log(playerScript.number+" calculates Root to emergencyButton");
             pathfinding.calculatePath(Game.Instance.GetComponent<WorldGenerator>().emergencyButton.transform.position);
         }
         else if(Game.Instance.activeSabortage!=null)
@@ -219,6 +218,14 @@ public class CrewMatePseudoAgent : PseudoAgent
         }
         else
         {
+            if(((CrewMate)playerScript).taskToDo.Count==0)
+            {
+                Vector3 startV3=new Vector3(playerScript.startPos.x, playerScript.startPos.y, 0);
+                if(Vector3.Distance(startV3,playerScript.transform.position)>=1f)
+                {
+                    pathfinding.calculatePath(startV3);
+                }
+            }
             pathfinding.calculateNextTaskGoal(((CrewMate)playerScript).taskToDo);
         }
         timeStampLastReachedGoal=time;
