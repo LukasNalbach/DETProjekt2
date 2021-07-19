@@ -85,8 +85,8 @@ public class StartGui : UIBehaviour, ICancelHandler
         GameObject.Find("Canvas/Options").transform.SetSiblingIndex(0);
         GameObject.Find("Canvas/MainMenu").transform.SetSiblingIndex(1);
 
-        Settings.numberPlayers=5;
-        Settings.numberImposters=1;
+        Settings.numberPlayers=7;
+        Settings.numberImposters=2;
 
         pointerPlayerSpeedOptions=(Settings.getPlayerSpeedOptions().Length-1)/2;
         Settings.playerSpeed=Settings.getPlayerSpeedOptions()[pointerPlayerSpeedOptions];

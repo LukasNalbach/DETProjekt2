@@ -63,11 +63,6 @@ public class Imposter : Player
                 changeVentPosition();
             }
         }
-        if(activePlayer()&&Input.GetKeyDown(KeyCode.Q))
-        {
-            Game.Instance.startSabortageBournTrees();
-            //Game.Instance.startSabortage(Game.Instance.allSabortages[0]);
-        }
         base.Update();
     }
     public new void FixedUpdate()

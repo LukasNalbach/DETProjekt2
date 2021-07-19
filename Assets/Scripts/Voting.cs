@@ -51,6 +51,7 @@ public class Voting : MonoBehaviour
         {
             TextMeshProUGUI text=GameObject.Find("Canvas/Players/Player" + i + "/textName").GetComponent<TextMeshProUGUI>();
             text.color=Game.Instance.allPlayers[i].color;
+            GameObject.Find("Canvas/Players/Player" + i + "/textName/RawImage").SetActive(Game.Instance.GetComponent<swapPlayer>().currentPlayer.GetComponent<Player>() is Imposter && Game.Instance.allPlayers[i] is Imposter);
             if(!Game.Instance.allPlayers[i].isAlive())
             {
                 //Destroy(GameObject.Find("Canvas/Players/Player" + i));
