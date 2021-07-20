@@ -72,7 +72,7 @@ public class Voting : MonoBehaviour
         int votingTimeStart=t;
         while (t > 0) {
             t--;
-            if(votingTimeStart-t==15)
+            if(t==1)
             {
                 foreach(Player player in Game.Instance.allLivingPlayers())
                 {

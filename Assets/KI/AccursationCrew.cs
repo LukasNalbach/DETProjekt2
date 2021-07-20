@@ -98,7 +98,7 @@ public class AccursationCrew
             //Debug.Log(random+" ,"+ numbersSameVerdacht.Count);
             numberAcursedPlayer=numbersSameVerdacht[random];
         }
-        //Debug.Log("numberAcursedPlayer:"+numberAcursedPlayer+", greatestVerdacht: "+greatestVerdacht+", minSchwelleAccurcation"+minSchwelleAccurcation);
+        Debug.Log("numberAcursedPlayer:"+numberAcursedPlayer+", greatestVerdacht: "+greatestVerdacht+", minSchwelleAccurcation"+minSchwelleAccurcation);
         if(numberAcursedPlayer==-1)
         {
             Game.skip(nr);
@@ -131,7 +131,7 @@ public class AccursationCrew
     {
         if(verdacht[initiator]<=minSchwelleAccurcation*1.5&&verdacht[reciver]<=minSchwelleAccurcation)
         {
-            verdacht[reciver]/=2;
+            temporerVerdachtDurchPublicAccursation[reciver]-=0.5f;
         }
     }
     public void accuse(int initiator, int reciver)
